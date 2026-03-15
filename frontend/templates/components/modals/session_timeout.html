@@ -1,0 +1,63 @@
+<!-- Session Timeout Modal -->
+<div class="modal-overlay" id="sessionTimeoutModal" style="display: none;">
+    <div class="modal-content session-modal">
+        <div class="modal-icon">⏰</div>
+        <h3>Still There?</h3>
+        <p>You've been inactive for 25 minutes. You'll be logged out in 5 minutes for your security.</p>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="logoutNow()">Logout Now</button>
+            <button class="btn btn-primary" onclick="stayLoggedIn()">Stay Logged In</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.session-modal {
+    max-width: 400px;
+    text-align: center;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+}
+
+.modal-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+</style>

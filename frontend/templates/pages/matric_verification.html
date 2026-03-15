@@ -1,0 +1,110 @@
+{% extends "base/public_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+    <!-- Back Link -->
+    <a href="/" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C;">
+        <i class="fas fa-arrow-left me-2"></i> Back to Home
+    </a>
+
+    <!-- Progress -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <span>Step 1 of 3</span>
+            <span>33%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 33%"></div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+        <h2 class="text-center mb-4">🎓 Verify Your Student Status</h2>
+        
+        <p class="text-center mb-4" style="color: #B99B7C;">
+            Enter your matric number to confirm you're a registered student.
+        </p>
+
+        <form id="matricVerificationForm">
+            <div class="form-group">
+                <label class="form-label">Matric Number</label>
+                <input type="text" class="form-input" id="matricNumber" 
+                       placeholder="e.g., 202012345" required>
+                <small class="text-muted">Enter your 9-10 digit matric number</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" id="verifyBtn" disabled>
+                Continue to Verification
+            </button>
+        </form>
+
+        <!-- Info Card -->
+        <div class="info-card mt-4">
+            <span class="info-icon">💡</span>
+            <span>Your matric number is on your student ID card.</span>
+        </div>
+
+        <!-- Login Link -->
+        <p class="text-center mt-4">
+            Already have an account?
+            <a href="/login" style="color: #5D7A5C; font-weight: 600;">Login here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const matricInput = document.getElementById('matricNumber');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const form = document.getElementById('matricVerificationForm');
+
+    // Real-time validation
+    matricInput.addEventListener('input', function() {
+        const result = validateMatricNumber(this.value);
+        verifyBtn.disabled = !result.valid;
+        
+        if (this.value && !result.valid) {
+            this.classList.add('error');
+        } else {
+            this.classList.remove('error');
+        }
+    });
+
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const matricNumber = matricInput.value.trim();
+        const result = validateMatricNumber(matricNumber);
+        
+        if (!result.valid) {
+            flashMessages.error(result.message);
+            return;
+        }
+
+        // Show loading state
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
+
+        // Call API
+        const apiResult = await verifyMatricNumber(matricNumber);
+        
+        if (apiResult.success) {
+            // Store matric number for next step
+            sessionStorage.setItem('matricNumber', matricNumber);
+            flashMessages.success('Matric number verified!');
+            setTimeout(() => {
+                window.location.href = '/verify-student';
+            }, 2000);
+        } else {
+            flashMessages.error(apiResult.error || 'Verification failed');
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = 'Continue to Verification';
+        }
+    });
+});
+</script>
+{% endblock %}

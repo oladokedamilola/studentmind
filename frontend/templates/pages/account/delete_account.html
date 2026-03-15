@@ -1,0 +1,190 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/settings" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0 text-danger">⚠️ Delete Account</h2>
+    </div>
+
+    <!-- Warning Card -->
+    <div class="card border-danger mb-4">
+        <div class="card-body text-center">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">😢</div>
+            <h4 class="text-danger mb-3">We're sorry to see you go</h4>
+            <p class="mb-4">This action is permanent and cannot be undone. All your data will be permanently deleted.</p>
+        </div>
+    </div>
+
+    <!-- What Will Be Deleted -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">📋 This will delete:</h5>
+            
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    Your profile information
+                </li>
+                <li class="mb-2">
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    All chat history and conversations
+                </li>
+                <li class="mb-2">
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    Mood tracking history and insights
+                </li>
+                <li class="mb-2">
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    Saved resources and favorites
+                </li>
+                <li class="mb-2">
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    Assessment results and history
+                </li>
+                <li>
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    All personal data and settings
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- What Will Be Kept -->
+    <div class="card mb-4" style="background: #FDF6E9;">
+        <div class="card-body">
+            <h5 class="mb-3">💚 This will be kept (anonymized):</h5>
+            
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="fas fa-check-circle" style="color: #9CAF88;"></i>
+                    Anonymous usage statistics (no personal identifiers)
+                </li>
+                <li>
+                    <i class="fas fa-check-circle" style="color: #9CAF88;"></i>
+                    Aggregated data for research (fully anonymized)
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Alternatives -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">💡 Before you go, consider:</h5>
+            
+            <div class="alternative-option mb-3 p-3" style="border: 1px solid #E6E6FA; border-radius: 12px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Take a break instead</strong>
+                        <p class="small text-muted mb-0">Temporarily deactivate your account</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick="deactivateAccount()">
+                        Deactivate
+                    </button>
+                </div>
+            </div>
+            
+            <div class="alternative-option p-3" style="border: 1px solid #E6E6FA; border-radius: 12px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Adjust notification settings</strong>
+                        <p class="small text-muted mb-0">Reduce notification frequency</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick="window.location.href='/settings/notifications'">
+                        Adjust
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Form -->
+    <div class="card border-danger">
+        <div class="card-body">
+            <h5 class="mb-3">🔐 Confirm Account Deletion</h5>
+            
+            <form id="deleteForm" onsubmit="deleteAccount(event)">
+                <div class="mb-3">
+                    <label class="form-label">Enter your password to confirm</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Type "DELETE" to confirm</label>
+                    <input type="text" class="form-control" id="confirmText" required 
+                           pattern="DELETE" title='Please type "DELETE" exactly'>
+                </div>
+                
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="understand" required>
+                    <label class="form-check-label">
+                        I understand that this action is permanent and cannot be undone
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-danger w-100" id="deleteBtn">
+                    Permanently Delete My Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Support Contact -->
+    <div class="text-center mt-4">
+        <p class="text-muted">
+            Need help? <a href="/contact" style="color: #5D7A5C;">Contact Support</a>
+        </p>
+    </div>
+</div>
+
+<script>
+document.getElementById('confirmText').addEventListener('input', function() {
+    const deleteBtn = document.getElementById('deleteBtn');
+    deleteBtn.disabled = this.value !== 'DELETE';
+});
+
+function deleteAccount(event) {
+    event.preventDefault();
+    
+    const password = document.getElementById('password').value;
+    
+    if (!password) {
+        flashMessages.error('Please enter your password');
+        return;
+    }
+    
+    // Show loading
+    const btn = document.getElementById('deleteBtn');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    btn.disabled = true;
+    
+    // Final confirmation
+    if (confirm('Are you absolutely sure? This cannot be undone.')) {
+        // Simulate API call
+        setTimeout(() => {
+            flashMessages.warning('Account deletion requested. You will receive a confirmation email.');
+            
+            setTimeout(() => {
+                window.location.href = '/logout';
+            }, 3000);
+        }, 2000);
+    } else {
+        btn.innerHTML = 'Permanently Delete My Account';
+        btn.disabled = false;
+    }
+}
+
+function deactivateAccount() {
+    if (confirm('Deactivate your account temporarily? You can reactivate anytime by logging in.')) {
+        flashMessages.info('Account deactivated. You will be logged out.');
+        setTimeout(() => {
+            window.location.href = '/logout';
+        }, 2000);
+    }
+}
+</script>
+{% endblock %}

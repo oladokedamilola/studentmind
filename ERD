@@ -1,0 +1,31 @@
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│   Faculty       │       │   Department    │       │   Student       │
+├─────────────────┤       ├─────────────────┤       ├─────────────────┤
+│ id (PK)         │◄──────│ id (PK)         │       │ id (PK)         │
+│ name            │       │ name            │       │ matric_number   │
+│ code            │       │ code            │       │ first_name      │
+│ created_at      │       │ faculty_id (FK) │───┐   │ middle_name     │
+└─────────────────┘       │ created_at      │   │   │ last_name       │
+                          └─────────────────┘   │   │ email           │
+                                                │   │ department_id (FK)│
+                                                │   │ year_of_entry    │
+┌─────────────────┐       ┌─────────────────┐   │   │ status          │
+│   StudentAuth   │       │   AcademicYear  │   │   │ created_at      │
+├─────────────────┤       ├─────────────────┤   │   └─────────────────┘
+│ id (PK)         │       │ id (PK)         │   │           │
+│ student_id (FK) │───────│ year            │   │           │
+│ password_hash   │       │ is_current      │   │           │
+│ is_verified     │       └─────────────────┘   │           │
+│ last_login      │                              │           │
+│ created_at      │                              │           │
+└─────────────────┘                              │           │
+                                                  │           │
+                              ┌─────────────────┐ │           │
+                              │   Enrollment    │ │           │
+                              ├─────────────────┤ │           │
+                              │ id (PK)         │ │           │
+                              │ student_id (FK) │◀┘           │
+                              │ department_id (FK)│───────────┘
+                              │ academic_year_id(FK)│
+                              │ enrollment_date │
+                              └─────────────────┘

@@ -1,0 +1,116 @@
+{% extends "base/public_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+    <!-- Back Link -->
+    <a href="/verify-matric" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C;">
+        <i class="fas fa-arrow-left me-2"></i> Back to Edit Matric
+    </a>
+
+    <!-- Progress -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <span>Step 2 of 3</span>
+            <span>66%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 66%"></div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+        <h2 class="text-center mb-4">✅ Is this you?</h2>
+
+        <!-- Student Info Card -->
+        <div class="text-center mb-4">
+            <div style="width: 100px; height: 100px; background: #E6E6FA; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-graduate" style="font-size: 50px; color: #5D7A5C;"></i>
+            </div>
+            
+            <h3 id="studentName">John Michael Doe</h3>
+            <hr class="my-3">
+            
+            <div style="text-align: left;">
+                <p><strong>Matric:</strong> <span id="studentMatric">202012345</span></p>
+                <p><strong>Email:</strong> <span id="studentEmail">john.doe@uni.edu</span></p>
+                <p><strong>Department:</strong> <span id="studentDept">Computer Science</span></p>
+                <p><strong>Faculty:</strong> <span id="studentFaculty">Science</span></p>
+                <p><strong>Year of Entry:</strong> <span id="studentYear">2020</span></p>
+            </div>
+        </div>
+
+        <!-- Confirmation Question -->
+        <p class="text-center mb-4" style="font-weight: 600;">Is this information correct?</p>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-3">
+            <button class="btn btn-outline flex-grow-1" onclick="handleNo()">No, that's not me</button>
+            <button class="btn btn-primary flex-grow-1" onclick="handleYes()">Yes, Continue</button>
+        </div>
+
+        <!-- Privacy Note -->
+        <div class="info-card mt-4">
+            <span class="info-icon">🔒</span>
+            <span>We only use this to verify you're a student. Your data is encrypted.</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // Check if we have matric number
+    const matricNumber = sessionStorage.getItem('matricNumber');
+    if (!matricNumber) {
+        window.location.href = '/verify-matric';
+        return;
+    }
+
+    // Show loading state
+    showLoading();
+
+    // Fetch student data (mock for now - replace with actual API call)
+    setTimeout(() => {
+        // Mock data - replace with actual API call
+        document.getElementById('studentMatric').textContent = matricNumber;
+        document.getElementById('studentName').textContent = 'John Michael Doe';
+        document.getElementById('studentEmail').textContent = 'john.doe@uni.edu';
+        document.getElementById('studentDept').textContent = 'Computer Science';
+        document.getElementById('studentFaculty').textContent = 'Science';
+        document.getElementById('studentYear').textContent = '2020';
+        
+        hideLoading();
+    }, 1500);
+});
+
+function showLoading() {
+    // Show skeleton loading
+    document.querySelectorAll('h3, p, strong').forEach(el => {
+        el.classList.add('skeleton');
+    });
+}
+
+function hideLoading() {
+    document.querySelectorAll('.skeleton').forEach(el => {
+        el.classList.remove('skeleton');
+    });
+}
+
+function handleNo() {
+    flashMessages.info('Let\'s try again with a different matric number.');
+    sessionStorage.removeItem('matricNumber');
+    setTimeout(() => {
+        window.location.href = '/verify-matric';
+    }, 2000);
+}
+
+function handleYes() {
+    flashMessages.success('Information confirmed!');
+    setTimeout(() => {
+        window.location.href = '/create-password';
+    }, 2000);
+}
+</script>
+{% endblock %}

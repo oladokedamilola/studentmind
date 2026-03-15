@@ -1,0 +1,267 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/dashboard" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0">📊 How are you feeling today?</h2>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+        <div class="card-body">
+            <!-- Date -->
+            <div class="text-center mb-4">
+                <h5 class="mb-0">{{ now|date:"l, F j, Y" }}</h5>
+                <small class="text-muted">Daily Mood Check-in</small>
+            </div>
+
+            <!-- Mood Scale -->
+            <div class="mood-scale mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span style="color: #5D7A5C;">Very Low</span>
+                    <span style="color: #5D7A5C;">Excellent</span>
+                </div>
+                <div class="mood-buttons d-flex justify-content-between gap-2">
+                    <button class="mood-btn" data-value="1" onclick="selectMood(1)">
+                        <span class="mood-emoji">😭</span>
+                        <span class="mood-label">1</span>
+                    </button>
+                    <button class="mood-btn" data-value="2" onclick="selectMood(2)">
+                        <span class="mood-emoji">😟</span>
+                        <span class="mood-label">2</span>
+                    </button>
+                    <button class="mood-btn" data-value="3" onclick="selectMood(3)">
+                        <span class="mood-emoji">😐</span>
+                        <span class="mood-label">3</span>
+                    </button>
+                    <button class="mood-btn" data-value="4" onclick="selectMood(4)">
+                        <span class="mood-emoji">🙂</span>
+                        <span class="mood-label">4</span>
+                    </button>
+                    <button class="mood-btn" data-value="5" onclick="selectMood(5)">
+                        <span class="mood-emoji">😊</span>
+                        <span class="mood-label">5</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mood Descriptors -->
+            <div class="mood-descriptors mb-4" id="moodDescriptors" style="display: none;">
+                <label class="form-label">What words describe your feeling?</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Anxious')">Anxious</span>
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Stressed')">Stressed</span>
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Tired')">Tired</span>
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Calm')">Calm</span>
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Hopeful')">Hopeful</span>
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Motivated')">Motivated</span>
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Overwhelmed')">Overwhelmed</span>
+                    <span class="descriptor-pill" onclick="toggleDescriptor('Peaceful')">Peaceful</span>
+                </div>
+            </div>
+
+            <!-- Journal Note -->
+            <div class="journal-note mb-4">
+                <label class="form-label">Add a note (optional)</label>
+                <textarea class="form-control" rows="3" id="moodNote" placeholder="What's on your mind today?"></textarea>
+            </div>
+
+            <!-- Activities (optional) -->
+            <div class="activities mb-4">
+                <label class="form-label">What did you do today?</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="activity-pill" onclick="toggleActivity('Exercise')">🏃 Exercise</span>
+                    <span class="activity-pill" onclick="toggleActivity('Study')">📚 Study</span>
+                    <span class="activity-pill" onclick="toggleActivity('Social')">👥 Social</span>
+                    <span class="activity-pill" onclick="toggleActivity('Rest')">😴 Rest</span>
+                    <span class="activity-pill" onclick="toggleActivity('Meditation')">🧘 Meditation</span>
+                    <span class="activity-pill" onclick="toggleActivity('Nature')">🌳 Nature</span>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <button class="btn btn-primary w-100" id="saveBtn" onclick="saveMood()" disabled>
+                Save Today's Mood
+            </button>
+
+            <!-- Previous Entries Preview -->
+            <div class="previous-entries mt-4 pt-4 border-top">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Your Last 3 Entries</h6>
+                    <a href="/mood/history" style="color: #5D7A5C;">View Full History →</a>
+                </div>
+                
+                <div class="entry-preview d-flex justify-content-between align-items-center py-2">
+                    <div><span class="me-2">😐</span> Yesterday</div>
+                    <span class="text-muted">3 (Okay)</span>
+                </div>
+                <div class="entry-preview d-flex justify-content-between align-items-center py-2">
+                    <div><span class="me-2">😟</span> Monday</div>
+                    <span class="text-muted">2 (Low)</span>
+                </div>
+                <div class="entry-preview d-flex justify-content-between align-items-center py-2">
+                    <div><span class="me-2">🙂</span> Sunday</div>
+                    <span class="text-muted">4 (Good)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Motivational Quote -->
+    <div class="info-card mt-4 text-center">
+        <p class="mb-0" style="font-style: italic;">"Checking in with yourself is an act of self-love."</p>
+    </div>
+</div>
+
+<style>
+.mood-btn {
+    flex: 1;
+    background: white;
+    border: 2px solid #E6E6FA;
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.mood-btn:hover {
+    transform: translateY(-3px);
+    border-color: #9CAF88;
+}
+
+.mood-btn.selected {
+    background: #9CAF88;
+    border-color: #5D7A5C;
+}
+
+.mood-btn.selected .mood-emoji,
+.mood-btn.selected .mood-label {
+    color: white;
+}
+
+.mood-emoji {
+    font-size: 2rem;
+    color: #5D7A5C;
+}
+
+.mood-label {
+    font-weight: 600;
+    color: #5D7A5C;
+}
+
+.descriptor-pill, .activity-pill {
+    background: white;
+    border: 1px solid #E6E6FA;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.875rem;
+    color: #5D7A5C;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.descriptor-pill:hover, .activity-pill:hover,
+.descriptor-pill.selected, .activity-pill.selected {
+    background: #9CAF88;
+    color: white;
+    border-color: #9CAF88;
+}
+
+.entry-preview {
+    border-bottom: 1px solid #E6E6FA;
+}
+
+.entry-preview:last-child {
+    border-bottom: none;
+}
+</style>
+
+<script>
+let selectedMood = null;
+let selectedDescriptors = [];
+let selectedActivities = [];
+
+function selectMood(value) {
+    // Remove selected class from all mood buttons
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked button
+    event.currentTarget.classList.add('selected');
+    
+    // Store selected mood
+    selectedMood = value;
+    
+    // Show descriptors
+    document.getElementById('moodDescriptors').style.display = 'block';
+    
+    // Enable save button
+    document.getElementById('saveBtn').disabled = false;
+}
+
+function toggleDescriptor(descriptor) {
+    const pill = event.currentTarget;
+    pill.classList.toggle('selected');
+    
+    if (pill.classList.contains('selected')) {
+        selectedDescriptors.push(descriptor);
+    } else {
+        selectedDescriptors = selectedDescriptors.filter(d => d !== descriptor);
+    }
+}
+
+function toggleActivity(activity) {
+    const pill = event.currentTarget;
+    pill.classList.toggle('selected');
+    
+    if (pill.classList.contains('selected')) {
+        selectedActivities.push(activity);
+    } else {
+        selectedActivities = selectedActivities.filter(a => a !== activity);
+    }
+}
+
+function saveMood() {
+    if (!selectedMood) {
+        flashMessages.error('Please select a mood');
+        return;
+    }
+    
+    const note = document.getElementById('moodNote').value;
+    
+    // Show loading
+    const btn = document.getElementById('saveBtn');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+    btn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        flashMessages.success('Mood logged successfully! 🌟');
+        
+        // Reset form
+        selectedMood = null;
+        selectedDescriptors = [];
+        selectedActivities = [];
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        document.querySelectorAll('.descriptor-pill, .activity-pill').forEach(pill => {
+            pill.classList.remove('selected');
+        });
+        document.getElementById('moodNote').value = '';
+        document.getElementById('moodDescriptors').style.display = 'none';
+        
+        btn.innerHTML = 'Save Today\'s Mood';
+        btn.disabled = true;
+    }, 1500);
+}
+</script>
+{% endblock %}

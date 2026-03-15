@@ -1,0 +1,261 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/assessments" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+            <h2 class="mb-0">PHQ-9 Depression Scale</h2>
+            <small class="text-muted">Question 3 of 9</small>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container mb-4">
+        <div class="d-flex justify-content-between mb-2">
+            <span>Progress</span>
+            <span>33%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 33%"></div>
+        </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-4">Over the last 2 weeks, how often have you been bothered by:</h5>
+            
+            <div class="question-box p-4 mb-4" style="background: #FDF6E9; border-radius: 16px;">
+                <h4 class="text-center mb-0" style="color: #5D7A5C;">Trouble falling asleep, staying asleep, or sleeping too much</h4>
+            </div>
+
+            <!-- Options -->
+            <div class="options-container">
+                <div class="option-item mb-3" onclick="selectOption(0)">
+                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
+                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
+                        <span>Not at all</span>
+                    </div>
+                </div>
+                
+                <div class="option-item mb-3" onclick="selectOption(1)">
+                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
+                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
+                        <span>Several days</span>
+                    </div>
+                </div>
+                
+                <div class="option-item mb-3" onclick="selectOption(2)">
+                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
+                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
+                        <span>More than half the days</span>
+                    </div>
+                </div>
+                
+                <div class="option-item mb-4" onclick="selectOption(3)">
+                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
+                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
+                        <span>Nearly every day</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline flex-grow-1" onclick="previousQuestion()">
+                    <i class="fas fa-chevron-left me-2"></i>Previous
+                </button>
+                <button class="btn btn-primary flex-grow-1" onclick="nextQuestion()" id="nextBtn" disabled>
+                    Next<i class="fas fa-chevron-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="question-indicator text-center">
+        <span class="text-muted">Question <strong>3</strong> of <strong>9</strong></span>
+        <div class="dots-container mt-2">
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+
+    <!-- Save & Exit -->
+    <div class="text-center mt-4">
+        <button class="btn btn-link" style="color: #B99B7C;" onclick="saveAndExit()">
+            <i class="fas fa-save me-2"></i>Save and Exit
+        </button>
+    </div>
+</div>
+
+<style>
+.option-item .d-flex:hover {
+    background: #E6E6FA;
+    border-color: #9CAF88 !important;
+}
+
+.option-item.selected .d-flex {
+    background: #9CAF88;
+    border-color: #5D7A5C !important;
+    color: white;
+}
+
+.option-item.selected .option-radio {
+    background: white;
+    border-color: white;
+}
+
+.dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #E6E6FA;
+    border-radius: 50%;
+    margin: 0 3px;
+}
+
+.dot.completed {
+    background: #9CAF88;
+}
+
+.dot.active {
+    background: #5D7A5C;
+    transform: scale(1.3);
+}
+</style>
+
+<script>
+let selectedOption = null;
+const totalQuestions = 9;
+let currentQuestion = 3;
+
+function selectOption(index) {
+    // Remove selected class from all options
+    document.querySelectorAll('.option-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked option
+    event.currentTarget.classList.add('selected');
+    
+    // Store selection
+    selectedOption = index;
+    
+    // Enable next button
+    document.getElementById('nextBtn').disabled = false;
+}
+
+function previousQuestion() {
+    if (currentQuestion > 1) {
+        currentQuestion--;
+        updateQuestion();
+    }
+}
+
+function nextQuestion() {
+    if (selectedOption === null) {
+        flashMessages.warning('Please select an answer before continuing');
+        return;
+    }
+    
+    if (currentQuestion < totalQuestions) {
+        // Save answer
+        saveAnswer(currentQuestion, selectedOption);
+        
+        // Move to next question
+        currentQuestion++;
+        
+        if (currentQuestion <= totalQuestions) {
+            updateQuestion();
+        } else {
+            // Complete assessment
+            completeAssessment();
+        }
+    }
+}
+
+function updateQuestion() {
+    // Show loading
+    flashMessages.info(`Loading question ${currentQuestion}...`);
+    
+    // Reset selection
+    selectedOption = null;
+    document.getElementById('nextBtn').disabled = true;
+    document.querySelectorAll('.option-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Update progress
+    const progress = (currentQuestion / totalQuestions) * 100;
+    document.querySelector('.progress-fill').style.width = `${progress}%`;
+    document.querySelector('.progress-container span:last-child').textContent = `${Math.round(progress)}%`;
+    
+    // Update question text (in production, fetch from backend)
+    const questions = [
+        "Little interest or pleasure in doing things",
+        "Feeling down, depressed, or hopeless",
+        "Trouble falling asleep, staying asleep, or sleeping too much",
+        "Feeling tired or having little energy",
+        "Poor appetite or overeating",
+        "Feeling bad about yourself",
+        "Trouble concentrating on things",
+        "Moving or speaking so slowly that others could notice",
+        "Thoughts that you would be better off dead"
+    ];
+    
+    document.querySelector('.question-box h4').textContent = questions[currentQuestion - 1];
+    document.querySelector('.question-indicator strong:first-child').textContent = currentQuestion;
+    
+    // Update dots
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, index) => {
+        dot.classList.remove('completed', 'active');
+        if (index + 1 < currentQuestion) {
+            dot.classList.add('completed');
+        } else if (index + 1 === currentQuestion) {
+            dot.classList.add('active');
+        }
+    });
+}
+
+function saveAnswer(question, answer) {
+    console.log(`Saved question ${question}: option ${answer}`);
+    // In production, send to backend
+}
+
+function completeAssessment() {
+    flashMessages.success('Assessment completed! Calculating results...');
+    
+    // Show loading
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    nextBtn.disabled = true;
+    
+    // Simulate calculation
+    setTimeout(() => {
+        window.location.href = '/assessments/results/phq9';
+    }, 2000);
+}
+
+function saveAndExit() {
+    if (confirm('Save your progress and exit? You can continue later.')) {
+        flashMessages.success('Progress saved');
+        setTimeout(() => {
+            window.location.href = '/assessments';
+        }, 1500);
+    }
+}
+</script>
+{% endblock %}

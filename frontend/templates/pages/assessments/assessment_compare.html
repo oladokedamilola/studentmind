@@ -1,0 +1,301 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/assessments/history" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0">📊 Compare Assessment Results</h2>
+    </div>
+
+    <!-- Assessment Selector -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">Select Assessment Type</label>
+                    <select class="form-select" onchange="changeAssessmentType(this.value)">
+                        <option value="phq9" selected>PHQ-9 (Depression)</option>
+                        <option value="gad7">GAD-7 (Anxiety)</option>
+                        <option value="pss">PSS (Stress)</option>
+                    </select>
+                </div>
+                <div class="col-md-7">
+                    <label class="form-label">Time Range</label>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline flex-grow-1 active">3 Months</button>
+                        <button class="btn btn-outline flex-grow-1">6 Months</button>
+                        <button class="btn btn-outline flex-grow-1">1 Year</button>
+                        <button class="btn btn-outline flex-grow-1">All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Comparison Chart -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">PHQ-9 Score Trend</h5>
+            <canvas id="comparisonChart" style="height: 300px;"></canvas>
+            
+            <!-- Legend -->
+            <div class="d-flex justify-content-center gap-4 mt-3">
+                <div class="d-flex align-items-center">
+                    <div style="width: 12px; height: 12px; background: #9CAF88; border-radius: 3px; margin-right: 6px;"></div>
+                    <span>Your Scores</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div style="width: 12px; height: 12px; background: #E6E6FA; border-radius: 3px; margin-right: 6px;"></div>
+                    <span>Average</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div style="width: 12px; height: 12px; background: #B99B7C; border-radius: 3px; margin-right: 6px;"></div>
+                    <span>Improvement Trend</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <small class="text-muted">Starting Score</small>
+                <h3>14</h3>
+                <span class="text-muted">Feb 15, 2025</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <small class="text-muted">Current Score</small>
+                <h3>12</h3>
+                <span class="text-muted">Mar 15, 2025</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <small class="text-muted">Change</small>
+                <h3 style="color: #51cf66;">-2</h3>
+                <span class="badge" style="background: #51cf66; color: white;">Improving</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <small class="text-muted">Improvement Rate</small>
+                <h3>14%</h3>
+                <span class="text-muted">over 30 days</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Comparison Table -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">📋 Detailed Comparison</h5>
+            
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr style="background: #FDF6E9;">
+                            <th>Date</th>
+                            <th>Score</th>
+                            <th>Severity</th>
+                            <th>Change</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mar 15, 2025</td>
+                            <td><strong>12</strong></td>
+                            <td><span class="badge" style="background: #9CAF88; color: white;">Moderate</span></td>
+                            <td style="color: #51cf66;">↓ -3</td>
+                            <td><i class="fas fa-check-circle" style="color: #51cf66;"></i> Improvement</td>
+                        </tr>
+                        <tr>
+                            <td>Mar 1, 2025</td>
+                            <td><strong>15</strong></td>
+                            <td><span class="badge" style="background: #5D7A5C; color: white;">Mod-Severe</span></td>
+                            <td style="color: #ff6b6b;">↑ +1</td>
+                            <td><i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i> Slight increase</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 15, 2025</td>
+                            <td><strong>14</strong></td>
+                            <td><span class="badge" style="background: #9CAF88; color: white;">Moderate</span></td>
+                            <td>-</td>
+                            <td>Baseline</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights Card -->
+    <div class="card" style="background: #FDF6E9;">
+        <div class="card-body">
+            <h5 class="mb-3">🧠 Insights & Patterns</h5>
+            
+            <div class="insights-grid">
+                <div class="insight-item mb-3">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="fas fa-calendar-check" style="color: #9CAF88; font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>Your lowest scores are on Mondays</strong>
+                            <p class="small text-muted mb-0">Consider scheduling self-care activities on Sunday evenings</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-item mb-3">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="fas fa-chart-line" style="color: #9CAF88; font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>15% improvement over 3 months</strong>
+                            <p class="small text-muted mb-0">You're making steady progress. Keep up the good work!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-item">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="fas fa-lightbulb" style="color: #9CAF88; font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>Correlation detected</strong>
+                            <p class="small text-muted mb-0">Your mood scores improve after exercise days</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-3 mt-4">
+        <button class="btn btn-outline flex-grow-1" onclick="exportComparison()">
+            <i class="fas fa-download me-2"></i>Export Report
+        </button>
+        <button class="btn btn-primary flex-grow-1" onclick="window.location.href='/assessments/take/phq9'">
+            <i class="fas fa-plus-circle me-2"></i>Take New Assessment
+        </button>
+    </div>
+</div>
+
+<style>
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.table td, .table th {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.insight-item {
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.insight-item:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-soft);
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeComparisonChart();
+});
+
+function initializeComparisonChart() {
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Feb 15', 'Mar 1', 'Mar 15'],
+            datasets: [
+                {
+                    label: 'Your Score',
+                    data: [14, 15, 12],
+                    borderColor: '#9CAF88',
+                    backgroundColor: 'rgba(156, 175, 136, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#5D7A5C',
+                    pointRadius: 6
+                },
+                {
+                    label: 'Student Average',
+                    data: [13, 13, 13],
+                    borderColor: '#E6E6FA',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Trend Line',
+                    data: [14, 13.5, 13],
+                    borderColor: '#B99B7C',
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 27,
+                    title: {
+                        display: true,
+                        text: 'PHQ-9 Score'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function changeAssessmentType(type) {
+    flashMessages.info(`Loading ${type.toUpperCase()} data...`);
+    
+    // In production, update chart with new data
+    setTimeout(() => {
+        flashMessages.success('Chart updated');
+    }, 1000);
+}
+
+function exportComparison() {
+    flashMessages.success('Generating comparison report...');
+    setTimeout(() => {
+        flashMessages.info('Report downloaded');
+    }, 1500);
+}
+</script>
+{% endblock %}

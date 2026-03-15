@@ -1,0 +1,390 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/dashboard" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0">⚙️ Account Settings</h2>
+    </div>
+
+    <!-- Settings Navigation -->
+    <div class="settings-nav mb-4">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <button class="settings-tab active w-100" onclick="showSection('profile')">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="settings-tab w-100" onclick="showSection('security')">
+                    <i class="fas fa-lock"></i>
+                    <span>Security</span>
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="settings-tab w-100" onclick="showSection('notifications')">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="settings-tab w-100" onclick="showSection('privacy')">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Privacy</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div id="profile-section" class="settings-section">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="mb-4">Profile Information</h5>
+                
+                <form id="profileForm" onsubmit="updateProfile(event)">
+                    <div class="text-center mb-4">
+                        <div class="profile-pic-wrapper position-relative d-inline-block">
+                            <div style="width: 100px; height: 100px; background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-user-graduate" style="font-size: 50px; color: #5D7A5C;"></i>
+                            </div>
+                            <button class="btn btn-sm btn-primary position-absolute" style="bottom: 0; right: 0; border-radius: 50%;" onclick="changePhoto()">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" value="John" disabled>
+                            <small class="text-muted">Contact support to change name</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" value="Doe" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="john.doe@uni.edu" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Matric Number</label>
+                            <input type="text" class="form-control" value="202012345" disabled>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" rows="3" placeholder="Tell us a little about yourself...">Computer Science student passionate about mental health awareness.</textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-4">Student Information</h5>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Department</label>
+                        <input type="text" class="form-control" value="Computer Science" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Faculty</label>
+                        <input type="text" class="form-control" value="Science" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Level</label>
+                        <input type="text" class="form-control" value="300L" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Year of Entry</label>
+                        <input type="text" class="form-control" value="2020" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Section (hidden by default) -->
+    <div id="security-section" class="settings-section" style="display: none;">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="mb-4">Change Password</h5>
+                
+                <form onsubmit="changePassword(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-4">Two-Factor Authentication</h5>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <strong>Enable 2FA</strong>
+                        <p class="small text-muted mb-0">Add an extra layer of security to your account</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="twoFactorSwitch">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Login Alerts</strong>
+                        <p class="small text-muted mb-0">Get notified of new logins to your account</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="loginAlertsSwitch" checked>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Section (hidden by default) -->
+    <div id="notifications-section" class="settings-section" style="display: none;">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-4">Notification Preferences</h5>
+                
+                <div class="notification-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <strong>Email Notifications</strong>
+                        <p class="small text-muted mb-0">Receive updates and reminders via email</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                    </div>
+                </div>
+                
+                <div class="notification-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <strong>Push Notifications</strong>
+                        <p class="small text-muted mb-0">Browser notifications for real-time updates</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="pushNotifications" checked>
+                    </div>
+                </div>
+                
+                <div class="notification-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <strong>Mood Reminders</strong>
+                        <p class="small text-muted mb-0">Daily reminders to log your mood</p>
+                    </div>
+                    <div>
+                        <select class="form-select form-select-sm">
+                            <option>9:00 AM</option>
+                            <option>12:00 PM</option>
+                            <option>6:00 PM</option>
+                            <option selected>8:00 PM</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="notification-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <strong>Assessment Reminders</strong>
+                        <p class="small text-muted mb-0">Reminders to take regular assessments</p>
+                    </div>
+                    <div>
+                        <select class="form-select form-select-sm">
+                            <option>Weekly</option>
+                            <option selected>Bi-weekly</option>
+                            <option>Monthly</option>
+                            <option>Never</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="notification-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Resource Recommendations</strong>
+                        <p class="small text-muted mb-0">Get personalized resource suggestions</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="resourceRecommendations" checked>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary mt-4" onclick="saveNotificationSettings()">
+                    Save Preferences
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Section (hidden by default) -->
+    <div id="privacy-section" class="settings-section" style="display: none;">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="mb-4">Privacy Settings</h5>
+                
+                <div class="privacy-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <strong>Share Anonymous Data</strong>
+                        <p class="small text-muted mb-0">Help improve our services by sharing anonymous usage data</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="shareData" checked>
+                    </div>
+                </div>
+                
+                <div class="privacy-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <strong>Profile Visibility</strong>
+                        <p class="small text-muted mb-0">Make my profile visible to counselors</p>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="profileVisibility">
+                    </div>
+                </div>
+                
+                <div class="privacy-item">
+                    <div>
+                        <strong>Data Export</strong>
+                        <p class="small text-muted mb-2">Download a copy of your data</p>
+                        <button class="btn btn-outline" onclick="exportData()">
+                            <i class="fas fa-download me-2"></i>Export My Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-danger">
+            <div class="card-body">
+                <h5 class="mb-4 text-danger">Danger Zone</h5>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Delete Account</strong>
+                        <p class="small text-muted mb-0">Permanently delete your account and all data</p>
+                    </div>
+                    <button class="btn btn-outline-danger" onclick="confirmDeleteAccount()">
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.settings-tab {
+    padding: 1rem;
+    background: white;
+    border: 1px solid #E6E6FA;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.settings-tab i {
+    font-size: 1.5rem;
+    color: #9CAF88;
+}
+
+.settings-tab:hover {
+    background: #E6E6FA;
+    transform: translateY(-2px);
+}
+
+.settings-tab.active {
+    background: #9CAF88;
+    border-color: #5D7A5C;
+    color: white;
+}
+
+.settings-tab.active i {
+    color: white;
+}
+
+.notification-item, .privacy-item {
+    transition: var(--transition);
+}
+
+.notification-item:hover, .privacy-item:hover {
+    background: #FDF6E9;
+    padding-left: 10px;
+}
+</style>
+
+<script>
+function showSection(section) {
+    // Update tabs
+    document.querySelectorAll('.settings-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    
+    // Show selected section
+    document.querySelectorAll('.settings-section').forEach(sec => {
+        sec.style.display = 'none';
+    });
+    document.getElementById(`${section}-section`).style.display = 'block';
+}
+
+function updateProfile(event) {
+    event.preventDefault();
+    flashMessages.success('Profile updated successfully!');
+}
+
+function changePassword(event) {
+    event.preventDefault();
+    flashMessages.success('Password changed successfully!');
+}
+
+function changePhoto() {
+    flashMessages.info('Photo upload feature coming soon!');
+}
+
+function saveNotificationSettings() {
+    flashMessages.success('Notification preferences saved!');
+}
+
+function exportData() {
+    flashMessages.success('Preparing your data for export...');
+    setTimeout(() => {
+        flashMessages.info('Data export complete');
+    }, 2000);
+}
+
+function confirmDeleteAccount() {
+    if (confirm('Are you absolutely sure? This action cannot be undone.')) {
+        if (confirm('This will permanently delete all your data. Type "DELETE" to confirm.')) {
+            flashMessages.warning('Account deletion requested');
+        }
+    }
+}
+</script>
+{% endblock %}

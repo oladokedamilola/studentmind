@@ -1,6 +1,6 @@
 # Core Django
 Django
-#djangorestframework
+djangorestframework
 #django-cors-headers
 
 # Database

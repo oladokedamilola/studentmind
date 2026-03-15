@@ -1,0 +1,173 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header with Actions -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <h1 class="mb-3 mb-md-0">💬 Your Conversations</h1>
+        <div class="d-flex gap-2 w-100 w-md-auto">
+            <div class="position-relative flex-grow-1">
+                <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #B99B7C;"></i>
+                <input type="text" class="form-control" placeholder="Search conversations" style="padding-left: 40px;" id="searchInput">
+            </div>
+            <a href="/chat/new" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Chat
+            </a>
+        </div>
+    </div>
+
+    <!-- Conversations List -->
+    <div class="conversations-container">
+        <!-- Today's Conversations -->
+        <div class="mb-4">
+            <h6 class="text-muted mb-3" style="font-size: 0.9rem; letter-spacing: 0.5px;">TODAY</h6>
+            
+            <div class="conversation-item-card" onclick="window.location.href='/chat/1'" style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-comment" style="color: #5D7A5C;"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-1">Exam Anxiety Support</h6>
+                            <small class="text-muted">2:30 PM</small>
+                        </div>
+                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">I'm really anxious about my exams next week...</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge" style="background: #9CAF88; color: white;">3 messages</span>
+                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation-item-card mt-2" onclick="window.location.href='/chat/2'" style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-moon" style="color: #5D7A5C;"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-1">Sleep Issues Discussion</h6>
+                            <small class="text-muted">11:20 AM</small>
+                        </div>
+                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">Can't sleep at night, keep waking up at 3am...</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge" style="background: #ff6b6b; color: white;">1 new</span>
+                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">8 messages</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yesterday's Conversations -->
+        <div class="mb-4">
+            <h6 class="text-muted mb-3" style="font-size: 0.9rem; letter-spacing: 0.5px;">YESTERDAY</h6>
+            
+            <div class="conversation-item-card" onclick="window.location.href='/chat/3'" style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-heart-broken" style="color: #5D7A5C;"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-1">Relationship Stress</h6>
+                            <small class="text-muted">8:45 PM</small>
+                        </div>
+                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">We had a big argument and I don't know what to do...</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">12 messages</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Week -->
+        <div class="mb-4">
+            <h6 class="text-muted mb-3" style="font-size: 0.9rem; letter-spacing: 0.5px;">LAST WEEK</h6>
+            
+            <div class="conversation-item-card" onclick="window.location.href='/chat/4'" style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-brain" style="color: #5D7A5C;"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-1">Procrastination & Focus</h6>
+                            <small class="text-muted">Mon</small>
+                        </div>
+                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">Can't focus on my assignments, keep procrastinating...</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">15 messages</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load More Button -->
+    <div class="text-center mt-4">
+        <button class="btn btn-outline" onclick="loadMoreConversations()">
+            <i class="fas fa-chevron-down me-2"></i>Load More
+        </button>
+    </div>
+</div>
+
+<style>
+.conversation-item-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.conversation-item-card:hover {
+    transform: translateX(5px);
+    border-color: #9CAF88;
+    box-shadow: 0 5px 15px rgba(93, 122, 92, 0.1);
+}
+
+.badge {
+    padding: 0.35rem 0.65rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+</style>
+
+<script>
+function loadMoreConversations() {
+    // Show loading
+    const btn = event.target.closest('button');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+    btn.disabled = true;
+    
+    // Simulate loading more conversations
+    setTimeout(() => {
+        flashMessages.info('No more conversations to load');
+        btn.innerHTML = '<i class="fas fa-check me-2"></i>All Loaded';
+    }, 1500);
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const conversations = document.querySelectorAll('.conversation-item-card');
+    
+    conversations.forEach(conv => {
+        const title = conv.querySelector('h6').textContent.toLowerCase();
+        const preview = conv.querySelector('p').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || preview.includes(searchTerm)) {
+            conv.style.display = 'block';
+        } else {
+            conv.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

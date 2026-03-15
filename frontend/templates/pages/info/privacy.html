@@ -1,0 +1,78 @@
+{% extends "base/public_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <!-- Header -->
+    <div class="mb-4">
+        <a href="/" class="btn btn-link ps-0" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
+        <h1 class="mt-3">Privacy Policy</h1>
+        <p class="text-muted">Last updated: March 15, 2025</p>
+    </div>
+
+    <!-- Privacy Content -->
+    <div class="card">
+        <div class="card-body">
+            <!-- Summary -->
+            <div class="info-card mb-4">
+                <span class="info-icon">🔒</span>
+                <div>
+                    <strong>TL;DR:</strong> Your privacy is our top priority. We never sell your data, and all personal information is encrypted.
+                </div>
+            </div>
+
+            <!-- Sections -->
+            <div class="privacy-section mb-4">
+                <h5 class="mb-3">1. Information We Collect</h5>
+                <p>We collect minimal information necessary to provide our services:</p>
+                <ul>
+                    <li>Account information (matric number, email)</li>
+                    <li>Chat conversations (anonymized for training)</li>
+                    <li>Mood tracking data</li>
+                    <li>Assessment responses</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section mb-4">
+                <h5 class="mb-3">2. How We Protect Your Data</h5>
+                <ul>
+                    <li>End-to-end encryption for all chats</li>
+                    <li>Anonymous student IDs - we never store your name with your data</li>
+                    <li>Regular security audits</li>
+                    <li>GDPR and institutional compliance</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section mb-4">
+                <h5 class="mb-3">3. Data Sharing</h5>
+                <p>We only share data in these limited circumstances:</p>
+                <ul>
+                    <li>With your explicit consent</li>
+                    <li>For crisis intervention (if you're in danger)</li>
+                    <li>Anonymized data for research (you can opt out)</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section mb-4">
+                <h5 class="mb-3">4. Your Rights</h5>
+                <ul>
+                    <li>Access your data anytime</li>
+                    <li>Delete your account and all data</li>
+                    <li>Export your data</li>
+                    <li>Opt out of research</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h5 class="mb-3">5. Contact Us</h5>
+                <p>For privacy concerns, contact our Data Protection Officer:</p>
+                <p>
+                    <i class="fas fa-envelope me-2" style="color: #9CAF88;"></i> privacy@mindhaven.com<br>
+                    <i class="fas fa-phone me-2" style="color: #9CAF88;"></i> +234 (0) 123 456 789
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

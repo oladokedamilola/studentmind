@@ -1,0 +1,635 @@
+🗺️ UPDATED: Complete Development Roadmap - StudentMind PWA
+With Student Verification System & PythonAnywhere Deployment
+Project Overview
+App Name: StudentMind
+
+Type: PWA Mental Health Support Chat Application
+
+Stack: Django + Bootstrap 5 + JavaScript + OpenAI API
+
+Authentication: Matric Number-based Student Verification System
+
+Deployment Target: PythonAnywhere
+
+Phase 0: Project Foundation 🏗️
+Duration: 1 Week
+
+Objectives:
+Create local project folder structure with separate directories for backend, frontend, documentation, and tests
+
+Set up Python virtual environment
+
+Install core dependencies: Django, Django REST Framework, OpenAI SDK, database drivers, and PWA utilities
+
+Create requirements.txt file listing all project dependencies
+
+Create runtime.txt specifying Python version for PythonAnywhere compatibility
+
+Initialize Git repository locally
+
+Create GitHub repository named "studentmind-pwa"
+
+Draft comprehensive README.md with project overview, features, tech stack, setup instructions, and deployment target
+
+Push initial commit to GitHub
+
+Establish branch strategy (main, develop, feature branches)
+
+Create .env.example template for environment variables
+
+Phase 1: Backend Foundation 🔧
+Duration: 2 Weeks
+
+Objectives:
+Initialize Django project with optimal structure (manage.py in root)
+
+Configure Django settings with environment-specific separation (base, development, production)
+
+Set up environment variables handling for local and production use
+
+Configure database connections (SQLite for development, MySQL for PythonAnywhere production)
+
+Set up Django REST Framework
+
+Create core Django apps: accounts, chat, openai_integration, emergency, resources
+
+Design database models for anonymous user sessions
+
+Design database models for conversation threads and messages
+
+Design database models for resource library items
+
+Design database models for mood tracking entries
+
+Design database models for emergency flags and crisis incidents
+
+Implement anonymous session management without requiring user accounts
+
+Set up OpenAI API client configuration
+
+Implement rate limiting for API requests
+
+Configure CORS settings for PWA frontend access
+
+Set up basic encryption utilities for message handling
+
+Configure Django admin interface for content management
+
+Set up testing framework with initial test cases
+
+Phase 1.5: Student Verification System 🎓
+Duration: 1 Week
+
+Database Design Objectives:
+Create normalized university database schema with Faculty, Department, and Student tables
+
+Design StudentAuth model for secure authentication (separate from core student data)
+
+Create AcademicYear and Enrollment models for comprehensive student tracking
+
+Implement proper foreign key relationships to eliminate data redundancy
+
+Data Import Objectives:
+Create management command for importing student data from JSON files
+
+Design JSON structure with nested faculty and department information
+
+Implement dry-run mode for validation before actual import
+
+Create sample student data file for testing
+
+Set up automatic academic year generation from student records
+
+Authentication API Objectives:
+Matric Number Verification Endpoint: POST /api/university/verify-matric/ - Check if student exists in database
+
+Password Creation Endpoint: POST /api/university/create-password/ - Allow verified students to set password
+
+Login Endpoint: POST /api/university/login/ - Authenticate with matric number + password
+
+Logout Endpoint: POST /api/university/logout/ - End user session
+
+Current User Endpoint: GET /api/university/me/ - Retrieve logged-in student information
+
+Password Change Endpoint: POST /api/university/change-password/ - Update password for authenticated users
+
+Session Check Endpoint: POST /api/university/check-session/ - Validate active session
+
+Security Objectives:
+Implement password hashing using Django's built-in make_password
+
+Add login attempt limiting (5 attempts before 30-minute lockout)
+
+Create session-based authentication (no tokens stored client-side)
+
+Implement password strength validation (minimum 8 chars, uppercase, lowercase, numbers)
+
+Separate authentication data from core student information
+
+Add account locking mechanism for brute force protection
+
+Admin Interface Objectives:
+Register all models with customized Django admin
+
+Create inline admin for StudentAuth within Student admin
+
+Add search and filter capabilities for all models
+
+Implement read-only fields for sensitive data
+
+Create comprehensive list displays with key information
+
+Testing Objectives:
+Create test script for complete authentication flow
+
+Test edge cases (invalid matric, already registered, wrong password)
+
+Verify account locking after multiple failed attempts
+
+Test session persistence and expiry
+
+Validate password strength enforcement
+
+Phase 2: Chat API Development 💬
+Duration: 2 Weeks
+
+Objectives:
+Create API endpoints for sending messages
+
+Create API endpoints for retrieving message history
+
+Implement conversation threading logic
+
+Add pagination for message history retrieval
+
+Design system prompts for various mental health scenarios (general anxiety, academic stress, relationship issues)
+
+Create prompt templates for consistent AI responses
+
+Implement context window management for ongoing conversations
+
+Build keyword and phrase detection for crisis identification
+
+Implement sentiment analysis for emotional tone detection
+
+Design escalation protocols for crisis situations
+
+Create emergency response message templates
+
+Implement basic priority queue for message processing
+
+Set up asynchronous task handling for long-running processes
+
+Create Celery task queue configuration for PythonAnywhere compatibility
+
+Configure Redis as message broker for task queue
+
+Implement retry logic for failed API calls
+
+Create Django admin customizations for monitoring conversations
+
+Add anonymized conversation monitoring interface
+
+Implement resource management interface for administrators
+
+Create basic analytics dashboard for usage tracking
+
+Phase 3: Frontend Development - Authentication UI 🎨
+Duration: 1 Week (New Sub-phase)
+
+Objectives:
+Create login page with matric number and password fields
+
+Build registration flow with three steps:
+
+Step 1: Matric number input form
+
+Step 2: Student verification display page (shows name, department, faculty for confirmation)
+
+Step 3: Password creation form with strength validation
+
+Implement password reset/change interface
+
+Create dashboard/homepage showing logged-in student information
+
+Build session timeout warning modal
+
+Add logout confirmation dialog
+
+Create error message displays for authentication failures
+
+Implement loading states for API calls
+
+Design responsive authentication pages for mobile devices
+
+Add form validation before submission
+
+Create "Remember Me" functionality for session persistence
+
+Phase 3.5: Frontend Development - Main Application 🎨
+Duration: 2 Weeks
+
+Objectives:
+Set up Django template directory structure
+
+Create base HTML template with Bootstrap 5 integration
+
+Add responsive meta tags for mobile optimization
+
+Design and implement chat message interface with message bubbles
+
+Create message input area with send button
+
+Implement timestamp display for messages
+
+Design floating emergency button for crisis situations
+
+Create loading states and typing indicators
+
+Set up JavaScript module structure
+
+Implement API service layer for backend communication
+
+Create DOM manipulation utilities for dynamic content
+
+Add event handlers for user interactions
+
+Implement session management (use student session instead of anonymous)
+
+Add session expiry handling with renewal options
+
+Implement reconnection logic for dropped connections
+
+Create polling mechanism for real-time message updates
+
+Add error handling and user-friendly error messages
+
+Create 404 and 500 error pages
+
+Implement responsive design for mobile devices
+
+Test frontend across different screen sizes and browsers
+
+Phase 4: PWA Implementation 📱
+Duration: 2 Weeks
+
+Objectives:
+Create manifest.json file with app metadata
+
+Define app icons in multiple sizes for different devices
+
+Configure theme colors and display modes
+
+Register service worker for offline capabilities
+
+Implement cache strategies for static assets
+
+Create offline fallback page for when network is unavailable
+
+Implement message queuing for offline message storage
+
+Add background sync functionality for queued messages
+
+Design offline indicators to inform users of connectivity status
+
+Set up push notification service
+
+Create notification templates for follow-ups and new resources
+
+Implement permission handling for notifications
+
+Add notification preferences for users
+
+Design install prompt for first-time visitors
+
+Create splash screen for app loading
+
+Implement app shortcut icons
+
+Design first-run experience for new users
+
+Test PWA installability on various devices (Android, iOS, desktop)
+
+Verify offline functionality works as expected
+
+Ensure all static assets are cacheable and versioned
+
+Phase 5: Advanced Features 🚀
+Duration: 2 Weeks
+
+Objectives:
+Create mood tracking interface with emoji or scale-based input
+
+Implement daily check-in reminders
+
+Add data visualization for mood patterns using Chart.js
+
+Create mood history view for users to track progress
+
+Generate basic insights from mood patterns (optionally segmented by faculty/department)
+
+Build content-based recommendation system for resources
+
+Tag resources with relevant categories (anxiety, stress, exams)
+
+Track user interactions with resources
+
+Implement similarity matching for personalized recommendations
+
+Create "Recommended for you" section on resources page
+
+Add search functionality for resource library
+
+Enhance priority queue with scoring algorithm
+
+Implement keyword weight calculation for message urgency
+
+Add sentiment score integration to priority calculation
+
+Create counselor dashboard for monitoring urgent messages
+
+Implement real-time alerts for high-priority messages
+
+Add user preferences for personalization
+
+Implement topic interests tracking
+
+Create personalized greetings based on usage patterns
+
+Add session context memory for conversation continuity
+
+Build comprehensive analytics dashboard with student population segmentation
+
+Track active users and message volume by faculty/department
+
+Identify common discussion topics across different student groups
+
+Monitor crisis alert frequency with demographic insights
+
+Generate reports with privacy-preserving metrics
+
+Implement data export functionality for administrators
+
+Phase 6: PythonAnywhere Deployment Configuration ☁️
+Duration: 2 Weeks
+
+Objectives:
+Configure production settings for PythonAnywhere environment
+
+Set up MySQL database connection parameters
+
+Configure static and media file storage paths
+
+Implement SSL/HTTPS security settings
+
+Set up caching configuration using Redis
+
+Configure Celery broker and result backend for PythonAnywhere
+
+Create WSGI configuration file for PythonAnywhere web app
+
+Prepare database migration scripts for MySQL
+
+Set up environment variables on PythonAnywhere
+
+Configure static files mapping in PythonAnywhere dashboard
+
+Plan always-on task configuration for Celery workers
+
+Document PythonAnywhere-specific setup procedures
+
+Create deployment checklist for production launch
+
+Test database connections from PythonAnywhere environment
+
+Verify static file serving works correctly
+
+Test Celery task execution in PythonAnywhere environment
+
+Configure logging for production monitoring
+
+Set up error tracking and alerting
+
+Plan backup strategy for MySQL database (including student data)
+
+Document rollback procedures for failed deployments
+
+Phase 7: Testing, Deployment & Launch 🚢
+Duration: 3 Weeks
+
+Objectives:
+Recruit student testers for user acceptance testing
+
+Create testing scenarios covering all app features including registration flow
+
+Develop feedback collection forms and surveys
+
+Conduct usability testing sessions
+
+Document user pain points and suggestions
+
+Optimize database queries for performance
+
+Implement API response caching where appropriate
+
+Optimize images and static assets
+
+Minify CSS and JavaScript files
+
+Improve page load times
+
+Conduct security audit and penetration testing
+
+Verify data encryption implementation
+
+Review session security measures
+
+Rotate API keys and credentials
+
+Address identified vulnerabilities
+
+Set up production environment on PythonAnywhere
+
+Create MySQL database on PythonAnywhere
+
+Import university student data using import command
+
+Run database migrations on production database
+
+Collect static files to configured directory
+
+Configure WSGI file with production settings
+
+Set up SSL certificate and enable HTTPS
+
+Configure domain or subdomain if applicable
+
+Deploy application to PythonAnywhere
+
+Set up always-on tasks for Celery (paid plan required)
+
+Configure scheduled tasks for maintenance
+
+Create comprehensive API documentation
+
+Write user guide for students (including registration instructions)
+
+Create admin manual for counselors and administrators
+
+Document deployment procedures
+
+Prepare maintenance and update procedures
+
+Create launch checklist
+
+Prepare communication materials for announcement
+
+Set up support channels for users
+
+Configure monitoring tools
+
+Plan rollback strategy
+
+Execute soft launch with limited users
+
+Gather initial feedback
+
+Address critical issues
+
+Execute full public launch
+
+Monitor system performance post-launch
+
+Post-Launch Phase 📈
+Duration: Ongoing
+
+Objectives:
+Set up error tracking and monitoring
+
+Monitor OpenAI API usage and costs daily
+
+Track user engagement metrics (by faculty/department)
+
+Perform regular security updates
+
+Verify backups are working correctly (especially student data)
+
+Analyze user feedback for improvement opportunities
+
+Prioritize new features for future versions
+
+Plan version 2.0 roadmap
+
+Conduct A/B tests for feature improvements
+
+Tune performance based on usage patterns
+
+Build user community around the app
+
+Gather and showcase success stories
+
+Develop referral program for student outreach
+
+Partner with university counseling services
+
+Explore expansion to other institutions
+
+Review hosting plan adequacy monthly
+
+Scale resources as user base grows
+
+Maintain compliance with data protection regulations
+
+Update documentation as features change
+
+Plan for long-term sustainability
+
+Data Management Strategy
+Student Data Import:
+JSON files with nested faculty/department structure
+
+Management command with dry-run capability
+
+Validation before production import
+
+Regular updates as new students enroll
+
+Data Retention:
+Student core data persists indefinitely
+
+Authentication data persists with student account
+
+Chat conversations stored with encryption
+
+Mood tracking data retained for analytics
+
+Automatic anonymization for reports
+
+Privacy Considerations:
+Student verification without storing sensitive data
+
+Separate authentication from core student info
+
+Session-based authentication (no tokens)
+
+Encrypted message storage
+
+Aggregated analytics only (no individual identification)
+
+Updated Timeline Summary
+Phase	Duration	Focus
+Phase 0	1 week	Foundation, repository, documentation
+Phase 1	2 weeks	Backend architecture and models
+Phase 1.5	1 week	Student verification system
+Phase 2	2 weeks	Chat API and OpenAI integration
+Phase 3	1 week	Frontend - Authentication UI
+Phase 3.5	2 weeks	Frontend - Main application
+Phase 4	2 weeks	PWA features implementation
+Phase 5	2 weeks	Advanced features and analytics
+Phase 6	2 weeks	PythonAnywhere configuration
+Phase 7	3 weeks	Testing, deployment, launch
+Total	18 weeks	~4.5 months to launch
+PythonAnywhere Plan Recommendations by Phase
+Phase	Recommended Plan	Purpose
+Development	Free	Local development, initial testing
+Pilot Testing	Hacker ($5/month)	Always-on tasks, more resources
+Production Launch	Web Developer ($12/month)	MySQL, always-on, priority support
+Scale-up	Unlimited ($30/month)	Maximum resources for growth
+Updated Launch Readiness Checklist
+All core features implemented and tested
+
+Student verification system working with real data
+
+User acceptance testing completed with positive feedback
+
+Security audit passed (including authentication system)
+
+PythonAnywhere production environment configured
+
+Student data imported successfully
+
+Database migrations successful
+
+Static files serving correctly
+
+HTTPS enabled and working
+
+Celery tasks running (paid plan)
+
+OpenAI API integration working with rate limiting
+
+Crisis detection and escalation tested
+
+Backup system configured (including student data)
+
+Monitoring tools in place
+
+Documentation complete (including registration guide)
+
+Support channels established
+
+Communication materials ready
+
+Rollback plan documented
+
+Stakeholders informed

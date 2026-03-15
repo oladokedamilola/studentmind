@@ -1,0 +1,14 @@
+<!-- Flash Messages Container -->
+<div id="flash-messages-container"></div>
+
+<script>
+// Initialize flash messages
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for any flash messages passed from server
+    {% if messages %}
+        {% for message in messages %}
+            flashMessages.show("{{ message }}", "{{ message.tags|default:'info' }}");
+        {% endfor %}
+    {% endif %}
+});
+</script>

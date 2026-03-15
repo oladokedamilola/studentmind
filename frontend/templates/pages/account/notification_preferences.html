@@ -1,0 +1,251 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/settings" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0">🔔 Notification Preferences</h2>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+        <div class="card-body">
+            <!-- Notification Categories -->
+            <div class="notification-categories mb-4">
+                <h5 class="mb-3">Notification Categories</h5>
+                
+                <!-- Email Notifications -->
+                <div class="category-section mb-4 p-3" style="background: #FDF6E9; border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-envelope" style="color: #9CAF88; font-size: 1.25rem;"></i>
+                            <h6 class="mb-0">Email Notifications</h6>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="emailMaster" checked onchange="toggleMaster('email')">
+                        </div>
+                    </div>
+                    
+                    <div class="email-options ms-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Daily mood reminders</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailMood" checked>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Weekly progress reports</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailProgress" checked>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>New resource alerts</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailResources">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Assessment reminders</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailAssessments" checked>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Push Notifications -->
+                <div class="category-section mb-4 p-3" style="background: #FDF6E9; border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-bell" style="color: #9CAF88; font-size: 1.25rem;"></i>
+                            <h6 class="mb-0">Push Notifications</h6>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="pushMaster" checked onchange="toggleMaster('push')">
+                        </div>
+                    </div>
+                    
+                    <div class="push-options ms-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Chat message alerts</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="pushChat" checked>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Mood check-in reminders</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="pushMood" checked>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Crisis support available</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="pushCrisis" checked>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMS Notifications -->
+                <div class="category-section p-3" style="background: #FDF6E9; border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-sms" style="color: #9CAF88; font-size: 1.25rem;"></i>
+                            <h6 class="mb-0">SMS Notifications</h6>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="smsMaster" onchange="toggleMaster('sms')">
+                        </div>
+                    </div>
+                    
+                    <div class="sms-options ms-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Daily check-in reminders</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="smsCheckin">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Emergency alerts</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="smsEmergency">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiet Hours -->
+            <div class="quiet-hours mb-4">
+                <h5 class="mb-3">🌙 Quiet Hours</h5>
+                
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="quietHoursEnable">
+                    </div>
+                    <span>Don't disturb during quiet hours</span>
+                </div>
+                
+                <div class="row g-3 ms-4" id="quietHoursSettings" style="opacity: 0.5;">
+                    <div class="col-md-6">
+                        <label class="form-label">From</label>
+                        <input type="time" class="form-control" value="22:00" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">To</label>
+                        <input type="time" class="form-control" value="08:00" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frequency Settings -->
+            <div class="frequency-settings mb-4">
+                <h5 class="mb-3">⏰ Notification Frequency</h5>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Mood reminders</label>
+                        <select class="form-select">
+                            <option>Once daily</option>
+                            <option selected>Twice daily</option>
+                            <option>Every other day</option>
+                            <option>Weekly</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Progress reports</label>
+                        <select class="form-select">
+                            <option>Daily</option>
+                            <option selected>Weekly</option>
+                            <option>Monthly</option>
+                            <option>Never</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline flex-grow-1" onclick="resetToDefault()">
+                    Reset to Default
+                </button>
+                <button class="btn btn-primary flex-grow-1" onclick="savePreferences()">
+                    Save Preferences
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Preview -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="mb-3">👀 Preview Your Notifications</h5>
+            
+            <div class="preview-item d-flex align-items-center gap-3 p-2" style="background: #FDF6E9; border-radius: 8px;">
+                <div style="width: 40px; height: 40px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-smile" style="color: white;"></i>
+                </div>
+                <div>
+                    <strong>Mood Reminder</strong>
+                    <p class="small text-muted mb-0">How are you feeling today? Log your mood now.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMaster(type) {
+    const masterCheck = document.getElementById(`${type}Master`);
+    const options = document.querySelectorAll(`.${type}-options input[type="checkbox"]`);
+    
+    options.forEach(option => {
+        option.checked = masterCheck.checked;
+    });
+}
+
+document.getElementById('quietHoursEnable').addEventListener('change', function() {
+    const settings = document.getElementById('quietHoursSettings');
+    const inputs = settings.querySelectorAll('input');
+    
+    if (this.checked) {
+        settings.style.opacity = '1';
+        inputs.forEach(input => input.disabled = false);
+    } else {
+        settings.style.opacity = '0.5';
+        inputs.forEach(input => input.disabled = true);
+    }
+});
+
+function savePreferences() {
+    flashMessages.success('Notification preferences saved!');
+}
+
+function resetToDefault() {
+    if (confirm('Reset all notification preferences to default?')) {
+        // Reset checkboxes to default
+        document.getElementById('emailMaster').checked = true;
+        document.getElementById('emailMood').checked = true;
+        document.getElementById('emailProgress').checked = true;
+        document.getElementById('emailResources').checked = false;
+        document.getElementById('emailAssessments').checked = true;
+        
+        document.getElementById('pushMaster').checked = true;
+        document.getElementById('pushChat').checked = true;
+        document.getElementById('pushMood').checked = true;
+        document.getElementById('pushCrisis').checked = true;
+        
+        document.getElementById('smsMaster').checked = false;
+        document.getElementById('smsCheckin').checked = false;
+        document.getElementById('smsEmergency').checked = false;
+        
+        flashMessages.info('Preferences reset to default');
+    }
+}
+</script>
+{% endblock %}

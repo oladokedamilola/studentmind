@@ -1,0 +1,306 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <a href="/resources" class="btn btn-link me-2" style="color: #5D7A5C;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="mb-0">❤️ Your Saved Resources</h2>
+        </div>
+        
+        <button class="btn btn-outline" onclick="clearAllSaved()">
+            <i class="fas fa-trash me-2"></i>Clear All
+        </button>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="stats-card mb-4">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stat-item text-center">
+                    <h3>8</h3>
+                    <small class="text-muted">Saved Items</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item text-center">
+                    <h3>4</h3>
+                    <small class="text-muted">Categories</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item text-center">
+                    <h3>2</h3>
+                    <small class="text-muted">Unread</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Filter -->
+    <div class="categories-filter mb-4">
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="category-pill active" onclick="filterSaved('all')">All</button>
+            <button class="category-pill" onclick="filterSaved('anxiety')">Anxiety</button>
+            <button class="category-pill" onclick="filterSaved('stress')">Stress</button>
+            <button class="category-pill" onclick="filterSaved('sleep')">Sleep</button>
+            <button class="category-pill" onclick="filterSaved('meditation')">Meditation</button>
+        </div>
+    </div>
+
+    <!-- Saved Resources Grid -->
+    <div class="row g-3" id="savedGrid">
+        <!-- Saved Item 1 -->
+        <div class="col-md-6">
+            <div class="saved-card">
+                <div class="d-flex">
+                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-lungs" style="font-size: 32px; color: #5D7A5C;"></i>
+                    </div>
+                    <div class="saved-content p-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">5-Minute Breathing Exercise</h6>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Anxiety</span>
+                                    <small class="text-muted">Saved 2 days ago</small>
+                                </div>
+                            </div>
+                            <button class="btn btn-link text-danger" onclick="removeSaved(1)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/1'">Read</button>
+                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(1)">Move</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Item 2 -->
+        <div class="col-md-6">
+            <div class="saved-card">
+                <div class="d-flex">
+                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-graduation-cap" style="font-size: 32px; color: #5D7A5C;"></i>
+                    </div>
+                    <div class="saved-content p-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">Exam Stress Management</h6>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Stress</span>
+                                    <small class="text-muted">Saved 1 week ago</small>
+                                </div>
+                            </div>
+                            <button class="btn btn-link text-danger" onclick="removeSaved(2)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/2'">Read</button>
+                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(2)">Move</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Item 3 -->
+        <div class="col-md-6">
+            <div class="saved-card">
+                <div class="d-flex">
+                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-brain" style="font-size: 32px; color: #5D7A5C;"></i>
+                    </div>
+                    <div class="saved-content p-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">Mindfulness Meditation Guide</h6>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Meditation</span>
+                                    <small class="text-muted">Saved 2 weeks ago</small>
+                                </div>
+                            </div>
+                            <button class="btn btn-link text-danger" onclick="removeSaved(3)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/3'">Read</button>
+                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(3)">Move</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Item 4 -->
+        <div class="col-md-6">
+            <div class="saved-card">
+                <div class="d-flex">
+                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-bed" style="font-size: 32px; color: #5D7A5C;"></i>
+                    </div>
+                    <div class="saved-content p-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">Better Sleep Guide</h6>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Sleep</span>
+                                    <small class="text-muted">Saved 2 weeks ago</small>
+                                </div>
+                            </div>
+                            <button class="btn btn-link text-danger" onclick="removeSaved(4)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/4'">Read</button>
+                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(4)">Move</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Folder Card -->
+    <div class="create-folder-card mt-4">
+        <div class="d-flex align-items-center justify-content-between p-3" style="background: white; border-radius: 16px;">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-folder-plus" style="font-size: 24px; color: #9CAF88;"></i>
+                <span>Organize your saved resources into folders</span>
+            </div>
+            <button class="btn btn-outline" onclick="createFolder()">
+                <i class="fas fa-plus me-2"></i>New Folder
+            </button>
+        </div>
+    </div>
+
+    <!-- Empty State (hidden by default) -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
+        <h5>No saved resources yet</h5>
+        <p class="text-muted">When you save resources, they'll appear here</p>
+        <a href="/resources" class="btn btn-primary mt-2">
+            <i class="fas fa-compass me-2"></i>Browse Resources
+        </a>
+    </div>
+</div>
+
+<style>
+.stats-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.stat-item h3 {
+    font-size: 2rem;
+    color: #5D7A5C;
+    margin-bottom: 0.25rem;
+}
+
+.saved-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.saved-card:hover {
+    transform: translateY(-3px);
+    border-color: #9CAF88;
+    box-shadow: var(--shadow-soft);
+}
+
+.category-pill {
+    padding: 0.5rem 1.25rem;
+    background: white;
+    border: 1px solid #E6E6FA;
+    border-radius: 30px;
+    font-size: 0.875rem;
+    color: #5D7A5C;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.category-pill:hover, .category-pill.active {
+    background: #9CAF88;
+    color: white;
+    border-color: #9CAF88;
+}
+
+.create-folder-card {
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.create-folder-card:hover {
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+let savedCount = 8;
+
+function filterSaved(filter) {
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    flashMessages.info(`Filtering by: ${filter}`);
+    
+    // Simulate filter
+    setTimeout(() => {
+        flashMessages.success('Filter applied');
+    }, 500);
+}
+
+function removeSaved(id) {
+    if (confirm('Remove this resource from your saved items?')) {
+        const card = event.target.closest('.col-md-6');
+        card.style.animation = 'slideOut 0.3s ease';
+        
+        setTimeout(() => {
+            card.remove();
+            savedCount--;
+            
+            if (savedCount === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('savedGrid').style.display = 'none';
+            }
+            
+            flashMessages.success('Resource removed from saved');
+        }, 300);
+    }
+}
+
+function clearAllSaved() {
+    if (confirm('Are you sure you want to remove all saved resources?')) {
+        document.getElementById('savedGrid').innerHTML = '';
+        document.getElementById('emptyState').style.display = 'block';
+        flashMessages.info('All saved resources cleared');
+    }
+}
+
+function moveToFolder(id) {
+    flashMessages.info('Move to folder feature coming soon!');
+}
+
+function createFolder() {
+    const folderName = prompt('Enter folder name:');
+    if (folderName) {
+        flashMessages.success(`Folder "${folderName}" created!`);
+    }
+}
+</script>
+{% endblock %}

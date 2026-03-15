@@ -1,0 +1,236 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/chat" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0">🔍 Search Conversations</h2>
+    </div>
+
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="searchForm" onsubmit="performSearch(event)">
+                <div class="d-flex gap-2">
+                    <div class="flex-grow-1 position-relative">
+                        <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #B99B7C;"></i>
+                        <input type="text" class="form-control" id="searchQuery" placeholder="Search for keywords..." style="padding-left: 40px;" value="exam anxiety">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+                
+                <!-- Filters -->
+                <div class="mt-3 d-flex flex-wrap gap-2">
+                    <span class="filter-pill active" onclick="filterBy('all')">All</span>
+                    <span class="filter-pill" onclick="filterBy('today')">Today</span>
+                    <span class="filter-pill" onclick="filterBy('week')">This Week</span>
+                    <span class="filter-pill" onclick="filterBy('month')">This Month</span>
+                    <span class="filter-pill" onclick="filterBy('older')">Older</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="text-muted">3 results found</h6>
+        <select class="form-select form-select-sm" style="width: auto;">
+            <option>Most Recent</option>
+            <option>Oldest First</option>
+            <option>Most Relevant</option>
+        </select>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results">
+        <!-- Result 1 -->
+        <div class="result-card" onclick="window.location.href='/chat/1'" style="cursor: pointer;">
+            <div class="d-flex gap-3">
+                <div class="result-icon" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-comment" style="color: #5D7A5C;"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h6 class="mb-1">Exam Anxiety Support</h6>
+                        <small class="text-muted">Today, 2:30 PM</small>
+                    </div>
+                    <p class="mb-2" style="color: #5D7A5C;">
+                        ...really anxious about my <mark style="background: #E6E6FA; padding: 2px 4px; border-radius: 4px;">exam</mark> next week. I can't sleep or focus...
+                    </p>
+                    <div class="d-flex gap-2">
+                        <span class="badge" style="background: #9CAF88; color: white;">3 matches</span>
+                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">High relevance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result 2 -->
+        <div class="result-card mt-2" onclick="window.location.href='/chat/2'" style="cursor: pointer;">
+            <div class="d-flex gap-3">
+                <div class="result-icon" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-graduation-cap" style="color: #5D7A5C;"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h6 class="mb-1">Study Stress</h6>
+                        <small class="text-muted">Yesterday, 8:45 PM</small>
+                    </div>
+                    <p class="mb-2" style="color: #5D7A5C;">
+                        ...worried about my upcoming <mark style="background: #E6E6FA; padding: 2px 4px; border-radius: 4px;">exam</mark> results. I studied so hard but still feel unprepared...
+                    </p>
+                    <div class="d-flex gap-2">
+                        <span class="badge" style="background: #9CAF88; color: white;">1 match</span>
+                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Medium relevance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result 3 -->
+        <div class="result-card mt-2" onclick="window.location.href='/chat/3'" style="cursor: pointer;">
+            <div class="d-flex gap-3">
+                <div class="result-icon" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-book" style="color: #5D7A5C;"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h6 class="mb-1">Study Tips Discussion</h6>
+                        <small class="text-muted">Mar 10, 2025</small>
+                    </div>
+                    <p class="mb-2" style="color: #5D7A5C;">
+                        ...how to prepare for final <mark style="background: #E6E6FA; padding: 2px 4px; border-radius: 4px;">exam</mark> efficiently without burning out...
+                    </p>
+                    <div class="d-flex gap-2">
+                        <span class="badge" style="background: #9CAF88; color: white;">1 match</span>
+                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Low relevance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- No Results State (hidden by default) -->
+    <div id="noResults" class="text-center py-5" style="display: none;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+        <h5>No conversations found</h5>
+        <p class="text-muted">Try different keywords or browse all conversations</p>
+        <a href="/chat" class="btn btn-outline mt-2">
+            <i class="fas fa-comments me-2"></i>View All Conversations
+        </a>
+    </div>
+
+    <!-- Search Tips -->
+    <div class="info-card mt-4">
+        <span class="info-icon">💡</span>
+        <div>
+            <strong>Search Tips:</strong>
+            <ul class="mt-2 mb-0">
+                <li>Use specific keywords (e.g., "exam", "sleep", "anxiety")</li>
+                <li>Try different word combinations</li>
+                <li>Search for emotions (e.g., "stressed", "worried", "happy")</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.result-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.result-card:hover {
+    transform: translateX(5px);
+    border-color: #9CAF88;
+    box-shadow: 0 5px 15px rgba(93, 122, 92, 0.1);
+}
+
+.filter-pill {
+    padding: 0.5rem 1.25rem;
+    background: white;
+    border: 1px solid #E6E6FA;
+    border-radius: 30px;
+    font-size: 0.875rem;
+    color: #5D7A5C;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-pill:hover, .filter-pill.active {
+    background: #9CAF88;
+    color: white;
+    border-color: #9CAF88;
+}
+
+mark {
+    background: #E6E6FA;
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: #5D7A5C;
+}
+
+.badge {
+    padding: 0.35rem 0.65rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+</style>
+
+<script>
+function performSearch(event) {
+    event.preventDefault();
+    
+    const query = document.getElementById('searchQuery').value;
+    if (!query.trim()) {
+        flashMessages.warning('Please enter a search term');
+        return;
+    }
+    
+    // Show loading state
+    const btn = event.target.querySelector('button[type="submit"]');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Searching...';
+    btn.disabled = true;
+    
+    // Simulate search
+    setTimeout(() => {
+        btn.innerHTML = 'Search';
+        btn.disabled = false;
+        
+        // For demo, just show results (in real app, would fetch new results)
+        flashMessages.success(`Found results for "${query}"`);
+    }, 1500);
+}
+
+function filterBy(period) {
+    // Update active filter
+    document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Show loading
+    flashMessages.info(`Filtering by: ${period}`);
+    
+    // Simulate filter (in real app, would fetch filtered results)
+    setTimeout(() => {
+        flashMessages.success('Results filtered');
+    }, 1000);
+}
+
+// Real-time search suggestions (simplified)
+document.getElementById('searchQuery').addEventListener('input', function(e) {
+    if (e.target.value.length > 2) {
+        // In real app, would show suggestions
+        console.log('Searching for:', e.target.value);
+    }
+});
+</script>
+{% endblock %}

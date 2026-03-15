@@ -1,0 +1,241 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/dashboard" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0">💬 Start New Conversation</h2>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="text-center mb-4" style="color: #5D7A5C;">What would you like to talk about today?</h5>
+            
+            <!-- Quick Topics Grid -->
+            <div class="quick-topics mb-4">
+                <label class="form-label">Quick Topics:</label>
+                <div class="row g-2">
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Exam Stress')">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Exam Stress</span>
+                        </button>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Sleep Issues')">
+                            <i class="fas fa-moon"></i>
+                            <span>Sleep Issues</span>
+                        </button>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Anxiety')">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>Anxiety</span>
+                        </button>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Mood')">
+                            <i class="fas fa-smile"></i>
+                            <span>Mood</span>
+                        </button>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Focus')">
+                            <i class="fas fa-brain"></i>
+                            <span>Focus</span>
+                        </button>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Relationship')">
+                            <i class="fas fa-heart"></i>
+                            <span>Relationship</span>
+                        </button>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Motivation')">
+                            <i class="fas fa-fire"></i>
+                            <span>Motivation</span>
+                        </button>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <button class="topic-btn w-100" onclick="selectTopic('Self-Care')">
+                            <i class="fas fa-spa"></i>
+                            <span>Self-Care</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-3">
+                <span class="or-divider">OR</span>
+            </div>
+
+            <!-- Custom Topic -->
+            <div class="custom-topic">
+                <label class="form-label">Type your own:</label>
+                <div class="d-flex gap-2">
+                    <input type="text" class="form-control" id="customTopic" placeholder="e.g., I'm feeling overwhelmed with assignments..." style="flex: 1;">
+                    <button class="btn btn-primary" onclick="startChatWithCustom()" id="startBtn" disabled>
+                        <i class="fas fa-comment me-2"></i>Start
+                    </button>
+                </div>
+                <small class="text-muted mt-2 d-block">Be as specific as you'd like - this helps our AI support you better.</small>
+            </div>
+
+            <!-- Previous Topics Suggestion -->
+            <div class="previous-topics mt-4 pt-4 border-top">
+                <small class="text-muted d-block mb-2">From your history:</small>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="suggestion-pill" onclick="useSuggestion('Exam anxiety again')">Exam anxiety again</span>
+                    <span class="suggestion-pill" onclick="useSuggestion('Sleep issues returning')">Sleep issues returning</span>
+                    <span class="suggestion-pill" onclick="useSuggestion('Feeling better today')">Feeling better today</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Card -->
+    <div class="info-card mt-4">
+        <span class="info-icon">💡</span>
+        <span>You can talk about anything - your conversations are private and confidential.</span>
+    </div>
+</div>
+
+<style>
+.topic-btn {
+    background: white;
+    border: 2px solid #E6E6FA;
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    color: #5D7A5C;
+}
+
+.topic-btn:hover {
+    background: #E6E6FA;
+    border-color: #9CAF88;
+    transform: translateY(-2px);
+}
+
+.topic-btn i {
+    font-size: 1.5rem;
+    color: #9CAF88;
+}
+
+.topic-btn span {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.or-divider {
+    background: #FDF6E9;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    color: #B99B7C;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.suggestion-pill {
+    background: #E6E6FA;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    color: #5D7A5C;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.suggestion-pill:hover {
+    background: #9CAF88;
+    color: white;
+}
+
+.topic-btn.selected {
+    background: #9CAF88;
+    border-color: #5D7A5C;
+    color: white;
+}
+
+.topic-btn.selected i {
+    color: white;
+}
+</style>
+
+<script>
+let selectedTopic = '';
+
+function selectTopic(topic) {
+    // Remove selected class from all buttons
+    document.querySelectorAll('.topic-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked button
+    event.currentTarget.classList.add('selected');
+    
+    // Store selected topic
+    selectedTopic = topic;
+    
+    // Enable start button
+    document.getElementById('startBtn').disabled = false;
+    
+    // Clear custom input
+    document.getElementById('customTopic').value = '';
+}
+
+function startChatWithCustom() {
+    const customTopic = document.getElementById('customTopic').value.trim();
+    if (customTopic) {
+        startChat(customTopic);
+    } else if (selectedTopic) {
+        startChat(selectedTopic);
+    }
+}
+
+function startChat(topic) {
+    // Show loading
+    const btn = document.getElementById('startBtn');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Starting...';
+    btn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        flashMessages.success('Starting new conversation about: ' + topic);
+        setTimeout(() => {
+            window.location.href = '/chat/new-session?topic=' + encodeURIComponent(topic);
+        }, 1500);
+    }, 1000);
+}
+
+function useSuggestion(suggestion) {
+    document.getElementById('customTopic').value = suggestion;
+    selectedTopic = '';
+    document.querySelectorAll('.topic-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    document.getElementById('startBtn').disabled = false;
+}
+
+// Enable/disable start button based on input
+document.getElementById('customTopic').addEventListener('input', function(e) {
+    const startBtn = document.getElementById('startBtn');
+    startBtn.disabled = !e.target.value.trim() && !selectedTopic;
+});
+
+// Also check for selected topic changes
+document.querySelectorAll('.topic-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('startBtn').disabled = false;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base/public_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 500px;">
+    <!-- Back Link -->
+    <a href="/forgot-password" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C;">
+        <i class="fas fa-arrow-left me-2"></i> Back
+    </a>
+
+    <!-- Success Card -->
+    <div class="card mt-4 text-center">
+        <div class="card-body py-5">
+            <div style="font-size: 5rem; margin-bottom: 1rem;">
+                <i class="fas fa-envelope-open-text" style="color: #9CAF88;"></i>
+            </div>
+            
+            <h3 class="mb-3">Check Your Email</h3>
+            
+            <p class="mb-4" style="color: #5D7A5C;">
+                We've sent a password reset link to:<br>
+                <strong>john.doe@uni.edu</strong>
+            </p>
+            
+            <div class="info-card mb-4">
+                <span class="info-icon">⏱️</span>
+                <span>The link will expire in 1 hour for security reasons.</span>
+            </div>
+            
+            <div class="d-flex flex-column gap-2">
+                <a href="/login" class="btn btn-primary">
+                    Back to Login
+                </a>
+                
+                <button class="btn btn-link" onclick="resendEmail()" style="color: #5D7A5C;">
+                    Didn't receive the email? Click to resend
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Card -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h6 class="mb-2">📧 Email Tips:</h6>
+            <ul class="small text-muted mb-0">
+                <li>Check your spam or junk folder</li>
+                <li>Add noreply@mindhaven.com to your contacts</li>
+                <li>Wait a few minutes for the email to arrive</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+function resendEmail() {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+    
+    setTimeout(() => {
+        flashMessages.success('Reset link resent! Please check your email.');
+        btn.disabled = false;
+        btn.innerHTML = 'Didn\'t receive the email? Click to resend';
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <a href="/assessments" class="btn btn-link me-2" style="color: #5D7A5C;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="mb-0">📋 Assessment History</h2>
+        </div>
+        
+        <select class="form-select" style="width: auto;" onchange="filterAssessments(this.value)">
+            <option value="all">All Assessments</option>
+            <option value="phq9">PHQ-9 Only</option>
+            <option value="gad7">GAD-7 Only</option>
+            <option value="pss">PSS Only</option>
+        </select>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="summary-card p-3" style="background: white; border-radius: 16px;">
+                <small class="text-muted">Total Assessments</small>
+                <h3>12</h3>
+                <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">+2 this month</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card p-3" style="background: white; border-radius: 16px;">
+                <small class="text-muted">Last Assessment</small>
+                <h3>2 days ago</h3>
+                <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">PHQ-9</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card p-3" style="background: white; border-radius: 16px;">
+                <small class="text-muted">Average Score</small>
+                <h3>11.5</h3>
+                <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Timeline -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-4">Assessment Timeline</h5>
+            
+            <!-- PHQ-9 Section -->
+            <div class="assessment-section mb-4">
+                <h6 class="mb-3" style="color: #5D7A5C;">
+                    <i class="fas fa-chart-line me-2"></i>PHQ-9 (Depression)
+                </h6>
+                
+                <div class="timeline-item mb-3" onclick="viewAssessment(1)">
+                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
+                        <div>
+                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 15, 2025</span>
+                            <span class="text-muted">2:30 PM</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold" style="color: #5D7A5C;">Score: 12</span>
+                            <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
+                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item mb-3" onclick="viewAssessment(2)">
+                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
+                        <div>
+                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 1, 2025</span>
+                            <span class="text-muted">10:15 AM</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold" style="color: #5D7A5C;">Score: 15</span>
+                            <span class="badge" style="background: #5D7A5C; color: white;">Mod-Severe</span>
+                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item mb-3" onclick="viewAssessment(3)">
+                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
+                        <div>
+                            <span class="badge me-2" style="background: #9CAF88; color: white;">Feb 15, 2025</span>
+                            <span class="text-muted">3:45 PM</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold" style="color: #5D7A5C;">Score: 14</span>
+                            <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
+                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GAD-7 Section -->
+            <div class="assessment-section mb-4">
+                <h6 class="mb-3" style="color: #5D7A5C;">
+                    <i class="fas fa-heartbeat me-2"></i>GAD-7 (Anxiety)
+                </h6>
+                
+                <div class="timeline-item mb-3" onclick="viewAssessment(4)">
+                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
+                        <div>
+                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 15, 2025</span>
+                            <span class="text-muted">2:35 PM</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold" style="color: #5D7A5C;">Score: 8</span>
+                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Mild</span>
+                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item mb-3" onclick="viewAssessment(5)">
+                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
+                        <div>
+                            <span class="badge me-2" style="background: #9CAF88; color: white;">Feb 15, 2025</span>
+                            <span class="text-muted">4:00 PM</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold" style="color: #5D7A5C;">Score: 12</span>
+                            <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
+                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PSS Section -->
+            <div class="assessment-section">
+                <h6 class="mb-3" style="color: #5D7A5C;">
+                    <i class="fas fa-tachometer-alt me-2"></i>PSS (Stress)
+                </h6>
+                
+                <div class="timeline-item mb-3" onclick="viewAssessment(6)">
+                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
+                        <div>
+                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 10, 2025</span>
+                            <span class="text-muted">11:20 AM</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fw-bold" style="color: #5D7A5C;">Score: 24</span>
+                            <span class="badge" style="background: #B99B7C; color: white;">High</span>
+                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Load More -->
+            <div class="text-center mt-4">
+                <button class="btn btn-outline" onclick="loadMoreHistory()">
+                    <i class="fas fa-chevron-down me-2"></i>Load More
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Chart Card -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">📈 Progress Over Time</h5>
+                <a href="/assessments/compare" class="btn btn-link" style="color: #5D7A5C;">
+                    View Full Comparison
+                </a>
+            </div>
+            
+            <canvas id="progressChart" style="height: 200px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<style>
+.summary-card {
+    transition: var(--transition);
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-soft);
+}
+
+.timeline-item {
+    transition: var(--transition);
+}
+
+.timeline-item:hover .p-3 {
+    background: #E6E6FA !important;
+    transform: translateX(5px);
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeProgressChart();
+});
+
+function initializeProgressChart() {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Feb 15', 'Mar 1', 'Mar 15'],
+            datasets: [
+                {
+                    label: 'PHQ-9',
+                    data: [14, 15, 12],
+                    borderColor: '#9CAF88',
+                    backgroundColor: 'transparent',
+                    tension: 0.4
+                },
+                {
+                    label: 'GAD-7',
+                    data: [12, null, 8],
+                    borderColor: '#5D7A5C',
+                    backgroundColor: 'transparent',
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 27
+                }
+            }
+        }
+    });
+}
+
+function filterAssessments(value) {
+    flashMessages.info(`Filtering: ${value}`);
+    // In production, filter the timeline
+}
+
+function viewAssessment(id) {
+    window.location.href = `/assessments/results/${id}`;
+}
+
+function loadMoreHistory() {
+    const btn = event.target.closest('button');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        flashMessages.info('No more history to load');
+        btn.innerHTML = '<i class="fas fa-check me-2"></i>All Loaded';
+    }, 1500);
+}
+</script>
+{% endblock %}

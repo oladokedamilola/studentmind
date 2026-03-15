@@ -1,0 +1,119 @@
+{% extends "base/public_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3" style="color: #5D7A5C;">About MindHaven</h1>
+        <p class="lead" style="color: #B99B7C;">Your campus sanctuary for mental wellness</p>
+    </div>
+
+    <!-- Mission Card -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <i class="fas fa-heart" style="font-size: 3rem; color: #9CAF88; margin-bottom: 1rem;"></i>
+            <h3 class="mb-3">Our Mission</h3>
+            <p class="mb-0" style="font-size: 1.1rem;">To provide every university student with a safe, private, and accessible space to support their mental health journey.</p>
+        </div>
+    </div>
+
+    <!-- Story Section -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Our Story</h5>
+                    <p>MindHaven was born from a simple observation: university students face immense pressure but often lack access to timely mental health support. Long wait times, stigma, and limited resources leave many students struggling alone.</p>
+                    <p class="mb-0">We created MindHaven to bridge this gap - offering immediate, anonymous support whenever and wherever students need it.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Our Values</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-lock me-2" style="color: #9CAF88;"></i>
+                            <strong>Privacy First</strong> - Your data is always encrypted and anonymous
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-heart me-2" style="color: #9CAF88;"></i>
+                            <strong>Compassionate</strong> - Every interaction is nurturing and supportive
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-universal-access me-2" style="color: #9CAF88;"></i>
+                            <strong>Accessible</strong> - Free for all students, available 24/7
+                        </li>
+                        <li>
+                            <i class="fas fa-leaf me-2" style="color: #9CAF88;"></i>
+                            <strong>Evidence-Based</strong> - Resources grounded in research
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <h3 class="text-center mb-4">Meet Our Team</h3>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div style="width: 100px; height: 100px; background: #E6E6FA; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-md" style="font-size: 3rem; color: #5D7A5C;"></i>
+                    </div>
+                    <h5>Dr. Sarah Chen</h5>
+                    <p class="text-muted">Clinical Psychologist</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div style="width: 100px; height: 100px; background: #E6E6FA; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-laptop-code" style="font-size: 3rem; color: #5D7A5C;"></i>
+                    </div>
+                    <h5>Michael Okonkwo</h5>
+                    <p class="text-muted">Lead Developer</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div style="width: 100px; height: 100px; background: #E6E6FA; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-graduation-cap" style="font-size: 3rem; color: #5D7A5C;"></i>
+                    </div>
+                    <h5>Student Advisory Board</h5>
+                    <p class="text-muted">12 student representatives</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="card mb-5" style="background: #9CAF88; color: white;">
+        <div class="card-body py-4">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <h2>10,000+</h2>
+                    <p>Students Supported</p>
+                </div>
+                <div class="col-md-4">
+                    <h2>15</h2>
+                    <p>Partner Universities</p>
+                </div>
+                <div class="col-md-4">
+                    <h2>24/7</h2>
+                    <p>Always Available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

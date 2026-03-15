@@ -1,0 +1,348 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div class="d-flex align-items-center">
+            <a href="/dashboard" class="btn btn-link me-2" style="color: #5D7A5C;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="mb-0">📈 Your Mood History</h2>
+        </div>
+        
+        <!-- Time Range Filter -->
+        <select class="form-select" style="width: auto;" id="timeRange" onchange="changeTimeRange()">
+            <option value="7">Last 7 days</option>
+            <option value="14">Last 14 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 3 months</option>
+        </select>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Average Mood</small>
+                        <h3 class="mb-0">3.2</h3>
+                    </div>
+                    <div class="stat-icon" style="background: #E6E6FA; border-radius: 12px; padding: 12px;">
+                        <i class="fas fa-smile" style="color: #5D7A5C; font-size: 24px;"></i>
+                    </div>
+                </div>
+                <span class="badge mt-2" style="background: #9CAF88; color: white;">Okay</span>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Best Day</small>
+                        <h3 class="mb-0">4.5</h3>
+                    </div>
+                    <div class="stat-icon" style="background: #E6E6FA; border-radius: 12px; padding: 12px;">
+                        <i class="fas fa-star" style="color: #5D7A5C; font-size: 24px;"></i>
+                    </div>
+                </div>
+                <span class="badge mt-2" style="background: #9CAF88; color: white;">Good</span>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Lowest Day</small>
+                        <h3 class="mb-0">1.5</h3>
+                    </div>
+                    <div class="stat-icon" style="background: #E6E6FA; border-radius: 12px; padding: 12px;">
+                        <i class="fas fa-heart-broken" style="color: #5D7A5C; font-size: 24px;"></i>
+                    </div>
+                </div>
+                <span class="badge mt-2" style="background: #9CAF88; color: white;">Low</span>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Trend</small>
+                        <h3 class="mb-0">↑ 12%</h3>
+                    </div>
+                    <div class="stat-icon" style="background: #E6E6FA; border-radius: 12px; padding: 12px;">
+                        <i class="fas fa-chart-line" style="color: #5D7A5C; font-size: 24px;"></i>
+                    </div>
+                </div>
+                <span class="badge mt-2" style="background: #9CAF88; color: white;">Improving</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">Mood Trends</h5>
+            <div class="chart-container" style="height: 300px; position: relative;">
+                <!-- Chart Canvas -->
+                <canvas id="moodChart"></canvas>
+            </div>
+            
+            <!-- Legend -->
+            <div class="d-flex justify-content-center gap-4 mt-3">
+                <div class="d-flex align-items-center">
+                    <div style="width: 12px; height: 12px; background: #9CAF88; border-radius: 3px; margin-right: 6px;"></div>
+                    <span>Your Mood</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div style="width: 12px; height: 12px; background: #E6E6FA; border-radius: 3px; margin-right: 6px;"></div>
+                    <span>Average</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights and Details -->
+    <div class="row g-4">
+        <!-- Mood Insights -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">🧠 Mood Insights</h5>
+                    
+                    <div class="insight-item mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Most Common Mood</span>
+                            <span class="badge" style="background: #9CAF88; color: white;">Okay (3)</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: 45%; background: #9CAF88;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-item mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Good Days (4-5)</span>
+                            <span class="badge" style="background: #9CAF88; color: white;">8 days</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: 27%; background: #9CAF88;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-item mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Low Days (1-2)</span>
+                            <span class="badge" style="background: #9CAF88; color: white;">5 days</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: 17%; background: #9CAF88;"></div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="pattern-insights">
+                        <p class="mb-2"><i class="fas fa-lightbulb me-2" style="color: #9CAF88;"></i> Your mood tends to be lower on Mondays and improves through the week.</p>
+                        <p class="mb-0"><i class="fas fa-lightbulb me-2" style="color: #9CAF88;"></i> You're 30% happier on days when you exercise.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Entries -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">📝 Recent Entries</h5>
+                        <a href="/mood/calendar" style="color: #5D7A5C;">View Calendar →</a>
+                    </div>
+                    
+                    <div class="recent-entries">
+                        <div class="entry-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <span class="me-2" style="font-size: 1.25rem;">😊</span>
+                                <span>Today</span>
+                            </div>
+                            <div>
+                                <span class="me-3">5 - Excellent</span>
+                                <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="entry-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <span class="me-2" style="font-size: 1.25rem;">😐</span>
+                                <span>Yesterday</span>
+                            </div>
+                            <div>
+                                <span class="me-3">3 - Okay</span>
+                                <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="entry-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <span class="me-2" style="font-size: 1.25rem;">😟</span>
+                                <span>Mar 13, 2025</span>
+                            </div>
+                            <div>
+                                <span class="me-3">2 - Low</span>
+                                <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="entry-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <span class="me-2" style="font-size: 1.25rem;">🙂</span>
+                                <span>Mar 12, 2025</span>
+                            </div>
+                            <div>
+                                <span class="me-3">4 - Good</span>
+                                <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="entry-item d-flex justify-content-between align-items-center py-2">
+                            <div>
+                                <span class="me-2" style="font-size: 1.25rem;">😐</span>
+                                <span>Mar 11, 2025</span>
+                            </div>
+                            <div>
+                                <span class="me-3">3 - Okay</span>
+                                <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline w-100 mt-3" onclick="window.location.href='/mood/log'">
+                        <i class="fas fa-plus me-2"></i>Log Today's Mood
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.insight-item {
+    padding: 0.5rem 0;
+}
+
+.entry-item {
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.entry-item:hover {
+    background: #FDF6E9;
+    padding-left: 10px;
+}
+
+.progress {
+    background: #E6E6FA;
+    border-radius: 4px;
+}
+
+.progress-bar {
+    border-radius: 4px;
+}
+</style>
+
+<!-- Chart.js for mood chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMoodChart();
+});
+
+function initializeMoodChart() {
+    const ctx = document.getElementById('moodChart').getContext('2d');
+    
+    // Sample data - in production, this would come from your backend
+    const labels = ['Mar 1', 'Mar 5', 'Mar 9', 'Mar 13', 'Mar 17', 'Mar 21', 'Mar 25', 'Mar 29'];
+    const moodData = [2.5, 3.0, 2.0, 3.5, 4.0, 3.0, 4.5, 5.0];
+    const averageData = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0];
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Your Mood',
+                    data: moodData,
+                    borderColor: '#9CAF88',
+                    backgroundColor: 'rgba(156, 175, 136, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#5D7A5C',
+                    pointBorderColor: 'white',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                },
+                {
+                    label: 'Average',
+                    data: averageData,
+                    borderColor: '#E6E6FA',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            const labels = ['Very Low', 'Low', 'Okay', 'Good', 'Excellent'];
+                            return labels[value - 1] || value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function changeTimeRange() {
+    const range = document.getElementById('timeRange').value;
+    flashMessages.info(`Loading ${range} day view...`);
+    
+    // In production, this would fetch new data and update the chart
+    setTimeout(() => {
+        flashMessages.success('Mood history updated');
+    }, 1000);
+}
+</script>
+{% endblock %}

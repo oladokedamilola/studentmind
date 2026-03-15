@@ -1,0 +1,189 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="/assessments" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-0">📊 Your PHQ-9 Results</h2>
+    </div>
+
+    <!-- Date -->
+    <p class="text-muted mb-4">Taken on March 15, 2025 at 2:30 PM</p>
+
+    <!-- Results Card -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <!-- Score Circle -->
+            <div class="score-circle mx-auto mb-4" style="width: 150px; height: 150px; border-radius: 50%; background: #E6E6FA; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <span style="font-size: 3rem; font-weight: 700; color: #5D7A5C;">12</span>
+                <span style="color: #5D7A5C;">out of 27</span>
+            </div>
+
+            <!-- Interpretation -->
+            <h4 class="mb-3" style="color: #5D7A5C;">Moderate Depression</h4>
+            
+            <div class="score-scale mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Minimal</span>
+                    <span>Mild</span>
+                    <span>Moderate</span>
+                    <span>Mod-Severe</span>
+                    <span>Severe</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" style="width: 44%; background: #9CAF88;"></div>
+                </div>
+                <div class="position-relative" style="height: 20px;">
+                    <div class="position-absolute" style="left: 44%; transform: translateX(-50%);">
+                        <i class="fas fa-chevron-up" style="color: #5D7A5C;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <p class="mb-0">Your score suggests you may be experiencing moderate depression symptoms. This is a common experience for many students, and help is available.</p>
+        </div>
+    </div>
+
+    <!-- Detailed Breakdown -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">📋 Detailed Breakdown</h5>
+            
+            <div class="breakdown-item mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Little interest in things</span>
+                    <span class="badge" style="background: #9CAF88; color: white;">2 - Several days</span>
+                </div>
+            </div>
+            
+            <div class="breakdown-item mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Feeling down or hopeless</span>
+                    <span class="badge" style="background: #9CAF88; color: white;">2 - Several days</span>
+                </div>
+            </div>
+            
+            <div class="breakdown-item mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Sleep issues</span>
+                    <span class="badge" style="background: #9CAF88; color: white;">3 - More than half</span>
+                </div>
+            </div>
+            
+            <div class="breakdown-item mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Feeling tired</span>
+                    <span class="badge" style="background: #9CAF88; color: white;">2 - Several days</span>
+                </div>
+            </div>
+            
+            <div class="breakdown-item mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Appetite changes</span>
+                    <span class="badge" style="background: #9CAF88; color: white;">1 - Not at all</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-link w-100" onclick="toggleFullBreakdown()">
+                View All 9 Responses
+            </button>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="card mb-4" style="background: #FDF6E9;">
+        <div class="card-body">
+            <h5 class="mb-3">💡 Recommendations</h5>
+            
+            <div class="recommendation-item d-flex align-items-center gap-3 mb-3">
+                <div style="width: 40px; height: 40px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-comment" style="color: white;"></i>
+                </div>
+                <div>
+                    <strong>Consider speaking with a counselor</strong>
+                    <p class="small mb-0 text-muted">Talking to a professional can help you develop coping strategies</p>
+                </div>
+            </div>
+            
+            <div class="recommendation-item d-flex align-items-center gap-3 mb-3">
+                <div style="width: 40px; height: 40px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-smile" style="color: white;"></i>
+                </div>
+                <div>
+                    <strong>Try our mood tracking feature</strong>
+                    <p class="small mb-0 text-muted">Track your daily mood to identify patterns</p>
+                </div>
+            </div>
+            
+            <div class="recommendation-item d-flex align-items-center gap-3">
+                <div style="width: 40px; height: 40px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-book-open" style="color: white;"></i>
+                </div>
+                <div>
+                    <strong>Explore coping resources</strong>
+                    <p class="small mb-0 text-muted">Check our library of articles and exercises</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-3">
+        <button class="btn btn-outline flex-grow-1" onclick="downloadResults()">
+            <i class="fas fa-download me-2"></i>Download PDF
+        </button>
+        <button class="btn btn-primary flex-grow-1" onclick="window.location.href='/assessments/history'">
+            <i class="fas fa-history me-2"></i>View History
+        </button>
+    </div>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-link" style="color: #B99B7C;" onclick="shareResults()">
+            <i class="fas fa-share-alt me-2"></i>Share with Counselor
+        </button>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="info-card mt-4">
+        <span class="info-icon">⚠️</span>
+        <small>This assessment is a screening tool, not a diagnosis. Please consult a mental health professional for proper evaluation.</small>
+    </div>
+</div>
+
+<style>
+.score-circle {
+    box-shadow: var(--shadow-soft);
+}
+
+.recommendation-item {
+    padding: 0.5rem;
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.recommendation-item:hover {
+    background: white;
+    transform: translateX(5px);
+}
+</style>
+
+<script>
+function toggleFullBreakdown() {
+    flashMessages.info('Full breakdown feature coming soon!');
+}
+
+function downloadResults() {
+    flashMessages.success('Preparing your PDF for download...');
+    setTimeout(() => {
+        flashMessages.info('PDF downloaded');
+    }, 1500);
+}
+
+function shareResults() {
+    flashMessages.info('Share feature - you can show these results to your counselor');
+}
+</script>
+{% endblock %}

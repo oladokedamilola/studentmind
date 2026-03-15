@@ -1,0 +1,75 @@
+{% extends "base/public_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <!-- Header -->
+    <div class="mb-4">
+        <a href="/" class="btn btn-link ps-0" style="color: #5D7A5C;">
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
+        <h1 class="mt-3">Terms of Service</h1>
+        <p class="text-muted">Last updated: March 15, 2025</p>
+    </div>
+
+    <!-- Terms Content -->
+    <div class="card">
+        <div class="card-body">
+            <!-- Important Notice -->
+            <div class="info-card mb-4" style="background: #FDF6E9;">
+                <span class="info-icon">⚠️</span>
+                <div>
+                    <strong>Important:</strong> MindHaven is a support tool, not a crisis service. If you're in immediate danger, please contact emergency services.
+                </div>
+            </div>
+
+            <div class="terms-section mb-4">
+                <h5 class="mb-3">1. Acceptance of Terms</h5>
+                <p>By accessing or using MindHaven, you agree to be bound by these Terms. If you disagree with any part, you may not access the service.</p>
+            </div>
+
+            <div class="terms-section mb-4">
+                <h5 class="mb-3">2. Eligibility</h5>
+                <p>You must be:</p>
+                <ul>
+                    <li>A currently enrolled university student</li>
+                    <li>At least 18 years old (or have parental consent)</li>
+                    <li>Using your institutional email for verification</li>
+                </ul>
+            </div>
+
+            <div class="terms-section mb-4">
+                <h5 class="mb-3">3. Acceptable Use</h5>
+                <p>You agree to:</p>
+                <ul>
+                    <li>Use the service respectfully</li>
+                    <li>Not share your account credentials</li>
+                    <li>Not use the service for illegal purposes</li>
+                    <li>Not attempt to circumvent security measures</li>
+                </ul>
+            </div>
+
+            <div class="terms-section mb-4">
+                <h5 class="mb-3">4. Service Limitations</h5>
+                <ul>
+                    <li>MindHaven is not a replacement for professional medical care</li>
+                    <li>We may occasionally need to perform maintenance</li>
+                    <li>Features may be updated or modified</li>
+                </ul>
+            </div>
+
+            <div class="terms-section mb-4">
+                <h5 class="mb-3">5. Termination</h5>
+                <p>We reserve the right to terminate accounts that violate these terms or for extended inactivity.</p>
+            </div>
+
+            <div class="terms-section">
+                <h5 class="mb-3">6. Contact</h5>
+                <p>For questions about these Terms:</p>
+                <p>
+                    <i class="fas fa-envelope me-2" style="color: #9CAF88;"></i> legal@mindhaven.com
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

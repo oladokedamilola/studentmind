@@ -1,0 +1,90 @@
+<div class="welcome-tour modal fade" id="welcomeTour" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+                <div id="tourCarousel" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner">
+                        <!-- Slide 1: Welcome -->
+                        <div class="carousel-item active">
+                            <div class="tour-slide p-5 text-center">
+                                <div class="tour-icon mb-4">
+                                    <img src="{% static 'images/welcome.svg' %}" alt="Welcome" style="height: 120px;">
+                                </div>
+                                <h3>Welcome to MindHaven 🌿</h3>
+                                <p class="text-muted">Your personal sanctuary for mental wellbeing</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 2: Chat -->
+                        <div class="carousel-item">
+                            <div class="tour-slide p-5 text-center">
+                                <div class="tour-icon mb-4">
+                                    <img src="{% static 'images/chat.svg' %}" alt="Chat" style="height: 120px;">
+                                </div>
+                                <h3>24/7 Support Chat</h3>
+                                <p class="text-muted">Talk anonymously with our AI assistant anytime</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 3: Mood -->
+                        <div class="carousel-item">
+                            <div class="tour-slide p-5 text-center">
+                                <div class="tour-icon mb-4">
+                                    <img src="{% static 'images/mood.svg' %}" alt="Mood" style="height: 120px;">
+                                </div>
+                                <h3>Track Your Mood</h3>
+                                <p class="text-muted">Understand your emotional patterns over time</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 4: Resources -->
+                        <div class="carousel-item">
+                            <div class="tour-slide p-5 text-center">
+                                <div class="tour-icon mb-4">
+                                    <img src="{% static 'images/resources.svg' %}" alt="Resources" style="height: 120px;">
+                                </div>
+                                <h3>Coping Resources</h3>
+                                <p class="text-muted">Access exercises, articles, and tools</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 5: Crisis -->
+                        <div class="carousel-item">
+                            <div class="tour-slide p-5 text-center">
+                                <div class="tour-icon mb-4">
+                                    <img src="{% static 'images/crisis.svg' %}" alt="Crisis" style="height: 120px;">
+                                </div>
+                                <h3>Emergency Support</h3>
+                                <p class="text-muted">One tap access to crisis resources when you need them most</p>
+                                
+                                <div class="mt-4">
+                                    <button class="btn btn-sage" data-bs-dismiss="modal">Start Your Journey</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carousel controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#tourCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#tourCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="modal-footer justify-content-center">
+                <div class="carousel-indicators-static">
+                    <span class="active"></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

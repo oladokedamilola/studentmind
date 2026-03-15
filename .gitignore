@@ -1,0 +1,395 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env/
+.venv/
+env.bak/
+venv.bak/
+pythonenv*
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+mediafiles/
+*.pot
+
+# Django REST Framework
+*.swagger-codegen
+*.openapi-generator
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.staging
+.env.test
+!.env.example  # Keep .env.example
+
+# Backend specific
+backend/media/
+backend/static/
+backend/staticfiles/
+backend/mediafiles/
+backend/__pycache__/
+backend/*/__pycache__/
+backend/apps/*/__pycache__/
+
+# Frontend
+frontend/node_modules/
+frontend/package-lock.json
+frontend/yarn.lock
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/.sass-cache/
+frontend/.scannerwork/
+frontend/coverage/
+frontend/.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-*
+.project
+.classpath
+.settings/
+*.komodoproject
+*.komodotools
+.netbeans/
+nbproject/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Testing
+.cache/
+.pytest_cache/
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.hypothesis/
+.cache
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+
+# Documentation
+docs/_build/
+docs/build/
+docs/source/_build/
+site/
+
+# Database
+*.sqlite3
+*.sqlite
+*.db
+*.sql
+*.sql.gz
+*.dump
+pgdata/
+postgres-data/
+mysql-data/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+Dockerfile.dev
+.docker/
+*.docker-data/
+
+# Security
+*.pem
+*.key
+*.crt
+*.csr
+*.pub
+*.gpg
+*.asc
+*.secret
+secrets/
+credentials/
+.credentials/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Backups
+*.bak
+*.backup
+*.old
+backups/
+backup/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# Project specific
+data/
+scripts/*.pyc
+tests/*.pyc
+tests/__pycache__/
+*.rdb
+*.rdb-journal
+
+# Coverage
+coverage/
+htmlcov/
+.coverage.*
+.coverage
+coverage.xml
+
+# Profiling
+prof/
+profile/
+*.prof
+*.stats
+
+# Jupyter Notebooks (if any)
+.ipynb_checkpoints/
+*.ipynb
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+*.celery
+
+# Sphinx documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# VSCode
+.vscode/
+.vscode-server/
+.history/
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Pyre type checker
+.pyre/
+
+# Pytype
+.pytype/
+
+# Cython
+*.so
+*.pyd
+
+# MkDocs
+/site/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pytype static type analyzer
+.pytype/
+
+# profile data
+.prof
+.profraw
+
+# Translations
+*.mo
+*.pot
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# PyBuilder
+.pybuilder/
+target/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# Cython debug symbols
+cython_debug/
+
+# Media files (user uploaded)
+/media/
+/uploads/
+/static/uploads/
+/media/uploads/
+
+# Database fixtures (if any)
+/fixtures/*.json
+!fixtures/initial_data.json
+
+# Project specific - MindHaven
+# Sensitive student data exports
+/exports/
+/student_data_exports/
+
+# Temporary assessment results
+/temp_assessment_results/
+
+# Local development overrides
+local_settings.py
+development_settings.py
+settings_local.py
+
+# VSCode workspace
+*.code-workspace
+
+# PyCharm workspace
+*.iws
+*.iml
+*.ipr
+
+# VS Code settings
+.vscode/*
+!.vscode/settings.json.example
+!.vscode/extensions.json
+!.vscode/launch.json.example
+
+# Environment specific
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Django secret key file
+secret_key.txt
+
+# Data directory (contains student data)
+/data/*
+!/data/.gitkeep
+
+# Scripts output
+/scripts/output/
+/scripts/*.log
+
+# Tests output
+/test_output/
+/test_reports/
+
+# Profiling data
+*.prof
+*.stats
+profile/
+profiling/
+
+# Database backups
+*.sql
+*.sql.gz
+*.dump
+*.backup
+
+# Docker compose override (for local development)
+docker-compose.override.yml
+
+# Kubernetes secrets (don't commit)
+*.secrets.yaml
+*.secrets.yml
+/secrets/
+
+# Terraform (if used)
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+
+# Ansible (if used)
+*.retry
+/inventory/
+/group_vars/
+/host_vars/

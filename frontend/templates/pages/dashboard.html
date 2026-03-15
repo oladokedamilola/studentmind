@@ -1,0 +1,185 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Welcome back, <span id="welcomeName">John</span>!</h1>
+    </div>
+
+    <!-- Student Info Card -->
+    <div class="card mb-4" style="background: #E6E6FA;">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div style="width: 50px; height: 50px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-graduate" style="color: white; font-size: 24px;"></i>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <small class="text-muted">Department</small>
+                            <p class="mb-0 fw-bold" id="userDept">Computer Science</p>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Level</small>
+                            <p class="mb-0 fw-bold" id="userLevel">300L</p>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Faculty</small>
+                            <p class="mb-0 fw-bold" id="userFaculty">Science</p>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Matric</small>
+                            <p class="mb-0 fw-bold" id="userMatric">202012345</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mood Check-in -->
+    <div class="card mb-4">
+        <h3 class="mb-3">How are you feeling today?</h3>
+        <div class="mood-grid">
+            <div class="mood-item" data-mood="low" onclick="selectMood(this)">
+                <div class="mood-emoji">😔</div>
+                <div>Low</div>
+            </div>
+            <div class="mood-item" data-mood="good" onclick="selectMood(this)">
+                <div class="mood-emoji">😊</div>
+                <div>Good</div>
+            </div>
+            <div class="mood-item" data-mood="okay" onclick="selectMood(this)">
+                <div class="mood-emoji">😐</div>
+                <div>Okay</div>
+            </div>
+            <div class="mood-item" data-mood="calm" onclick="selectMood(this)">
+                <div class="mood-emoji">😌</div>
+                <div>Calm</div>
+            </div>
+            <div class="mood-item" data-mood="anxious" onclick="selectMood(this)">
+                <div class="mood-emoji">😰</div>
+                <div>High Anx</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <h3 class="mb-3">Quick Actions</h3>
+                <div class="quick-actions">
+                    <div class="action-card" onclick="window.location.href='/chat'">
+                        <div class="action-icon">💬</div>
+                        <div>Chat Now</div>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='/resources'">
+                        <div class="action-icon">📚</div>
+                        <div>Resources</div>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='/mood-history'">
+                        <div class="action-icon">📊</div>
+                        <div>Mood History</div>
+                    </div>
+                    <div class="action-card" onclick="window.location.href='/crisis'">
+                        <div class="action-icon">🆘</div>
+                        <div>Crisis Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Conversations -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">Recent Conversations</h3>
+                    <a href="/conversations" style="color: #5D7A5C;">View All</a>
+                </div>
+                <div class="conversation-list">
+                    <div class="conversation-item">
+                        <span class="conversation-title">Exam anxiety support</span>
+                        <span class="conversation-time">2h ago</span>
+                    </div>
+                    <div class="conversation-item">
+                        <span class="conversation-title">Sleep issues discussion</span>
+                        <span class="conversation-time">1d ago</span>
+                    </div>
+                    <div class="conversation-item">
+                        <span class="conversation-title">Relationship advice</span>
+                        <span class="conversation-time">3d ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommended Resource -->
+    <div class="card" style="background: linear-gradient(135deg, #9CAF88 0%, #5D7A5C 100%); color: white;">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3 class="mb-2" style="color: white;">🌟 Recommended for You</h3>
+                    <p class="mb-0">5-minute breathing exercise to reduce anxiety</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn" style="background: white; color: #5D7A5C;" onclick="startExercise()">
+                        Try Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserData();
+});
+
+function selectMood(element) {
+    // Remove selected class from all moods
+    document.querySelectorAll('.mood-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked mood
+    element.classList.add('selected');
+    
+    // Get mood value
+    const mood = element.dataset.mood;
+    
+    // Show feedback
+    flashMessages.success(`Mood logged: ${mood}`);
+    
+    // Here you would send this to your backend
+    console.log('Mood selected:', mood);
+}
+
+function startExercise() {
+    flashMessages.info('Starting breathing exercise...');
+    // Navigate to exercise page
+    setTimeout(() => {
+        window.location.href = '/exercise/breathing';
+    }, 2000);
+}
+
+async function loadUserData() {
+    const result = await getCurrentUser();
+    if (result.success) {
+        const user = result.data;
+        document.getElementById('welcomeName').textContent = user.first_name || 'John';
+        document.getElementById('userDept').textContent = user.department || 'Computer Science';
+        document.getElementById('userLevel').textContent = user.level || '300L';
+        document.getElementById('userFaculty').textContent = user.faculty || 'Science';
+        document.getElementById('userMatric').textContent = user.matric_number || '202012345';
+    }
+}
+</script>
+{% endblock %}

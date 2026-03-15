@@ -1,0 +1,86 @@
+<!-- Preloader -->
+<div id="preloader" style="display: none;">
+    <div class="preloader-content">
+        <div class="preloader-logo">
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                <circle cx="30" cy="30" r="28" stroke="#9CAF88" stroke-width="2" stroke-dasharray="8 8"/>
+                <path d="M20 30 L27 37 L40 24" stroke="#5D7A5C" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="preloader-text">MindHaven</div>
+        <div class="preloader-spinner">
+            <div class="spinner"></div>
+        </div>
+        <div class="preloader-message">Creating your safe space...</div>
+    </div>
+</div>
+
+<style>
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #FDF6E9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: opacity 0.5s ease;
+}
+
+.preloader-content {
+    text-align: center;
+    animation: pulse 2s infinite;
+}
+
+.preloader-logo {
+    margin-bottom: 20px;
+    animation: rotate 3s linear infinite;
+}
+
+.preloader-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #5D7A5C;
+    margin-bottom: 20px;
+}
+
+.preloader-spinner {
+    margin: 20px 0;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #E6E6FA;
+    border-top: 3px solid #9CAF88;
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 1s linear infinite;
+}
+
+.preloader-message {
+    font-family: 'Quicksand', sans-serif;
+    color: #B99B7C;
+    font-size: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>

@@ -1,0 +1,240 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <a href="/dashboard" class="btn btn-link me-2" style="color: #5D7A5C;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="mb-0">📋 Mental Health Assessments</h2>
+        </div>
+        
+        <a href="/assessments/history" class="btn btn-outline">
+            <i class="fas fa-history me-2"></i>View History
+        </a>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="info-card mb-4">
+        <span class="info-icon">ℹ️</span>
+        <span>These assessments are screening tools, not diagnostic. Please consult a mental health professional for proper evaluation.</span>
+    </div>
+
+    <!-- Assessments Grid -->
+    <div class="row g-4">
+        <!-- PHQ-9 Card -->
+        <div class="col-md-6 col-lg-4">
+            <div class="assessment-card">
+                <div class="assessment-header p-4" style="background: #9CAF88; color: white; border-radius: 16px 16px 0 0;">
+                    <h4 class="mb-1">PHQ-9</h4>
+                    <p class="mb-0 opacity-75">Depression Scale</p>
+                </div>
+                <div class="assessment-body p-4" style="background: white;">
+                    <div class="mb-3">
+                        <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">9 questions</span>
+                        <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">3-5 minutes</span>
+                    </div>
+                    <p class="mb-3">Measures the severity of depression symptoms over the past two weeks.</p>
+                    
+                    <div class="last-taken mb-3">
+                        <small class="text-muted">Last taken: 2 weeks ago</small>
+                        <div class="progress mt-1" style="height: 4px;">
+                            <div class="progress-bar" style="width: 0%; background: #9CAF88;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary flex-grow-1" onclick="startAssessment('phq9')">
+                            <i class="fas fa-play me-2"></i>Take Assessment
+                        </button>
+                        <button class="btn btn-outline" onclick="viewHistory('phq9')">
+                            <i class="fas fa-chart-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAD-7 Card -->
+        <div class="col-md-6 col-lg-4">
+            <div class="assessment-card">
+                <div class="assessment-header p-4" style="background: #5D7A5C; color: white; border-radius: 16px 16px 0 0;">
+                    <h4 class="mb-1">GAD-7</h4>
+                    <p class="mb-0 opacity-75">Anxiety Scale</p>
+                </div>
+                <div class="assessment-body p-4" style="background: white;">
+                    <div class="mb-3">
+                        <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">7 questions</span>
+                        <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">2-3 minutes</span>
+                    </div>
+                    <p class="mb-3">Screens for generalized anxiety disorder and measures anxiety severity.</p>
+                    
+                    <div class="last-taken mb-3">
+                        <small class="text-muted">Last taken: 1 month ago</small>
+                        <div class="progress mt-1" style="height: 4px;">
+                            <div class="progress-bar" style="width: 0%; background: #5D7A5C;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary flex-grow-1" style="background: #5D7A5C; border-color: #5D7A5C;" onclick="startAssessment('gad7')">
+                            <i class="fas fa-play me-2"></i>Take Assessment
+                        </button>
+                        <button class="btn btn-outline" onclick="viewHistory('gad7')">
+                            <i class="fas fa-chart-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PSS Card -->
+        <div class="col-md-6 col-lg-4">
+            <div class="assessment-card">
+                <div class="assessment-header p-4" style="background: #B99B7C; color: white; border-radius: 16px 16px 0 0;">
+                    <h4 class="mb-1">PSS</h4>
+                    <p class="mb-0 opacity-75">Perceived Stress Scale</p>
+                </div>
+                <div class="assessment-body p-4" style="background: white;">
+                    <div class="mb-3">
+                        <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">10 questions</span>
+                        <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">4-5 minutes</span>
+                    </div>
+                    <p class="mb-3">Measures how stressful you perceive your life situations to be.</p>
+                    
+                    <div class="last-taken mb-3">
+                        <small class="text-muted">Never taken</small>
+                        <div class="progress mt-1" style="height: 4px;">
+                            <div class="progress-bar" style="width: 0%; background: #B99B7C;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary flex-grow-1" style="background: #B99B7C; border-color: #B99B7C;" onclick="startAssessment('pss')">
+                            <i class="fas fa-play me-2"></i>Take Assessment
+                        </button>
+                        <button class="btn btn-outline" onclick="viewHistory('pss')">
+                            <i class="fas fa-chart-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Assessments -->
+        <div class="col-md-6 col-lg-4">
+            <div class="assessment-card">
+                <div class="assessment-header p-4" style="background: #E6E6FA; color: #5D7A5C; border-radius: 16px 16px 0 0;">
+                    <h4 class="mb-1">ISI</h4>
+                    <p class="mb-0">Insomnia Severity Index</p>
+                </div>
+                <div class="assessment-body p-4" style="background: white;">
+                    <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">7 questions</span>
+                    <p class="mt-2">Assesses the nature, severity, and impact of insomnia.</p>
+                    <button class="btn btn-outline w-100" onclick="startAssessment('isi')">
+                        Start Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="assessment-card">
+                <div class="assessment-header p-4" style="background: #E6E6FA; color: #5D7A5C; border-radius: 16px 16px 0 0;">
+                    <h4 class="mb-1">MDQ</h4>
+                    <p class="mb-0">Mood Disorder Questionnaire</p>
+                </div>
+                <div class="assessment-body p-4" style="background: white;">
+                    <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">13 questions</span>
+                    <p class="mt-2">Screens for bipolar spectrum disorders.</p>
+                    <button class="btn btn-outline w-100" onclick="startAssessment('mdq')">
+                        Start Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="assessment-card">
+                <div class="assessment-header p-4" style="background: #E6E6FA; color: #5D7A5C; border-radius: 16px 16px 0 0;">
+                    <h4 class="mb-1">CAGE</h4>
+                    <p class="mb-0">Alcohol Screening</p>
+                </div>
+                <div class="assessment-body p-4" style="background: white;">
+                    <span class="badge mb-2" style="background: #E6E6FA; color: #5D7A5C;">4 questions</span>
+                    <p class="mt-2">Brief screening for alcohol-related problems.</p>
+                    <button class="btn btn-outline w-100" onclick="startAssessment('cage')">
+                        Start Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommended Schedule -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="mb-3">📅 Recommended Assessment Schedule</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="schedule-item p-3" style="background: #FDF6E9; border-radius: 12px;">
+                        <h6 class="mb-2">PHQ-9</h6>
+                        <p class="small mb-0">Every 2-4 weeks to track depression symptoms</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="schedule-item p-3" style="background: #FDF6E9; border-radius: 12px;">
+                        <h6 class="mb-2">GAD-7</h6>
+                        <p class="small mb-0">Every 2-4 weeks to monitor anxiety levels</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="schedule-item p-3" style="background: #FDF6E9; border-radius: 12px;">
+                        <h6 class="mb-2">PSS</h6>
+                        <p class="small mb-0">Monthly to track stress perception</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.assessment-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+    height: 100%;
+}
+
+.assessment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.schedule-item {
+    transition: var(--transition);
+}
+
+.schedule-item:hover {
+    transform: translateX(5px);
+    background: #E6E6FA !important;
+}
+</style>
+
+<script>
+function startAssessment(type) {
+    flashMessages.info(`Starting ${type.toUpperCase()} assessment...`);
+    setTimeout(() => {
+        window.location.href = `/assessments/take/${type}`;
+    }, 1000);
+}
+
+function viewHistory(type) {
+    window.location.href = `/assessments/history?type=${type}`;
+}
+</script>
+{% endblock %}

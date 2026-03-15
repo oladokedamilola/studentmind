@@ -1,0 +1,237 @@
+{% extends "base/authenticated_base.html" %}
+
+{% block content %}
+<div class="container-fluid chat-container" style="height: calc(100vh - 100px); display: flex; flex-direction: column;">
+    <!-- Chat Header -->
+    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+        <div class="d-flex align-items-center">
+            <a href="/chat" class="btn btn-link me-2" style="color: #5D7A5C;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h5 class="mb-0">Exam Anxiety Support</h5>
+                <small class="text-muted">Today, 2:30 PM</small>
+            </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="showChatOptions()">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="messages-container flex-grow-1 overflow-auto mb-3" id="messagesContainer">
+        <!-- AI Message -->
+        <div class="message-row ai-message mb-3">
+            <div class="d-flex align-items-start">
+                <div class="message-avatar me-2" style="width: 36px; height: 36px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-robot" style="color: white; font-size: 18px;"></i>
+                </div>
+                <div class="message-bubble" style="background: #FDF6E9; border-radius: 18px 18px 18px 4px; padding: 12px 16px; max-width: 70%;">
+                    <p class="mb-1" style="color: #5D7A5C;">Hi there! I'm here to help with your exam anxiety. How are you feeling right now?</p>
+                    <small class="text-muted">2:31 PM</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Message -->
+        <div class="message-row user-message mb-3 d-flex justify-content-end">
+            <div class="d-flex align-items-start flex-row-reverse">
+                <div class="message-avatar ms-2" style="width: 36px; height: 36px; background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user" style="color: #5D7A5C;"></i>
+                </div>
+                <div class="message-bubble" style="background: #9CAF88; border-radius: 18px 18px 4px 18px; padding: 12px 16px; max-width: 70%;">
+                    <p class="mb-1 text-white">I'm really anxious about my exams next week. I can't sleep or focus.</p>
+                    <small style="color: rgba(255,255,255,0.8);">2:32 PM</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Response -->
+        <div class="message-row ai-message mb-3">
+            <div class="d-flex align-items-start">
+                <div class="message-avatar me-2" style="width: 36px; height: 36px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-robot" style="color: white; font-size: 18px;"></i>
+                </div>
+                <div class="message-bubble" style="background: #FDF6E9; border-radius: 18px 18px 18px 4px; padding: 12px 16px; max-width: 70%;">
+                    <p class="mb-1" style="color: #5D7A5C;">I hear how stressed you are. Exam pressure can be overwhelming. Let's try a quick breathing exercise together. Would you like that?</p>
+                    <div class="mt-2">
+                        <button class="btn btn-sm" style="background: #9CAF88; color: white;" onclick="startBreathing()">
+                            <i class="fas fa-play me-1"></i>Start Exercise
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">2:33 PM</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-container p-3" style="background: white; border-radius: 16px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05);">
+        <form id="messageForm" onsubmit="sendMessage(event)">
+            <div class="d-flex gap-2">
+                <input type="text" class="form-control" placeholder="Type your message..." id="messageInput" autocomplete="off">
+                <button type="button" class="btn btn-outline" onclick="attachFile()">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Crisis Support Button -->
+    <button class="btn btn-danger position-fixed" style="bottom: 30px; right: 30px; border-radius: 50px; padding: 12px 24px; box-shadow: 0 5px 15px rgba(255,107,107,0.3);" onclick="showCrisisSupport()">
+        <i class="fas fa-exclamation-triangle me-2"></i>Crisis Support
+    </button>
+</div>
+
+<style>
+.messages-container {
+    scroll-behavior: smooth;
+    padding: 10px;
+}
+
+.message-row {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-bubble {
+    position: relative;
+    word-wrap: break-word;
+}
+
+.message-bubble p {
+    margin: 0;
+    line-height: 1.5;
+}
+</style>
+
+<script>
+// Auto-scroll to bottom on load
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('messagesContainer');
+    container.scrollTop = container.scrollHeight;
+});
+
+function sendMessage(event) {
+    event.preventDefault();
+    
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Add user message to chat
+    addMessage(message, 'user');
+    input.value = '';
+    
+    // Show typing indicator
+    showTypingIndicator();
+    
+    // Simulate AI response
+    setTimeout(() => {
+        hideTypingIndicator();
+        addMessage("Thank you for sharing that. Let's work through this together. What specific aspect of exams worries you most?", 'ai');
+    }, 2000);
+}
+
+function addMessage(text, sender) {
+    const container = document.getElementById('messagesContainer');
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message-row ${sender}-message mb-3 ${sender === 'user' ? 'd-flex justify-content-end' : ''}`;
+    
+    if (sender === 'user') {
+        messageDiv.innerHTML = `
+            <div class="d-flex align-items-start flex-row-reverse">
+                <div class="message-avatar ms-2" style="width: 36px; height: 36px; background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user" style="color: #5D7A5C;"></i>
+                </div>
+                <div class="message-bubble" style="background: #9CAF88; border-radius: 18px 18px 4px 18px; padding: 12px 16px; max-width: 70%;">
+                    <p class="mb-1 text-white">${text}</p>
+                    <small style="color: rgba(255,255,255,0.8);">${time}</small>
+                </div>
+            </div>
+        `;
+    } else {
+        messageDiv.innerHTML = `
+            <div class="d-flex align-items-start">
+                <div class="message-avatar me-2" style="width: 36px; height: 36px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-robot" style="color: white; font-size: 18px;"></i>
+                </div>
+                <div class="message-bubble" style="background: #FDF6E9; border-radius: 18px 18px 18px 4px; padding: 12px 16px; max-width: 70%;">
+                    <p class="mb-1" style="color: #5D7A5C;">${text}</p>
+                    <small class="text-muted">${time}</small>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const container = document.getElementById('messagesContainer');
+    const indicator = document.createElement('div');
+    indicator.id = 'typingIndicator';
+    indicator.className = 'message-row ai-message mb-3';
+    indicator.innerHTML = `
+        <div class="d-flex align-items-start">
+            <div class="message-avatar me-2" style="width: 36px; height: 36px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-robot" style="color: white; font-size: 18px;"></i>
+            </div>
+            <div class="message-bubble" style="background: #FDF6E9; border-radius: 18px; padding: 12px 16px;">
+                <div class="typing-dots">
+                    <span>.</span><span>.</span><span>.</span>
+                </div>
+            </div>
+        </div>
+    `;
+    container.appendChild(indicator);
+    container.scrollTop = container.scrollHeight;
+}
+
+function hideTypingIndicator() {
+    const indicator = document.getElementById('typingIndicator');
+    if (indicator) indicator.remove();
+}
+
+function startBreathing() {
+    flashMessages.info('Starting breathing exercise...');
+    setTimeout(() => {
+        window.location.href = '/resources/breathing-exercise';
+    }, 1500);
+}
+
+function attachFile() {
+    flashMessages.info('File attachment coming soon!');
+}
+
+function showChatOptions() {
+    // Create options menu
+    const options = [
+        { label: 'Save Conversation', icon: 'fa-save', action: 'saveChat' },
+        { label: 'Export as PDF', icon: 'fa-file-pdf', action: 'exportChat' },
+        { label: 'Delete Conversation', icon: 'fa-trash', action: 'deleteChat', danger: true }
+    ];
+    
+    // For simplicity, using flash message - in production, use a modal
+    flashMessages.info('Options menu would appear here');
+}
+
+function showCrisisSupport() {
+    if (confirm('Are you in crisis and need immediate support? Click OK to see crisis resources.')) {
+        window.location.href = '/crisis-support';
+    }
+}
+</script>
+{% endblock %}

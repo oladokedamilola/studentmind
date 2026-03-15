@@ -1,0 +1,86 @@
+{% extends "base/public_base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+    <div class="text-center py-5">
+        <!-- Illustration -->
+        <div style="font-size: 8rem; margin-bottom: 1rem;">
+            <i class="fas fa-tools" style="color: #E6E6FA;"></i>
+        </div>
+        
+        <h1 class="display-1 mb-3" style="color: #9CAF88;">500</h1>
+        <h2 class="mb-4">Something Went Wrong</h2>
+        
+        <p class="lead mb-4" style="color: #5D7A5C;">
+            We're experiencing technical difficulties.<br>
+            Our team has been notified and is working on it.
+        </p>
+
+        <!-- Status Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                    <div class="spinner-grow spinner-grow-sm" style="color: #9CAF88;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span>Attempting to reconnect...</span>
+                </div>
+                
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 50%; background: #9CAF88;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What you can do -->
+        <h5 class="mb-3">In the meantime, you can:</h5>
+        <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+            <button class="btn btn-primary" onclick="refreshPage()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh Page
+            </button>
+            <a href="/" class="btn btn-outline">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+        </div>
+
+        <!-- Report Issue -->
+        <div class="info-card">
+            <span class="info-icon">📧</span>
+            <span>If this persists, please let us know</span>
+        </div>
+        
+        <div class="mt-4">
+            <a href="/contact" style="color: #5D7A5C;">Report Issue</a>
+            <span class="mx-2">|</span>
+            <a href="/status" style="color: #5D7A5C;">System Status</a>
+        </div>
+
+        <!-- Error Reference -->
+        <p class="text-muted small mt-4">
+            Error Reference: ERR-500-{{ random_id }}<br>
+            Time: {% now "Y-m-d H:i:s" %}
+        </p>
+    </div>
+</div>
+
+<style>
+.display-1 {
+    font-size: 6rem;
+    font-weight: 700;
+    line-height: 1;
+}
+</style>
+
+<script>
+function refreshPage() {
+    location.reload();
+}
+
+// Auto-refresh attempt after 10 seconds
+setTimeout(() => {
+    if (confirm('Still having trouble? Would you like to refresh the page?')) {
+        location.reload();
+    }
+}, 10000);
+</script>
+{% endblock %}

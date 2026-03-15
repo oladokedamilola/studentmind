@@ -393,3 +393,5 @@ docker-compose.override.yml
 /inventory/
 /group_vars/
 /host_vars/
+
+.env

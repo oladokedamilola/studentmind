@@ -1,0 +1,128 @@
+{% extends 'base/public_base.html' %}
+{% load static %}
+
+{% block title %}Resend Verification - MindHaven{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    
+                    <h2 class="text-center mb-4">Resend Verification Email</h2>
+                    
+                    <p class="text-muted text-center mb-4">
+                        Enter your matric number to resend the verification link.
+                    </p>
+                    
+                    <form id="resendForm" onsubmit="event.preventDefault(); resendVerification();">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="matric_number" class="form-label">Matric Number</label>
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="matric_number" 
+                                   name="matric_number"
+                                   placeholder="e.g., 202012345"
+                                   required
+                                   pattern="\d{9,10}"
+                                   title="Please enter a valid 9-10 digit matric number">
+                            <div class="form-text">Enter the matric number you used to register.</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-sage btn-lg w-100" id="submitBtn">
+                            Send Verification Email
+                        </button>
+                    </form>
+                    
+                    <div id="messageArea" class="mt-4" style="display: none;"></div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-2">
+                            <a href="{% url 'pages:login' %}">Back to Login</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function resendVerification() {
+    const form = document.getElementById('resendForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageArea = document.getElementById('messageArea');
+    const matric = document.getElementById('matric_number').value;
+    
+    // Disable button to prevent double submission
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+    
+    try {
+        const response = await fetch('/api/accounts/api/resend-verification/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({ matric_number: matric })
+        });
+        
+        const data = await response.json();
+        
+        messageArea.style.display = 'block';
+        
+        if (response.ok && data.success) {
+            messageArea.innerHTML = `
+                <div class="alert alert-success">
+                    ✅ ${data.message || 'Verification email sent! Please check your inbox.'}
+                </div>
+            `;
+            form.reset();
+        } else {
+            const errorMsg = data.errors?.matric_number?.[0] || data.message || 'Failed to send verification email.';
+            messageArea.innerHTML = `
+                <div class="alert alert-danger">
+                    ❌ ${errorMsg}
+                </div>
+            `;
+        }
+    } catch (error) {
+        messageArea.style.display = 'block';
+        messageArea.innerHTML = `
+            <div class="alert alert-danger">
+                ❌ Network error. Please try again.
+            </div>
+        `;
+    } finally {
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Send Verification Email';
+    }
+}
+</script>
+
+<style>
+.btn-sage {
+    background-color: #9CAF88;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.btn-sage:hover {
+    background-color: #5D7A5C;
+    color: white;
+    transform: translateY(-2px);
+}
+.btn-sage:disabled {
+    background-color: #cccccc;
+}
+</style>
+{% endblock %}

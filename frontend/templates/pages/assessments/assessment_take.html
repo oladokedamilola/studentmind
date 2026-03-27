@@ -1,106 +1,72 @@
 {% extends "base/authenticated_base.html" %}
 
 {% block content %}
-<div class="container" style="max-width: 700px;">
+<div class="container py-2 py-sm-3" style="max-width: 800px; width: 100%; padding-left: 15px; padding-right: 15px;">
     <!-- Header -->
-    <div class="d-flex align-items-center mb-4">
-        <a href="/assessments" class="btn btn-link me-2" style="color: #5D7A5C;">
+    <div class="d-flex align-items-center mb-3 mb-md-4">
+        <a href="{% url 'pages:assessments_list' %}" class="btn btn-link p-0 me-2 me-sm-3" style="color: #5D7A5C; font-size: clamp(1rem, 4vw, 1.2rem);">
             <i class="fas fa-arrow-left"></i>
         </a>
-        <div>
-            <h2 class="mb-0">PHQ-9 Depression Scale</h2>
-            <small class="text-muted">Question 3 of 9</small>
+        <div style="min-width: 0; flex: 1;">
+            <h2 class="mb-0 text-truncate" style="font-size: clamp(1.1rem, 5vw, 1.5rem);">{{ assessment.name }}</h2>
+            <small class="text-muted" style="font-size: clamp(0.7rem, 3vw, 0.875rem);">Question <span id="currentQuestionDisplay">1</span> of <span id="totalQuestionsDisplay">{{ assessment.questions.count }}</span></small>
         </div>
     </div>
 
     <!-- Progress Bar -->
     <div class="progress-container mb-4">
         <div class="d-flex justify-content-between mb-2">
-            <span>Progress</span>
-            <span>33%</span>
+            <span style="font-size: clamp(0.75rem, 3vw, 0.875rem);">Progress</span>
+            <span id="progressPercent" style="font-size: clamp(0.75rem, 3vw, 0.875rem);">0%</span>
         </div>
-        <div class="progress-bar">
-            <div class="progress-fill" style="width: 33%"></div>
+        <div class="progress-bar" style="height: clamp(6px, 2vw, 8px);">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
         </div>
     </div>
 
     <!-- Question Card -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="mb-4">Over the last 2 weeks, how often have you been bothered by:</h5>
+    <div class="card mb-4" style="border-radius: clamp(16px, 4vw, 24px);">
+        <div class="card-body p-3 p-md-4">
+            <h5 class="mb-3 mb-md-4" style="font-size: clamp(0.95rem, 4vw, 1.1rem);">{{ assessment.instructions|default:"Over the last 2 weeks, how often have you been bothered by:" }}</h5>
             
-            <div class="question-box p-4 mb-4" style="background: #FDF6E9; border-radius: 16px;">
-                <h4 class="text-center mb-0" style="color: #5D7A5C;">Trouble falling asleep, staying asleep, or sleeping too much</h4>
+            <div class="question-box p-3 p-md-4 mb-4" style="background: #FDF6E9; border-radius: clamp(12px, 3vw, 16px);">
+                <h4 class="text-center mb-0" id="questionText" style="color: #5D7A5C; font-size: clamp(1rem, 5vw, 1.25rem);">Loading...</h4>
             </div>
 
-            <!-- Options -->
-            <div class="options-container">
-                <div class="option-item mb-3" onclick="selectOption(0)">
-                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
-                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
-                        <span>Not at all</span>
-                    </div>
-                </div>
-                
-                <div class="option-item mb-3" onclick="selectOption(1)">
-                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
-                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
-                        <span>Several days</span>
-                    </div>
-                </div>
-                
-                <div class="option-item mb-3" onclick="selectOption(2)">
-                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
-                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
-                        <span>More than half the days</span>
-                    </div>
-                </div>
-                
-                <div class="option-item mb-4" onclick="selectOption(3)">
-                    <div class="d-flex align-items-center p-3" style="border: 2px solid #E6E6FA; border-radius: 12px; cursor: pointer; transition: var(--transition);">
-                        <div class="option-radio me-3" style="width: 20px; height: 20px; border: 2px solid #9CAF88; border-radius: 50%;"></div>
-                        <span>Nearly every day</span>
-                    </div>
-                </div>
-            </div>
+            <!-- Options Container -->
+            <div class="options-container" id="optionsContainer"></div>
 
             <!-- Navigation Buttons -->
-            <div class="d-flex gap-3">
-                <button class="btn btn-outline flex-grow-1" onclick="previousQuestion()">
+            <div class="d-flex flex-column flex-sm-row gap-2 gap-md-3">
+                <button class="btn btn-outline flex-grow-1" onclick="previousQuestion()" id="prevBtn" style="padding: clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px); font-size: clamp(0.85rem, 3vw, 1rem);">
                     <i class="fas fa-chevron-left me-2"></i>Previous
                 </button>
-                <button class="btn btn-primary flex-grow-1" onclick="nextQuestion()" id="nextBtn" disabled>
+                <button class="btn btn-primary flex-grow-1" onclick="nextQuestion()" id="nextBtn" disabled style="padding: clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px); font-size: clamp(0.85rem, 3vw, 1rem);">
                     Next<i class="fas fa-chevron-right ms-2"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Progress Indicator -->
+    <!-- Progress Indicator Dots -->
     <div class="question-indicator text-center">
-        <span class="text-muted">Question <strong>3</strong> of <strong>9</strong></span>
-        <div class="dots-container mt-2">
-            <span class="dot completed"></span>
-            <span class="dot completed"></span>
-            <span class="dot active"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-        </div>
+        <div class="dots-container mt-2" id="dotsContainer"></div>
     </div>
 
     <!-- Save & Exit -->
     <div class="text-center mt-4">
-        <button class="btn btn-link" style="color: #B99B7C;" onclick="saveAndExit()">
+        <button class="btn btn-link" onclick="saveAndExit()" style="color: #B99B7C; font-size: clamp(0.8rem, 3vw, 0.9rem); padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px);">
             <i class="fas fa-save me-2"></i>Save and Exit
         </button>
     </div>
 </div>
 
 <style>
+.option-item .d-flex {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
 .option-item .d-flex:hover {
     background: #E6E6FA;
     border-color: #9CAF88 !important;
@@ -117,13 +83,32 @@
     border-color: white;
 }
 
+.option-radio {
+    width: clamp(16px, 4vw, 20px);
+    height: clamp(16px, 4vw, 20px);
+    border: 2px solid #9CAF88;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.option-item.selected .option-radio {
+    background: white;
+}
+
+.dots-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(4px, 2vw, 8px);
+}
+
 .dot {
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: clamp(8px, 3vw, 10px);
+    height: clamp(8px, 3vw, 10px);
     background: #E6E6FA;
     border-radius: 50%;
-    margin: 0 3px;
+    transition: all 0.3s ease;
 }
 
 .dot.completed {
@@ -134,128 +119,346 @@
     background: #5D7A5C;
     transform: scale(1.3);
 }
+
+.progress-container {
+    margin: clamp(1rem, 4vw, 2rem) 0;
+}
+
+.card {
+    box-shadow: 0 5px 20px rgba(26, 58, 26, 0.08);
+}
 </style>
 
 <script>
-let selectedOption = null;
-const totalQuestions = 9;
-let currentQuestion = 3;
+const assessmentId = {{ assessment.id }};
+let questions = [];
+let currentQuestionIndex = 0;
+let answers = {};
 
-function selectOption(index) {
+// Load assessment data from API
+async function loadAssessment() {
+    try {
+        console.log('Loading assessment ID:', assessmentId);
+        
+        const response = await fetch(`/api/assessments/api/${assessmentId}/`);
+        const data = await response.json();
+        
+        console.log('API Response:', data);
+        
+        // Check if data has questions
+        if (!data.questions || data.questions.length === 0) {
+            console.error('No questions found in response');
+            if (typeof flashMessages !== 'undefined') {
+                flashMessages.error('No questions found for this assessment');
+            }
+            return;
+        }
+        
+        questions = data.questions;
+        console.log('Questions loaded:', questions.length);
+        
+        // Update UI with loaded data
+        const totalDisplay = document.getElementById('totalQuestionsDisplay');
+        const totalNumber = document.getElementById('totalQuestionsNumber');
+        if (totalDisplay) totalDisplay.textContent = questions.length;
+        if (totalNumber) totalNumber.textContent = questions.length;
+        
+        // Render options for the first question
+        renderOptions(questions[0]);
+        
+        // Initialize dots
+        initializeDots();
+        
+        // Load saved progress from localStorage
+        loadSavedProgress();
+        
+        // Update display for first question
+        updateDisplay();
+        
+        // Enable the next button? No, it should be disabled until an answer is selected
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) nextBtn.disabled = true;
+        
+    } catch (error) {
+        console.error('Error loading assessment:', error);
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.error('Failed to load assessment. Please refresh the page.');
+        }
+    }
+}
+
+function renderOptions(question) {
+    const container = document.getElementById('optionsContainer');
+    if (!container) return;
+    
+    // Default options if none provided
+    const optionLabels = question.options || [
+        "Not at all",
+        "Several days",
+        "More than half the days",
+        "Nearly every day"
+    ];
+    
+    let html = '';
+    optionLabels.forEach((label, index) => {
+        html += `
+            <div class="option-item mb-2 mb-md-3" data-value="${index}" onclick="selectOption(${index})">
+                <div class="d-flex align-items-center p-2 p-md-3" style="border: 2px solid #E6E6FA; border-radius: clamp(10px, 3vw, 12px); cursor: pointer;">
+                    <div class="option-radio me-2 me-md-3"></div>
+                    <span style="font-size: clamp(0.85rem, 3.5vw, 1rem);">${escapeHtml(label)}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function initializeDots() {
+    const container = document.getElementById('dotsContainer');
+    if (!container) return;
+    
+    let dotsHtml = '';
+    for (let i = 0; i < questions.length; i++) {
+        let dotClass = '';
+        if (answers[i] !== undefined) dotClass = 'completed';
+        else if (i === currentQuestionIndex) dotClass = 'active';
+        dotsHtml += `<span class="dot ${dotClass}" data-index="${i}"></span>`;
+    }
+    container.innerHTML = dotsHtml;
+}
+
+function updateDots() {
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, index) => {
+        dot.classList.remove('completed', 'active');
+        if (answers[index] !== undefined) {
+            dot.classList.add('completed');
+        }
+        if (index === currentQuestionIndex) {
+            dot.classList.add('active');
+        }
+    });
+}
+
+function updateDisplay() {
+    if (!questions.length) return;
+    
+    const question = questions[currentQuestionIndex];
+    
+    // Update question text
+    const questionTextEl = document.getElementById('questionText');
+    if (questionTextEl) {
+        questionTextEl.textContent = question.text;
+    }
+    
+    // Update progress
+    const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    if (progressFill) progressFill.style.width = `${progress}%`;
+    if (progressPercent) progressPercent.textContent = `${Math.round(progress)}%`;
+    
+    // Update question numbers
+    const currentDisplay = document.getElementById('currentQuestionDisplay');
+    const currentNumber = document.getElementById('currentQuestionNumber');
+    if (currentDisplay) currentDisplay.textContent = currentQuestionIndex + 1;
+    if (currentNumber) currentNumber.textContent = currentQuestionIndex + 1;
+    
+    // Update dots
+    updateDots();
+    
+    // Load saved answer if exists
+    if (answers[currentQuestionIndex] !== undefined) {
+        const selectedValue = answers[currentQuestionIndex];
+        const options = document.querySelectorAll('.option-item');
+        options.forEach((opt, idx) => {
+            if (idx === selectedValue) {
+                opt.classList.add('selected');
+            } else {
+                opt.classList.remove('selected');
+            }
+        });
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) nextBtn.disabled = false;
+    } else {
+        document.querySelectorAll('.option-item').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) nextBtn.disabled = true;
+    }
+    
+    // Update previous button state
+    const prevBtn = document.getElementById('prevBtn');
+    if (prevBtn) {
+        prevBtn.disabled = (currentQuestionIndex === 0);
+    }
+    
+    // Update next button text for last question
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) {
+        if (currentQuestionIndex === questions.length - 1) {
+            nextBtn.innerHTML = 'Submit<i class="fas fa-check ms-2"></i>';
+        } else {
+            nextBtn.innerHTML = 'Next<i class="fas fa-chevron-right ms-2"></i>';
+        }
+    }
+}
+
+function selectOption(value) {
     // Remove selected class from all options
     document.querySelectorAll('.option-item').forEach(item => {
         item.classList.remove('selected');
     });
     
     // Add selected class to clicked option
-    event.currentTarget.classList.add('selected');
+    const selectedItem = document.querySelector(`.option-item[data-value="${value}"]`);
+    if (selectedItem) {
+        selectedItem.classList.add('selected');
+    }
     
-    // Store selection
-    selectedOption = index;
+    // Store answer
+    answers[currentQuestionIndex] = value;
+    
+    // Save to localStorage
+    saveProgress();
     
     // Enable next button
-    document.getElementById('nextBtn').disabled = false;
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.disabled = false;
 }
 
 function previousQuestion() {
-    if (currentQuestion > 1) {
-        currentQuestion--;
-        updateQuestion();
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        // Update the options for the new question
+        renderOptions(questions[currentQuestionIndex]);
+        updateDisplay();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
 function nextQuestion() {
-    if (selectedOption === null) {
-        flashMessages.warning('Please select an answer before continuing');
+    if (answers[currentQuestionIndex] === undefined) {
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.warning('Please select an answer before continuing');
+        }
         return;
     }
     
-    if (currentQuestion < totalQuestions) {
-        // Save answer
-        saveAnswer(currentQuestion, selectedOption);
-        
-        // Move to next question
-        currentQuestion++;
-        
-        if (currentQuestion <= totalQuestions) {
-            updateQuestion();
-        } else {
-            // Complete assessment
-            completeAssessment();
-        }
+    if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        // Update the options for the new question
+        renderOptions(questions[currentQuestionIndex]);
+        updateDisplay();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        // Submit assessment
+        submitAssessment();
     }
 }
 
-function updateQuestion() {
-    // Show loading
-    flashMessages.info(`Loading question ${currentQuestion}...`);
-    
-    // Reset selection
-    selectedOption = null;
-    document.getElementById('nextBtn').disabled = true;
-    document.querySelectorAll('.option-item').forEach(item => {
-        item.classList.remove('selected');
-    });
-    
-    // Update progress
-    const progress = (currentQuestion / totalQuestions) * 100;
-    document.querySelector('.progress-fill').style.width = `${progress}%`;
-    document.querySelector('.progress-container span:last-child').textContent = `${Math.round(progress)}%`;
-    
-    // Update question text (in production, fetch from backend)
-    const questions = [
-        "Little interest or pleasure in doing things",
-        "Feeling down, depressed, or hopeless",
-        "Trouble falling asleep, staying asleep, or sleeping too much",
-        "Feeling tired or having little energy",
-        "Poor appetite or overeating",
-        "Feeling bad about yourself",
-        "Trouble concentrating on things",
-        "Moving or speaking so slowly that others could notice",
-        "Thoughts that you would be better off dead"
-    ];
-    
-    document.querySelector('.question-box h4').textContent = questions[currentQuestion - 1];
-    document.querySelector('.question-indicator strong:first-child').textContent = currentQuestion;
-    
-    // Update dots
-    const dots = document.querySelectorAll('.dot');
-    dots.forEach((dot, index) => {
-        dot.classList.remove('completed', 'active');
-        if (index + 1 < currentQuestion) {
-            dot.classList.add('completed');
-        } else if (index + 1 === currentQuestion) {
-            dot.classList.add('active');
-        }
-    });
-}
-
-function saveAnswer(question, answer) {
-    console.log(`Saved question ${question}: option ${answer}`);
-    // In production, send to backend
-}
-
-function completeAssessment() {
-    flashMessages.success('Assessment completed! Calculating results...');
-    
-    // Show loading
+async function submitAssessment() {
     const nextBtn = document.getElementById('nextBtn');
+    const originalText = nextBtn.innerHTML;
     nextBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
     nextBtn.disabled = true;
     
-    // Simulate calculation
-    setTimeout(() => {
-        window.location.href = '/assessments/results/phq9';
-    }, 2000);
+    try {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        
+        // Convert answers to the format expected by the API
+        // The API expects responses as {question_id: score}
+        const formattedResponses = {};
+        for (let i = 0; i < questions.length; i++) {
+            formattedResponses[questions[i].id] = answers[i];
+        }
+        
+        console.log('Submitting responses:', formattedResponses);
+        
+        const response = await fetch(`/api/assessments/api/${assessmentId}/submit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ responses: formattedResponses }),
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        console.log('Submit response:', data);
+        
+        if (data.success) {
+            // Clear saved progress
+            localStorage.removeItem(`assessment_${assessmentId}_progress`);
+            
+            if (typeof flashMessages !== 'undefined') {
+                flashMessages.success('Assessment completed!');
+            }
+            
+            // Redirect to results page using the result ID from response
+            window.location.href = `/assessments/results/${data.result_id}/`;
+        } else {
+            throw new Error(data.error || 'Failed to submit');
+        }
+    } catch (error) {
+        console.error('Error submitting assessment:', error);
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.error(error.message || 'Failed to submit assessment. Please try again.');
+        }
+        nextBtn.innerHTML = originalText;
+        nextBtn.disabled = false;
+    }
+}
+
+function saveProgress() {
+    const progressData = {
+        assessment_id: assessmentId,
+        current_question: currentQuestionIndex,
+        answers: answers,
+        saved_at: new Date().toISOString()
+    };
+    localStorage.setItem(`assessment_${assessmentId}_progress`, JSON.stringify(progressData));
+}
+
+function loadSavedProgress() {
+    const saved = localStorage.getItem(`assessment_${assessmentId}_progress`);
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            if (data.answers) {
+                answers = data.answers;
+                currentQuestionIndex = data.current_question || 0;
+                console.log('Loaded saved progress:', { currentQuestionIndex, answersCount: Object.keys(answers).length });
+            }
+        } catch (e) {
+            console.error('Error loading saved progress:', e);
+        }
+    }
 }
 
 function saveAndExit() {
-    if (confirm('Save your progress and exit? You can continue later.')) {
+    saveProgress();
+    if (typeof flashMessages !== 'undefined') {
         flashMessages.success('Progress saved');
-        setTimeout(() => {
-            window.location.href = '/assessments';
-        }, 1500);
     }
+    setTimeout(() => {
+        window.location.href = "{% url 'pages:assessments_list' %}";
+    }, 1500);
 }
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadAssessment();
+});
 </script>
 {% endblock %}

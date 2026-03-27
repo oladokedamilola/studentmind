@@ -1,3 +1,4 @@
+<!--templates/pages/mood/mood_calendar.html-->
 {% extends "base/authenticated_base.html" %}
 
 {% block content %}
@@ -5,7 +6,7 @@
     <!-- Header -->
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div class="d-flex align-items-center">
-            <a href="/mood/history" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <a href="{% url 'pages:mood_history' %}" class="btn btn-link me-2" style="color: #5D7A5C;">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <h2 class="mb-0">📆 Mood Calendar</h2>
@@ -15,7 +16,7 @@
             <button class="btn btn-outline" onclick="changeMonth(-1)">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <h5 class="mb-0 mx-3" id="currentMonth">March 2025</h5>
+            <h5 class="mb-0 mx-3" id="currentMonth">{{ current_month }} {{ current_year }}</h5>
             <button class="btn btn-outline" onclick="changeMonth(1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
@@ -36,182 +37,71 @@
                 <div class="weekday">Sat</div>
             </div>
 
-            <!-- Calendar Days -->
-            <div class="calendar-grid">
-                <!-- Empty days for March 2025 (starts on Saturday) -->
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day empty"></div>
-                
-                <!-- Day 1 -->
-                <div class="calendar-day" data-date="2025-03-01" onclick="showDayDetails('2025-03-01')">
-                    <span class="day-number">1</span>
-                    <span class="mood-emoji">😊</span>
-                </div>
-                
-                <!-- Day 2 -->
-                <div class="calendar-day" data-date="2025-03-02" onclick="showDayDetails('2025-03-02')">
-                    <span class="day-number">2</span>
-                    <span class="mood-emoji">😐</span>
-                </div>
-                
-                <!-- Day 3 -->
-                <div class="calendar-day" data-date="2025-03-03" onclick="showDayDetails('2025-03-03')">
-                    <span class="day-number">3</span>
-                    <span class="mood-emoji">😟</span>
-                </div>
-                
-                <!-- Day 4 -->
-                <div class="calendar-day" data-date="2025-03-04" onclick="showDayDetails('2025-03-04')">
-                    <span class="day-number">4</span>
-                    <span class="mood-emoji">😊</span>
-                </div>
-                
-                <!-- Continue for all days... -->
-                <!-- Day 5-31 would be generated dynamically in production -->
-                
-                <!-- Sample for demonstration -->
-                <div class="calendar-day" data-date="2025-03-05">
-                    <span class="day-number">5</span>
-                    <span class="mood-emoji">😊</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-06">
-                    <span class="day-number">6</span>
-                    <span class="mood-emoji">😐</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-07">
-                    <span class="day-number">7</span>
-                    <span class="mood-emoji">😟</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-08">
-                    <span class="day-number">8</span>
-                    <span class="mood-emoji">😊</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-09">
-                    <span class="day-number">9</span>
-                    <span class="mood-emoji">😊</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-10">
-                    <span class="day-number">10</span>
-                    <span class="mood-emoji">😐</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-11">
-                    <span class="day-number">11</span>
-                    <span class="mood-emoji">😊</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-12">
-                    <span class="day-number">12</span>
-                    <span class="mood-emoji">😟</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-13">
-                    <span class="day-number">13</span>
-                    <span class="mood-emoji">😐</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-14">
-                    <span class="day-number">14</span>
-                    <span class="mood-emoji">😊</span>
-                </div>
-                <div class="calendar-day" data-date="2025-03-15">
-                    <span class="day-number">15</span>
-                    <span class="mood-emoji today">Today</span>
-                </div>
-                <!-- ... continue to 31 -->
+            <!-- Calendar Grid -->
+            <div id="calendarGrid" class="calendar-grid">
+                <!-- Will be populated dynamically -->
             </div>
 
             <!-- Legend -->
             <div class="calendar-legend mt-4">
                 <div class="d-flex flex-wrap gap-4 justify-content-center">
-                    <div class="d-flex align-items-center">
-                        <span class="legend-emoji me-2">😊</span>
-                        <span>Excellent (5)</span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="legend-emoji me-2">🙂</span>
-                        <span>Good (4)</span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="legend-emoji me-2">😐</span>
-                        <span>Okay (3)</span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="legend-emoji me-2">😟</span>
-                        <span>Low (2)</span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="legend-emoji me-2">😭</span>
-                        <span>Very Low (1)</span>
-                    </div>
+                    <div class="d-flex align-items-center"><span class="legend-emoji me-2">😊</span><span>Excellent (5)</span></div>
+                    <div class="d-flex align-items-center"><span class="legend-emoji me-2">🙂</span><span>Good (4)</span></div>
+                    <div class="d-flex align-items-center"><span class="legend-emoji me-2">😐</span><span>Okay (3)</span></div>
+                    <div class="d-flex align-items-center"><span class="legend-emoji me-2">😟</span><span>Low (2)</span></div>
+                    <div class="d-flex align-items-center"><span class="legend-emoji me-2">😭</span><span>Very Low (1)</span></div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Day Details Modal (hidden by default) -->
-    <div class="modal-overlay" id="dayDetailsModal" style="display: none;">
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="text-end">
-                <button class="btn btn-link" onclick="closeDayDetails()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="text-center mb-3">
-                <h3 id="selectedDate">March 15, 2025</h3>
-                <div class="display-1 my-3" id="selectedMoodEmoji">😊</div>
-                <h4 id="selectedMoodText">Excellent (5)</h4>
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Note</label>
-                <p class="p-3" style="background: #FDF6E9; border-radius: 12px;" id="selectedMoodNote">
-                    Had a great day! Finished my assignment early and went for a walk.
-                </p>
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Activities</label>
-                <div class="d-flex flex-wrap gap-2" id="selectedActivities">
-                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Exercise</span>
-                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Study</span>
-                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Nature</span>
-                </div>
-            </div>
-            
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline flex-grow-1" onclick="editEntry()">
-                    <i class="fas fa-edit me-2"></i>Edit
-                </button>
-                <button class="btn btn-primary flex-grow-1" onclick="closeDayDetails()">
-                    Close
-                </button>
             </div>
         </div>
     </div>
 
     <!-- Summary Stats -->
-    <div class="row g-3 mt-4">
+    <div class="row g-3 mt-4" id="monthStats">
         <div class="col-md-4">
             <div class="stat-card">
                 <h6>Monthly Average</h6>
-                <h3>3.4</h3>
-                <span class="badge" style="background: #9CAF88; color: white;">Okay</span>
+                <h3 id="monthAvg">--</h3>
+                <span class="badge" style="background: #9CAF88; color: white;" id="monthAvgLabel">--</span>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
                 <h6>Days Logged</h6>
-                <h3>24/31</h3>
-                <span class="badge" style="background: #9CAF88; color: white;">77%</span>
+                <h3 id="daysLogged">--</h3>
+                <span class="badge" style="background: #9CAF88; color: white;" id="daysLoggedPercent">--</span>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card">
-                <h6>Best Week</h6>
-                <h3>Week 3</h3>
-                <span class="badge" style="background: #9CAF88; color: white;">Avg: 4.2</span>
+                <h6>Best Day</h6>
+                <h3 id="bestDay">--</h3>
+                <span class="badge" style="background: #9CAF88; color: white;" id="bestDayValue">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Day Details Modal -->
+<div class="modal fade" id="dayDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectedDate"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="display-1 my-3" id="selectedMoodEmoji">😊</div>
+                <h4 id="selectedMoodText">Excellent (5)</h4>
+                <div class="mt-3">
+                    <label class="form-label fw-bold">Note</label>
+                    <p class="p-3" style="background: #FDF6E9; border-radius: 12px;" id="selectedMoodNote">No note added</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="window.location.href='{% url 'pages:mood_log' %}'">
+                    <i class="fas fa-edit me-2"></i>Edit
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -249,7 +139,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .calendar-day:hover:not(.empty) {
@@ -284,58 +174,177 @@
     background: white;
     border-radius: 16px;
     padding: 1.25rem;
-    box-shadow: var(--shadow-soft);
-    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
 }
 
 .stat-card:hover {
     transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .legend-emoji {
     font-size: 1.25rem;
 }
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(3px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10001;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 24px;
-    padding: 2rem;
-    width: 90%;
-    max-width: 400px;
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
 </style>
 
 <script>
-let currentMonth = 3; // March
-let currentYear = 2025;
+const API_BASE_URL = '/api/mood';
+let currentYear = {{ current_year }};
+let currentMonth = {{ current_month }};
+let monthMoodData = {};
 
+const moodEmojis = { 1: '😭', 2: '😟', 3: '😐', 4: '🙂', 5: '😊' };
+const moodNames = { 1: 'Very Low', 2: 'Low', 3: 'Okay', 4: 'Good', 5: 'Excellent' };
+
+// Get CSRF token
+function getCsrfToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Fetch mood data for a specific month
+async function fetchMonthMoodData(year, month) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/history/`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Filter moods for the selected month
+            monthMoodData = {};
+            data.moods.forEach(m => {
+                const [mYear, mMonth] = m.date.split('-');
+                if (parseInt(mYear) === year && parseInt(mMonth) === month) {
+                    monthMoodData[parseInt(m.date.split('-')[2])] = m.mood_score;
+                }
+            });
+            
+            renderCalendar(year, month);
+            updateMonthStats(year, month);
+        }
+    } catch (error) {
+        console.error('Error fetching mood data:', error);
+    }
+}
+
+// Render calendar
+function renderCalendar(year, month) {
+    const firstDay = new Date(year, month - 1, 1).getDay();
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const today = new Date();
+    const isCurrentMonth = today.getFullYear() === year && today.getMonth() + 1 === month;
+    const todayDate = today.getDate();
+    
+    let gridHtml = '';
+    
+    // Empty cells for days before the first day of month
+    for (let i = 0; i < firstDay; i++) {
+        gridHtml += '<div class="calendar-day empty"></div>';
+    }
+    
+    // Fill in the days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const mood = monthMoodData[day];
+        const moodEmoji = mood ? moodEmojis[mood] : '';
+        const isToday = isCurrentMonth && day === todayDate;
+        const todayClass = isToday ? ' today' : '';
+        
+        gridHtml += `
+            <div class="calendar-day${todayClass}" data-date="${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}" onclick="showDayDetails('${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}')">
+                <span class="day-number">${day}</span>
+                ${moodEmoji ? `<span class="mood-emoji">${moodEmoji}</span>` : ''}
+            </div>
+        `;
+    }
+    
+    document.getElementById('calendarGrid').innerHTML = gridHtml;
+}
+
+// Update month statistics
+function updateMonthStats(year, month) {
+    const moods = Object.values(monthMoodData);
+    const daysCount = new Date(year, month, 0).getDate();
+    
+    if (moods.length === 0) {
+        document.getElementById('monthAvg').textContent = '--';
+        document.getElementById('monthAvgLabel').textContent = 'No data';
+        document.getElementById('daysLogged').textContent = '0';
+        document.getElementById('daysLoggedPercent').textContent = '0%';
+        document.getElementById('bestDay').textContent = '--';
+        document.getElementById('bestDayValue').textContent = '--';
+        return;
+    }
+    
+    const avg = (moods.reduce((a, b) => a + b, 0) / moods.length).toFixed(1);
+    const percent = ((moods.length / daysCount) * 100).toFixed(0);
+    const best = Math.max(...moods);
+    const bestMoodName = moodNames[best];
+    
+    document.getElementById('monthAvg').textContent = avg;
+    document.getElementById('monthAvgLabel').textContent = moodNames[Math.round(avg)] || '--';
+    document.getElementById('daysLogged').textContent = `${moods.length} / ${daysCount}`;
+    document.getElementById('daysLoggedPercent').textContent = `${percent}%`;
+    document.getElementById('bestDay').textContent = best;
+    document.getElementById('bestDayValue').textContent = bestMoodName;
+}
+
+// Show day details modal
+async function showDayDetails(date) {
+    const [year, month, day] = date.split('-');
+    const moodScore = monthMoodData[parseInt(day)];
+    
+    // Fetch full mood details (including note)
+    let note = '';
+    try {
+        const response = await fetch(`${API_BASE_URL}/history/`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
+        });
+        const data = await response.json();
+        const entry = data.moods.find(m => m.date === date);
+        if (entry && entry.note) {
+            note = entry.note;
+        }
+    } catch (error) {
+        console.error('Error fetching note:', error);
+    }
+    
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    document.getElementById('selectedDate').textContent = formattedDate;
+    
+    if (moodScore) {
+        document.getElementById('selectedMoodEmoji').textContent = moodEmojis[moodScore];
+        document.getElementById('selectedMoodText').textContent = `${moodNames[moodScore]} (${moodScore})`;
+        document.getElementById('selectedMoodNote').textContent = note || 'No note added for this day.';
+    } else {
+        document.getElementById('selectedMoodEmoji').textContent = '❓';
+        document.getElementById('selectedMoodText').textContent = 'No mood logged';
+        document.getElementById('selectedMoodNote').textContent = 'No mood entry for this day. Click Edit to log your mood.';
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('dayDetailsModal'));
+    modal.show();
+}
+
+// Change month
 function changeMonth(delta) {
     currentMonth += delta;
     if (currentMonth < 1) {
@@ -349,29 +358,13 @@ function changeMonth(delta) {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
     
-    document.getElementById('currentMonth').textContent = 
-        `${monthNames[currentMonth - 1]} ${currentYear}`;
-    
-    flashMessages.info(`Loading ${monthNames[currentMonth - 1]} ${currentYear}`);
-    
-    // In production, this would fetch new calendar data
-    setTimeout(() => {
-        flashMessages.success('Calendar updated');
-    }, 1000);
+    document.getElementById('currentMonth').textContent = `${monthNames[currentMonth - 1]} ${currentYear}`;
+    fetchMonthMoodData(currentYear, currentMonth);
 }
 
-function showDayDetails(date) {
-    // In production, fetch details for this date
-    document.getElementById('dayDetailsModal').style.display = 'flex';
-}
-
-function closeDayDetails() {
-    document.getElementById('dayDetailsModal').style.display = 'none';
-}
-
-function editEntry() {
-    closeDayDetails();
-    window.location.href = '/mood/log?edit=' + document.getElementById('selectedDate').textContent;
-}
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    fetchMonthMoodData(currentYear, currentMonth);
+});
 </script>
 {% endblock %}

@@ -1,195 +1,119 @@
 {% extends "base/authenticated_base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid px-2 px-sm-3 px-md-4">
     <!-- Header -->
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between mb-3 mb-md-4 gap-2">
         <div class="d-flex align-items-center">
-            <a href="/assessments" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <a href="{% url 'pages:assessments_list' %}" class="btn btn-link p-0 me-2 me-sm-3" style="color: #5D7A5C; font-size: clamp(1rem, 4vw, 1.2rem);">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <h2 class="mb-0">📋 Assessment History</h2>
+            <h2 class="mb-0" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">📋 Assessment History</h2>
         </div>
         
-        <select class="form-select" style="width: auto;" onchange="filterAssessments(this.value)">
+        <select class="form-select" style="width: auto; min-width: clamp(120px, 40vw, 160px); padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px); font-size: clamp(0.8rem, 3vw, 0.9rem);" onchange="filterAssessments(this.value)">
             <option value="all">All Assessments</option>
             <option value="phq9">PHQ-9 Only</option>
             <option value="gad7">GAD-7 Only</option>
-            <option value="pss">PSS Only</option>
         </select>
     </div>
 
     <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="summary-card p-3" style="background: white; border-radius: 16px;">
-                <small class="text-muted">Total Assessments</small>
-                <h3>12</h3>
-                <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">+2 this month</span>
+    <div class="row g-2 g-md-3 mb-4">
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="summary-card p-3" style="background: white; border-radius: clamp(12px, 3vw, 16px);">
+                <small class="text-muted" style="font-size: clamp(0.7rem, 2.5vw, 0.8rem);">Total Assessments</small>
+                <h3 style="font-size: clamp(1.5rem, 6vw, 2rem); margin-bottom: 0.25rem;">{{ results.count }}</h3>
+                <span class="badge" style="background: #E6E6FA; color: #5D7A5C; font-size: clamp(0.65rem, 2.5vw, 0.75rem); padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 10px);">{{ recent_count }} this month</span>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="summary-card p-3" style="background: white; border-radius: 16px;">
-                <small class="text-muted">Last Assessment</small>
-                <h3>2 days ago</h3>
-                <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">PHQ-9</span>
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="summary-card p-3" style="background: white; border-radius: clamp(12px, 3vw, 16px);">
+                <small class="text-muted" style="font-size: clamp(0.7rem, 2.5vw, 0.8rem);">Last Assessment</small>
+                <h3 style="font-size: clamp(1.5rem, 6vw, 2rem); margin-bottom: 0.25rem;">{{ last_assessment_days }} days ago</h3>
+                <span class="badge" style="background: #E6E6FA; color: #5D7A5C; font-size: clamp(0.65rem, 2.5vw, 0.75rem); padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 10px);">{{ last_assessment_type }}</span>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="summary-card p-3" style="background: white; border-radius: 16px;">
-                <small class="text-muted">Average Score</small>
-                <h3>11.5</h3>
-                <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="summary-card p-3" style="background: white; border-radius: clamp(12px, 3vw, 16px);">
+                <small class="text-muted" style="font-size: clamp(0.7rem, 2.5vw, 0.8rem);">Average PHQ-9 Score</small>
+                <h3 style="font-size: clamp(1.5rem, 6vw, 2rem); margin-bottom: 0.25rem;">{{ avg_phq9_score|default:"N/A" }}</h3>
+                <span class="badge" style="background: {% if avg_phq9_score and avg_phq9_score <= 4 %}#4A6B4A{% elif avg_phq9_score and avg_phq9_score <= 9 %}#9CAF88{% elif avg_phq9_score and avg_phq9_score <= 14 %}#E5B25D{% else %}#C47E7E{% endif %}; color: white; font-size: clamp(0.65rem, 2.5vw, 0.75rem); padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 10px);">{{ avg_phq9_severity|default:"Not taken" }}</span>
             </div>
         </div>
     </div>
 
     <!-- History Timeline -->
-    <div class="card">
-        <div class="card-body">
-            <h5 class="mb-4">Assessment Timeline</h5>
+    <div class="card" style="border-radius: clamp(16px, 4vw, 24px);">
+        <div class="card-body p-3 p-md-4">
+            <h5 class="mb-3 mb-md-4" style="font-size: clamp(1rem, 4vw, 1.25rem);">Assessment Timeline</h5>
             
-            <!-- PHQ-9 Section -->
+            {% regroup results by assessment.code as assessment_groups %}
+            
+            {% for group in assessment_groups %}
             <div class="assessment-section mb-4">
-                <h6 class="mb-3" style="color: #5D7A5C;">
-                    <i class="fas fa-chart-line me-2"></i>PHQ-9 (Depression)
+                <h6 class="mb-3" style="color: #5D7A5C; font-size: clamp(0.9rem, 3.5vw, 1rem);">
+                    <i class="fas {% if group.grouper == 'phq9' %}fa-chart-line{% elif group.grouper == 'gad7' %}fa-heartbeat{% else %}fa-tachometer-alt{% endif %} me-2"></i>
+                    {{ group.list.0.assessment.name }}
                 </h6>
                 
-                <div class="timeline-item mb-3" onclick="viewAssessment(1)">
-                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
-                        <div>
-                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 15, 2025</span>
-                            <span class="text-muted">2:30 PM</span>
+                {% for result in group.list|slice:":5" %}
+                <div class="timeline-item mb-2 mb-md-3" onclick="viewAssessment({{ result.id }})">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center p-3" style="background: #FDF6E9; border-radius: clamp(10px, 3vw, 12px); cursor: pointer;">
+                        <div class="mb-2 mb-sm-0">
+                            <span class="badge me-2" style="background: #9CAF88; color: white; font-size: clamp(0.65rem, 2.5vw, 0.75rem); padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 10px);">{{ result.completed_at|date:"M j, Y" }}</span>
+                            <span class="text-muted" style="font-size: clamp(0.7rem, 2.5vw, 0.8rem);">{{ result.completed_at|time:"g:i A" }}</span>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fw-bold" style="color: #5D7A5C;">Score: 12</span>
-                            <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
-                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="timeline-item mb-3" onclick="viewAssessment(2)">
-                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
-                        <div>
-                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 1, 2025</span>
-                            <span class="text-muted">10:15 AM</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fw-bold" style="color: #5D7A5C;">Score: 15</span>
-                            <span class="badge" style="background: #5D7A5C; color: white;">Mod-Severe</span>
-                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
+                        <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap">
+                            <span class="fw-bold" style="color: #5D7A5C; font-size: clamp(0.85rem, 3vw, 0.95rem);">Score: {{ result.total_score }}</span>
+                            <span class="badge" style="background: {% if result.severity == 'Minimal' %}#4A6B4A{% elif result.severity == 'Mild' %}#9CAF88{% elif result.severity == 'Moderate' %}#E5B25D{% else %}#C47E7E{% endif %}; color: white; font-size: clamp(0.65rem, 2.5vw, 0.75rem); padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 10px);">{{ result.severity }}</span>
+                            <i class="fas fa-chevron-right" style="color: #B99B7C; font-size: clamp(0.7rem, 2.5vw, 0.8rem);"></i>
                         </div>
                     </div>
                 </div>
-                
-                <div class="timeline-item mb-3" onclick="viewAssessment(3)">
-                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
-                        <div>
-                            <span class="badge me-2" style="background: #9CAF88; color: white;">Feb 15, 2025</span>
-                            <span class="text-muted">3:45 PM</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fw-bold" style="color: #5D7A5C;">Score: 14</span>
-                            <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
-                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-            
-            <!-- GAD-7 Section -->
-            <div class="assessment-section mb-4">
-                <h6 class="mb-3" style="color: #5D7A5C;">
-                    <i class="fas fa-heartbeat me-2"></i>GAD-7 (Anxiety)
-                </h6>
-                
-                <div class="timeline-item mb-3" onclick="viewAssessment(4)">
-                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
-                        <div>
-                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 15, 2025</span>
-                            <span class="text-muted">2:35 PM</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fw-bold" style="color: #5D7A5C;">Score: 8</span>
-                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Mild</span>
-                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="timeline-item mb-3" onclick="viewAssessment(5)">
-                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
-                        <div>
-                            <span class="badge me-2" style="background: #9CAF88; color: white;">Feb 15, 2025</span>
-                            <span class="text-muted">4:00 PM</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fw-bold" style="color: #5D7A5C;">Score: 12</span>
-                            <span class="badge" style="background: #9CAF88; color: white;">Moderate</span>
-                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
-                        </div>
-                    </div>
-                </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                <h5>No assessment results yet</h5>
+                <p class="text-muted">Take your first assessment to start tracking your progress</p>
+                <a href="{% url 'pages:assessments_list' %}" class="btn btn-primary mt-2">Take an Assessment</a>
             </div>
-            
-            <!-- PSS Section -->
-            <div class="assessment-section">
-                <h6 class="mb-3" style="color: #5D7A5C;">
-                    <i class="fas fa-tachometer-alt me-2"></i>PSS (Stress)
-                </h6>
-                
-                <div class="timeline-item mb-3" onclick="viewAssessment(6)">
-                    <div class="d-flex justify-content-between align-items-center p-3" style="background: #FDF6E9; border-radius: 12px; cursor: pointer;">
-                        <div>
-                            <span class="badge me-2" style="background: #9CAF88; color: white;">Mar 10, 2025</span>
-                            <span class="text-muted">11:20 AM</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fw-bold" style="color: #5D7A5C;">Score: 24</span>
-                            <span class="badge" style="background: #B99B7C; color: white;">High</span>
-                            <i class="fas fa-chevron-right" style="color: #B99B7C;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Load More -->
-            <div class="text-center mt-4">
-                <button class="btn btn-outline" onclick="loadMoreHistory()">
-                    <i class="fas fa-chevron-down me-2"></i>Load More
-                </button>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
     <!-- Progress Chart Card -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">📈 Progress Over Time</h5>
-                <a href="/assessments/compare" class="btn btn-link" style="color: #5D7A5C;">
+    <div class="card mt-4" style="border-radius: clamp(16px, 4vw, 24px);">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-2">
+                <h5 class="mb-0" style="font-size: clamp(1rem, 4vw, 1.25rem);">📈 Progress Over Time</h5>
+                <a href="{% url 'pages:assessment_compare' %}" class="btn btn-link" style="color: #5D7A5C; font-size: clamp(0.85rem, 3vw, 0.95rem); padding: clamp(6px, 2vw, 8px);">
                     View Full Comparison
                 </a>
             </div>
             
-            <canvas id="progressChart" style="height: 200px;"></canvas>
+            <div style="position: relative; height: clamp(200px, 50vh, 300px); width: 100%;">
+                <canvas id="progressChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
 .summary-card {
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(26, 58, 26, 0.05);
 }
 
 .summary-card:hover {
     transform: translateY(-3px);
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 10px 25px rgba(26, 58, 26, 0.1);
 }
 
 .timeline-item {
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .timeline-item:hover .p-3 {
@@ -200,6 +124,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script>
+let progressChart = null;
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeProgressChart();
 });
@@ -207,63 +134,68 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeProgressChart() {
     const ctx = document.getElementById('progressChart').getContext('2d');
     
-    new Chart(ctx, {
+    if (progressChart) {
+        progressChart.destroy();
+    }
+    
+    const chartData = {{ chart_data|safe }};
+    
+    progressChart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: ['Feb 15', 'Mar 1', 'Mar 15'],
-            datasets: [
-                {
-                    label: 'PHQ-9',
-                    data: [14, 15, 12],
-                    borderColor: '#9CAF88',
-                    backgroundColor: 'transparent',
-                    tension: 0.4
-                },
-                {
-                    label: 'GAD-7',
-                    data: [12, null, 8],
-                    borderColor: '#5D7A5C',
-                    backgroundColor: 'transparent',
-                    tension: 0.4
-                }
-            ]
-        },
+        data: chartData,
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: clampValue(10, 12, 14)
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 27
+                    max: 27,
+                    title: {
+                        display: true,
+                        text: 'Score',
+                        font: {
+                            size: clampValue(10, 12, 13)
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: clampValue(10, 11, 12)
+                        }
+                    }
                 }
             }
         }
     });
 }
 
+function clampValue(min, preferred, max) {
+    if (window.innerWidth <= 480) return min;
+    if (window.innerWidth <= 768) return preferred;
+    return max;
+}
+
 function filterAssessments(value) {
-    flashMessages.info(`Filtering: ${value}`);
-    // In production, filter the timeline
+    if (value === 'all') {
+        window.location.href = "{% url 'pages:assessment_history' %}";
+    } else {
+        window.location.href = "{% url 'pages:assessment_history' %}?type=" + value;
+    }
 }
 
 function viewAssessment(id) {
-    window.location.href = `/assessments/results/${id}`;
-}
-
-function loadMoreHistory() {
-    const btn = event.target.closest('button');
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-    btn.disabled = true;
-    
-    setTimeout(() => {
-        flashMessages.info('No more history to load');
-        btn.innerHTML = '<i class="fas fa-check me-2"></i>All Loaded';
-    }, 1500);
+    window.location.href = `/assessments/results/${id}/`;
 }
 </script>
 {% endblock %}

@@ -1,9 +1,10 @@
 {% extends "base/public_base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container" style="max-width: 600px;">
     <!-- Back Link -->
-    <a href="/" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C;">
+    <a href="{% url 'pages:landing' %}" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C; text-decoration: none;">
         <i class="fas fa-arrow-left me-2"></i> Back to Home
     </a>
 
@@ -19,7 +20,7 @@
     </div>
 
     <!-- Main Card -->
-    <div class="card">
+    <div class="card mb-5">
         <h2 class="text-center mb-4">🎓 Verify Your Student Status</h2>
         
         <p class="text-center mb-4" style="color: #B99B7C;">
@@ -27,10 +28,14 @@
         </p>
 
         <form id="matricVerificationForm">
+            {% csrf_token %}
             <div class="form-group">
                 <label class="form-label">Matric Number</label>
                 <input type="text" class="form-input" id="matricNumber" 
-                       placeholder="e.g., 202012345" required>
+                       placeholder="e.g., 202012345" 
+                       pattern="[0-9]{9,10}"
+                       title="Please enter a valid 9-10 digit matric number"
+                       required>
                 <small class="text-muted">Enter your 9-10 digit matric number</small>
             </div>
 
@@ -48,40 +53,184 @@
         <!-- Login Link -->
         <p class="text-center mt-4">
             Already have an account?
-            <a href="/login" style="color: #5D7A5C; font-weight: 600;">Login here</a>
+            <a href="{% url 'pages:login' %}" style="color: #5D7A5C; font-weight: 600; text-decoration: none;">Login here</a>
         </p>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<style>
+/* Additional styles for better UX */
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #9CAF88;
+    pointer-events: none;
+}
+
+.form-input.valid {
+    border-color: #4A6B4A;
+    background-color: rgba(74, 107, 74, 0.05);
+}
+
+.form-input.error {
+    border-color: #C47E7E;
+    background-color: rgba(196, 126, 126, 0.05);
+}
+
+#matricNumber:focus {
+    border-color: #4A6B4A;
+    box-shadow: 0 0 0 3px rgba(74, 107, 74, 0.1);
+}
+</style>
+
 <script>
+// API endpoint - make sure this matches your Django URL configuration
+const API_BASE_URL = '/api/accounts/api';  // Updated to correct endpoint
+
+// Local validation function as fallback
+function localValidateMatricNumber(matric) {
+    const cleaned = matric.replace(/\s/g, '');
+    const regex = /^\d{9,10}$/;
+    
+    if (!cleaned) {
+        return { valid: false, message: 'Matric number is required' };
+    }
+    
+    if (!regex.test(cleaned)) {
+        return { valid: false, message: 'Matric number must be 9-10 digits' };
+    }
+    
+    return { valid: true, message: '' };
+}
+
+// Get CSRF token from cookie
+function getCsrfToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Main verification function using correct API endpoint
+async function verifyMatricNumber(matricNumber) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/verify-matric/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ matric_number: matricNumber }),
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Handle different error statuses
+            if (response.status === 404) {
+                return { 
+                    success: false, 
+                    error: 'Matric number not found in university database' 
+                };
+            } else if (response.status === 400) {
+                // Extract error message from response
+                const errorMsg = data.errors?.matric_number?.[0] || 
+                                 data.error || 
+                                 'Invalid request';
+                return { success: false, error: errorMsg };
+            } else if (response.status === 429) {
+                return { 
+                    success: false, 
+                    error: 'Too many attempts. Please try again later.' 
+                };
+            }
+            return { success: false, error: data.error || 'Verification failed' };
+        }
+
+        // Success - store student data in sessionStorage for next step
+        if (data.student) {
+            sessionStorage.setItem('verified_student', JSON.stringify(data.student));
+            sessionStorage.setItem('matricNumber', matricNumber);
+        }
+
+        return { success: true, data: data };
+    } catch (error) {
+        console.error('Network error:', error);
+        return { 
+            success: false, 
+            error: 'Network error. Please check your connection.' 
+        };
+    }
+}
+
+// Wait for DOM and scripts to be ready
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing matric verification');
+    
     const matricInput = document.getElementById('matricNumber');
     const verifyBtn = document.getElementById('verifyBtn');
     const form = document.getElementById('matricVerificationForm');
+    
+    // Determine which validation function to use
+    const validateFn = (typeof window.validateMatricNumber === 'function') 
+        ? window.validateMatricNumber 
+        : localValidateMatricNumber;
+    
+    console.log('Using validation function:', validateFn.name);
 
-    // Real-time validation
-    matricInput.addEventListener('input', function() {
-        const result = validateMatricNumber(this.value);
+    // Function to validate input and update UI
+    function validateAndUpdate() {
+        const value = matricInput.value.trim();
+        const result = validateFn(value);
+        
+        // Update button state
         verifyBtn.disabled = !result.valid;
         
-        if (this.value && !result.valid) {
-            this.classList.add('error');
+        // Update input styling
+        if (value.length > 0) {
+            if (result.valid) {
+                matricInput.classList.add('valid');
+                matricInput.classList.remove('error');
+                removeErrorMessage(matricInput);
+            } else {
+                matricInput.classList.remove('valid');
+                matricInput.classList.add('error');
+                showErrorMessage(matricInput, result.message);
+            }
         } else {
-            this.classList.remove('error');
+            matricInput.classList.remove('valid', 'error');
+            removeErrorMessage(matricInput);
         }
-    });
+        
+        console.log('Validation result:', result);
+    }
+
+    // Real-time validation
+    matricInput.addEventListener('input', validateAndUpdate);
+    matricInput.addEventListener('blur', validateAndUpdate);
 
     // Form submission
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const matricNumber = matricInput.value.trim();
-        const result = validateMatricNumber(matricNumber);
+        const result = validateFn(matricNumber);
         
         if (!result.valid) {
-            flashMessages.error(result.message);
+            if (typeof flashMessages !== 'undefined') {
+                flashMessages.error(result.message);
+            } else {
+                alert(result.message);
+            }
             return;
         }
 
@@ -89,22 +238,71 @@ document.addEventListener('DOMContentLoaded', function() {
         verifyBtn.disabled = true;
         verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
 
-        // Call API
-        const apiResult = await verifyMatricNumber(matricNumber);
-        
-        if (apiResult.success) {
-            // Store matric number for next step
-            sessionStorage.setItem('matricNumber', matricNumber);
-            flashMessages.success('Matric number verified!');
-            setTimeout(() => {
-                window.location.href = '/verify-student';
-            }, 2000);
-        } else {
-            flashMessages.error(apiResult.error || 'Verification failed');
+        try {
+            // Call the verification function
+            const apiResult = await verifyMatricNumber(matricNumber);
+            
+            if (apiResult.success) {
+                if (typeof flashMessages !== 'undefined') {
+                    flashMessages.success('Matric number verified!');
+                }
+                
+                // Redirect to confirmation page (step 2)
+                setTimeout(() => {
+                    window.location.href = "{% url 'pages:student_confirmation' %}";
+                }, 1500);
+            } else {
+                if (typeof flashMessages !== 'undefined') {
+                    flashMessages.error(apiResult.error);
+                } else {
+                    alert(apiResult.error);
+                }
+                
+                // Reset button state
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = 'Continue to Verification';
+            }
+        } catch (error) {
+            console.error('Verification error:', error);
+            
+            if (typeof flashMessages !== 'undefined') {
+                flashMessages.error('An error occurred. Please try again.');
+            } else {
+                alert('An error occurred. Please try again.');
+            }
+            
             verifyBtn.disabled = false;
             verifyBtn.innerHTML = 'Continue to Verification';
         }
     });
+
+    // Helper functions for error messages
+    function showErrorMessage(input, message) {
+        removeErrorMessage(input);
+        const error = document.createElement('span');
+        error.className = 'form-error';
+        error.textContent = message;
+        error.style.color = '#C47E7E';
+        error.style.fontSize = '0.875rem';
+        error.style.marginTop = '0.25rem';
+        error.style.display = 'block';
+        input.parentNode.appendChild(error);
+    }
+
+    function removeErrorMessage(input) {
+        const parent = input.parentNode;
+        const existingError = parent.querySelector('.form-error');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+
+    // Initial validation to set correct button state
+    validateAndUpdate();
 });
+
+// Make functions globally available if needed
+window.localValidateMatricNumber = localValidateMatricNumber;
+window.verifyMatricNumber = verifyMatricNumber;  // Make it globally available
 </script>
 {% endblock %}

@@ -1,3 +1,4 @@
+# apps/university/management/commands/import_students.py
 """
 Management command to import student data from JSON file.
 Usage: python manage.py import_students --file students.json
@@ -99,6 +100,7 @@ class Command(BaseCommand):
             'department': department,
             'year_of_entry': data.get('year_of_entry', 0),
             'status': data.get('status', 'active'),
+            'profile_image': data.get('profile_image', ''),
         }
         
         student, created = Student.objects.update_or_create(

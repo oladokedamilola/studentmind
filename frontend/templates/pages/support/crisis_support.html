@@ -1,0 +1,104 @@
+{% extends "base/authenticated_base.html" %}
+{% load static %}
+
+{% block title %}Crisis Support - MindHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🆘</div>
+                <h1>Crisis Support</h1>
+                <p class="text-muted">If you're in immediate danger, please call emergency services (911 or local emergency number).</p>
+            </div>
+            
+            <!-- Emergency Hotlines -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3>📞 24/7 Crisis Hotlines</h3>
+                    <div class="row mt-3">
+                        <div class="col-md-6 mb-3">
+                            <div class="hotline-card p-3 border rounded">
+                                <h5>National Suicide Prevention Lifeline</h5>
+                                <p class="h4 text-primary">988 or 1-800-273-8255</p>
+                                <small>Available 24/7, confidential</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="hotline-card p-3 border rounded">
+                                <h5>Crisis Text Line</h5>
+                                <p class="h4 text-primary">Text HOME to 741741</p>
+                                <small>Free, 24/7, confidential</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="hotline-card p-3 border rounded">
+                                <h5>Trevor Project (LGBTQ+)</h5>
+                                <p class="h4 text-primary">1-866-488-7386</p>
+                                <small>24/7 crisis intervention</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="hotline-card p-3 border rounded">
+                                <h5>Veterans Crisis Line</h5>
+                                <p class="h4 text-primary">988 then press 1</p>
+                                <small>Text 838255</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Campus Resources -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3>🏫 Campus Resources</h3>
+                    <div class="mt-3">
+                        <p><strong>University Counseling Center</strong><br>
+                        Location: Student Wellness Center, Room 101<br>
+                        Phone: (555) 123-4567<br>
+                        Hours: Mon-Fri 8am-5pm</p>
+                        
+                        <p><strong>After-Hours Support</strong><br>
+                        Call campus security: (555) 123-4568</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Self-Care Tips -->
+            <div class="card">
+                <div class="card-body">
+                    <h3>💚 When You're Feeling Overwhelmed</h3>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">✓ <strong>Breathe deeply</strong> - Inhale for 4, hold for 4, exhale for 4</li>
+                                <li class="mb-2">✓ <strong>Ground yourself</strong> - Name 5 things you see, 4 you can touch</li>
+                                <li class="mb-2">✓ <strong>Reach out</strong> - Call a trusted friend or family member</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">✓ <strong>Move your body</strong> - Take a short walk or stretch</li>
+                                <li class="mb-2">✓ <strong>Stay hydrated</strong> - Drink a glass of water</li>
+                                <li class="mb-2">✓ <strong>Use a coping skill</strong> - Try the 5-4-3-2-1 technique</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hotline-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hotline-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

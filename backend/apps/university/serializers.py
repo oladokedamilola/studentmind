@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Student, StudentAuth, Faculty, Department
+from .models import Student, Faculty, Department
 import re
+from apps.accounts.models import StudentAuth
 
 class MatricNumberSerializer(serializers.Serializer):
     """Serializer for matric number verification"""

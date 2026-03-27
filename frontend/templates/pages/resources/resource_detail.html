@@ -1,11 +1,15 @@
 {% extends "base/authenticated_base.html" %}
+{% load static %}
+{% load resource_filters %}
+
+{% block title %}{{ resource.title }} - MindHaven{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 800px;">
     <!-- Back Navigation -->
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div class="d-flex align-items-center">
-            <a href="/resources" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <a href="{% url 'pages:resources_list' %}" class="btn btn-link me-2" style="color: #5D7A5C;">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <h4 class="mb-0">Back to Resources</h4>
@@ -25,15 +29,29 @@
     <div class="card mb-4">
         <div class="resource-header p-4" style="background: #E6E6FA; border-radius: 24px 24px 0 0;">
             <div class="d-flex align-items-center gap-3 mb-3">
-                <span class="badge" style="background: #9CAF88; color: white; padding: 0.5rem 1rem;">Anxiety</span>
-                <span class="badge" style="background: white; color: #5D7A5C;">5 min read</span>
+                {% for category in resource.categories.all|slice:":2" %}
+                <span class="badge" style="background: #9CAF88; color: white; padding: 0.5rem 1rem;">{{ category.name }}</span>
+                {% endfor %}
+                {% if resource.duration_minutes %}
+                <span class="badge" style="background: white; color: #5D7A5C;">{{ resource.duration_minutes }} min read</span>
+                {% endif %}
             </div>
-            <h2 class="mb-3">5-Minute Breathing Exercise for Anxiety</h2>
+            <h2 class="mb-3">{{ resource.title }}</h2>
             
             <div class="d-flex align-items-center gap-3">
                 <div class="d-flex align-items-center">
-                    <span class="text-warning me-1">⭐⭐⭐⭐⭐</span>
-                    <span class="text-muted">(4.8) · 234 reads</span>
+                    {% with rating=resource.avg_rating|default:4.5 %}
+                    <span class="text-warning me-1">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= rating|floatformat:0 %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span class="text-muted">({{ rating }}) · {{ resource.view_count }} reads</span>
+                    {% endwith %}
                 </div>
             </div>
         </div>
@@ -41,183 +59,93 @@
         <div class="card-body p-4">
             <!-- Quick Actions -->
             <div class="d-flex gap-2 mb-4">
+                {% if resource.resource_type == 'exercise' or resource.resource_type == 'guided' %}
                 <button class="btn btn-primary" onclick="startExercise()">
                     <i class="fas fa-play me-2"></i>Start Guided Exercise
                 </button>
-                <button class="btn btn-outline" onclick="downloadPDF()">
-                    <i class="fas fa-download me-2"></i>Download PDF
+                {% endif %}
+                {% if resource.video_url %}
+                <button class="btn btn-outline" onclick="watchVideo()">
+                    <i class="fas fa-video me-2"></i>Watch Video
                 </button>
+                {% endif %}
             </div>
 
-            <!-- Resource Content -->
+            <!-- Resource Content - Properly formatted -->
             <div class="resource-content">
-                <h5>Why This Exercise Works</h5>
-                <p class="mb-4">When you're anxious, your breathing becomes shallow and rapid. This exercise helps activate your parasympathetic nervous system, signaling your body that it's safe to relax.</p>
-                
-                <h5>Step-by-Step Guide</h5>
-                
-                <div class="exercise-step mb-4 p-3" style="background: #FDF6E9; border-radius: 16px;">
-                    <h6 class="mb-2">Step 1: Find Your Position</h6>
-                    <p class="mb-0">Sit comfortably in a chair with your feet flat on the floor, or lie down if you prefer. Place one hand on your chest and the other on your belly.</p>
-                </div>
-                
-                <div class="exercise-step mb-4 p-3" style="background: #FDF6E9; border-radius: 16px;">
-                    <h6 class="mb-2">Step 2: Breathe In (4 seconds)</h6>
-                    <p class="mb-0">Slowly breathe in through your nose for 4 seconds. Feel your belly expand into your hand. Your chest should move only slightly.</p>
-                </div>
-                
-                <div class="exercise-step mb-4 p-3" style="background: #FDF6E9; border-radius: 16px;">
-                    <h6 class="mb-2">Step 3: Hold (4 seconds)</h6>
-                    <p class="mb-0">Gently hold your breath for 4 seconds. Don't clamp your airway shut - just pause naturally.</p>
-                </div>
-                
-                <div class="exercise-step mb-4 p-3" style="background: #FDF6E9; border-radius: 16px;">
-                    <h6 class="mb-2">Step 4: Breathe Out (6 seconds)</h6>
-                    <p class="mb-0">Slowly exhale through your mouth for 6 seconds, making a gentle "whoosh" sound. Feel your belly fall.</p>
-                </div>
-                
-                <div class="exercise-step mb-4 p-3" style="background: #FDF6E9; border-radius: 16px;">
-                    <h6 class="mb-2">Step 5: Repeat</h6>
-                    <p class="mb-0">Continue this pattern for 5 minutes. If you lose count, just start again at 1.</p>
-                </div>
+                {{ resource.content|format_resource_content|safe }}
+            </div>
 
-                <!-- Video Embed (Optional) -->
-                <div class="video-container mb-4" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px;">
-                    <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/example" frameborder="0" allowfullscreen></iframe>
-                </div>
+            <!-- Video Embed (if available) -->
+            {% if resource.video_url %}
+            <div class="video-container mt-4" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px;">
+                <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="{{ resource.video_url }}" frameborder="0" allowfullscreen></iframe>
+            </div>
+            {% endif %}
 
-                <!-- Tips -->
-                <div class="tips-section mb-4">
-                    <h5>💡 Tips for Best Results</h5>
-                    <ul>
-                        <li>Practice at the same time each day to build a habit</li>
-                        <li>Start with just 2-3 minutes if 5 feels too long</li>
-                        <li>Use this exercise at the first sign of anxiety</li>
-                        <li>Combine with calming music or nature sounds</li>
-                    </ul>
-                </div>
+            <!-- Tips Section (for exercise resources) -->
+            {% if resource.resource_type == 'exercise' %}
+            <div class="tips-section mt-4">
+                <h5>💡 Tips for Best Results</h5>
+                <ul>
+                    <li>Practice at the same time each day to build a habit</li>
+                    <li>Start with just 2-3 minutes if it feels too long</li>
+                    <li>Use this exercise at the first sign of stress</li>
+                    <li>Combine with calming music or nature sounds</li>
+                </ul>
+            </div>
+            {% endif %}
 
-                <!-- Related Affirmations -->
-                <div class="affirmations p-3" style="background: #E6E6FA; border-radius: 16px;">
-                    <h6 class="mb-3">🤗 Positive Affirmations</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="affirmation-pill">"I am calm and in control"</span>
-                        <span class="affirmation-pill">"This feeling will pass"</span>
-                        <span class="affirmation-pill">"I have the strength to cope"</span>
-                        <span class="affirmation-pill">"My breath anchors me to peace"</span>
-                    </div>
+            <!-- Related Affirmations (for anxiety resources) -->
+            {% if 'anxiety' in resource.categories.values_list|join:","|lower %}
+            <div class="affirmations p-3 mt-4" style="background: #E6E6FA; border-radius: 16px;">
+                <h6 class="mb-3">🤗 Positive Affirmations</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="affirmation-pill">"I am calm and in control"</span>
+                    <span class="affirmation-pill">"This feeling will pass"</span>
+                    <span class="affirmation-pill">"I have the strength to cope"</span>
+                    <span class="affirmation-pill">"My breath anchors me to peace"</span>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Resource Footer -->
             <hr class="my-4">
             
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-3">
-                    <button class="btn btn-outline" onclick="rateResource(5)">
-                        <i class="far fa-thumbs-up me-2"></i>Helpful (156)
+                    <button class="btn btn-outline" id="helpfulBtn" onclick="rateResource(true)">
+                        <i class="far fa-thumbs-up me-2"></i>Helpful (<span id="helpfulCount">{{ resource.helpful_count }}</span>)
                     </button>
-                    <button class="btn btn-outline" onclick="rateResource(1)">
-                        <i class="far fa-thumbs-down me-2"></i>Not Helpful (12)
+                    <button class="btn btn-outline" id="notHelpfulBtn" onclick="rateResource(false)">
+                        <i class="far fa-thumbs-down me-2"></i>Not Helpful (<span id="notHelpfulCount">{{ resource.not_helpful_count }}</span>)
                     </button>
                 </div>
-                <small class="text-muted">Last updated: March 2025</small>
+                <small class="text-muted">Last updated: {{ resource.updated_at|date:"F Y" }}</small>
             </div>
         </div>
     </div>
 
     <!-- Related Resources -->
+    {% if related_resources %}
     <div class="related-section mb-4">
         <h5 class="mb-3">You Might Also Like</h5>
         <div class="row g-3">
+            {% for related in related_resources %}
             <div class="col-md-4">
-                <div class="related-card" onclick="window.location.href='/resources/4'">
+                <div class="related-card" onclick="window.location.href='{% url 'pages:resource_detail' related.id %}'">
                     <div class="p-3">
-                        <h6 class="mb-2">Mindfulness Meditation</h6>
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Meditation</span>
+                        <h6 class="mb-2">{{ related.title }}</h6>
+                        {% for cat in related.categories.all|slice:":1" %}
+                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">{{ cat.name }}</span>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="related-card" onclick="window.location.href='/resources/5'">
-                    <div class="p-3">
-                        <h6 class="mb-2">Anxiety Coping Toolkit</h6>
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Anxiety</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="related-card" onclick="window.location.href='/resources/2'">
-                    <div class="p-3">
-                        <h6 class="mb-2">Exam Stress Tips</h6>
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Stress</span>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
-
-    <!-- Comments Section -->
-    <div class="card">
-        <div class="card-body">
-            <h5 class="mb-3">Comments (24)</h5>
-            
-            <!-- Add Comment -->
-            <div class="d-flex gap-2 mb-4">
-                <div style="width: 40px; height: 40px; background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-user" style="color: #5D7A5C;"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <input type="text" class="form-control" placeholder="Share your thoughts...">
-                    <button class="btn btn-primary btn-sm mt-2">Post Comment</button>
-                </div>
-            </div>
-            
-            <!-- Comment 1 -->
-            <div class="comment mb-3 pb-3 border-bottom">
-                <div class="d-flex gap-2">
-                    <div style="width: 36px; height: 36px; background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-user" style="color: #5D7A5C; font-size: 14px;"></i>
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <strong>Sarah K.</strong>
-                            <small class="text-muted">2 days ago</small>
-                        </div>
-                        <p class="mb-1">This exercise really helped me during my exam week! I did it every morning.</p>
-                        <div class="d-flex gap-3">
-                            <small class="text-muted"><i class="far fa-heart me-1"></i>12</small>
-                            <small class="text-muted">Reply</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Comment 2 -->
-            <div class="comment">
-                <div class="d-flex gap-2">
-                    <div style="width: 36px; height: 36px; background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-user" style="color: #5D7A5C; font-size: 14px;"></i>
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <strong>Michael T.</strong>
-                            <small class="text-muted">5 days ago</small>
-                        </div>
-                        <p class="mb-1">The 4-4-6 pattern is perfect. I feel so much calmer after just a few rounds.</p>
-                        <div class="d-flex gap-3">
-                            <small class="text-muted"><i class="far fa-heart me-1"></i>8</small>
-                            <small class="text-muted">Reply</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <button class="btn btn-link w-100 mt-3" style="color: #5D7A5C;">
-                View all 24 comments
-            </button>
-        </div>
-    </div>
+    {% endif %}
 </div>
 
 <style>
@@ -228,7 +156,7 @@
     font-size: 0.9rem;
     color: #5D7A5C;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .affirmation-pill:hover {
@@ -240,49 +168,166 @@
     background: white;
     border-radius: 12px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     border: 1px solid #E6E6FA;
 }
 
 .related-card:hover {
     transform: translateY(-3px);
     border-color: #9CAF88;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 5px 15px rgba(93, 122, 92, 0.1);
 }
 
-.exercise-step {
-    transition: var(--transition);
+.resource-content {
+    line-height: 1.6;
+    color: #2C3E2C;
+    font-size: 1rem;
 }
 
-.exercise-step:hover {
+.resource-content h1, 
+.resource-content h2, 
+.resource-content h3, 
+.resource-content h4, 
+.resource-content h5, 
+.resource-content h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #5D7A5C;
+    font-weight: 600;
+}
+
+.resource-content h5 {
+    font-size: 1.25rem;
+}
+
+.resource-content h6 {
+    font-size: 1.1rem;
+}
+
+.resource-content ul, 
+.resource-content ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+.resource-content li {
+    margin-bottom: 0.5rem;
+}
+
+.resource-content p {
+    margin-bottom: 1rem;
+}
+
+/* Step-by-step guide styling */
+.steps-container {
+    margin: 1.5rem 0;
+}
+
+.step-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #FDF6E9;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.step-item:hover {
     transform: translateX(5px);
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.step-number {
+    width: 36px;
+    height: 36px;
+    background: #9CAF88;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+    color: #5D7A5C;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 24px;
+    max-width: 400px;
+    width: 90%;
 }
 </style>
 
 <script>
 let isSaved = false;
+const resourceId = {{ resource.id }};
 
-function saveResource() {
-    const btn = document.getElementById('saveBtn');
-    isSaved = !isSaved;
-    
-    if (isSaved) {
+// Check if resource is already saved on load
+function checkSavedStatus() {
+    const savedIds = JSON.parse(localStorage.getItem('savedResources') || '[]');
+    if (savedIds.includes(resourceId)) {
+        isSaved = true;
+        const btn = document.getElementById('saveBtn');
         btn.innerHTML = '<i class="fas fa-heart me-2"></i>Saved';
         btn.style.background = '#9CAF88';
         btn.style.color = 'white';
-        flashMessages.success('Resource saved to your library!');
-    } else {
-        btn.innerHTML = '<i class="far fa-heart me-2"></i>Save';
-        btn.style.background = '';
-        btn.style.color = '';
-        flashMessages.info('Resource removed from saved');
     }
 }
 
-function startExercise() {
-    flashMessages.info('Starting guided exercise...');
+function saveResource() {
+    const btn = document.getElementById('saveBtn');
+    const savedIds = JSON.parse(localStorage.getItem('savedResources') || '[]');
     
+    if (isSaved) {
+        // Remove from saved
+        const updatedIds = savedIds.filter(id => id !== resourceId);
+        localStorage.setItem('savedResources', JSON.stringify(updatedIds));
+        localStorage.removeItem(`saved_${resourceId}`);
+        
+        btn.innerHTML = '<i class="far fa-heart me-2"></i>Save';
+        btn.style.background = '';
+        btn.style.color = '';
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.info('Resource removed from saved');
+        }
+    } else {
+        // Add to saved
+        savedIds.push(resourceId);
+        localStorage.setItem('savedResources', JSON.stringify(savedIds));
+        localStorage.setItem(`saved_${resourceId}`, new Date().toISOString());
+        
+        btn.innerHTML = '<i class="fas fa-heart me-2"></i>Saved';
+        btn.style.background = '#9CAF88';
+        btn.style.color = 'white';
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.success('Resource saved to your library!');
+        }
+    }
+    
+    isSaved = !isSaved;
+}
+
+function startExercise() {
     // Show modal with timer
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
@@ -296,30 +341,107 @@ function startExercise() {
     `;
     document.body.appendChild(modal);
     
-    // Start timer countdown (simplified)
-    let count = 4;
-    const timer = setInterval(() => {
-        count--;
-        if (count < 0) {
-            clearInterval(timer);
+    // Simple breathing exercise
+    let step = 0;
+    const steps = [
+        { text: 'Breathe In...', duration: 4 },
+        { text: 'Hold...', duration: 4 },
+        { text: 'Breathe Out...', duration: 6 },
+        { text: 'Hold...', duration: 2 }
+    ];
+    
+    function runStep(index) {
+        if (index >= steps.length) {
+            index = 0;
         }
-    }, 1000);
+        const stepData = steps[index];
+        document.getElementById('instruction').textContent = stepData.text;
+        let count = stepData.duration;
+        const timerEl = document.getElementById('timer');
+        
+        const interval = setInterval(() => {
+            timerEl.textContent = count;
+            count--;
+            if (count < 0) {
+                clearInterval(interval);
+                runStep(index + 1);
+            }
+        }, 1000);
+    }
+    
+    runStep(0);
 }
 
 function shareResource() {
-    flashMessages.info('Share feature coming soon!');
-}
-
-function downloadPDF() {
-    flashMessages.success('Downloading PDF...');
-}
-
-function rateResource(rating) {
-    if (rating === 5) {
-        flashMessages.success('Thank you for your feedback!');
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ resource.title|escapejs }}',
+            text: 'Check out this resource from MindHaven',
+            url: window.location.href
+        }).catch(() => {});
     } else {
-        flashMessages.info('We appreciate your honest feedback');
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.info('Copy the URL to share this resource');
+        }
+        navigator.clipboard.writeText(window.location.href);
     }
 }
+
+function watchVideo() {
+    const videoUrl = '{{ resource.video_url|safe }}';
+    if (videoUrl) {
+        window.open(videoUrl, '_blank');
+    } else {
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.info('Video coming soon!');
+        }
+    }
+}
+
+async function rateResource(helpful) {
+    try {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        
+        console.log('Rating resource:', resourceId, helpful);
+        
+        const response = await fetch(`/api/resources/api/${resourceId}/rate/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ helpful: helpful }),
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        console.log('Rating response:', data);
+        
+        if (data.success) {
+            // Update button counts
+            document.getElementById('helpfulCount').textContent = data.helpful_count;
+            document.getElementById('notHelpfulCount').textContent = data.not_helpful_count;
+            
+            if (typeof flashMessages !== 'undefined') {
+                flashMessages.success(helpful ? 'Thanks for your feedback!' : 'We appreciate your honest feedback');
+            }
+        } else {
+            throw new Error(data.error || 'Failed to rate');
+        }
+    } catch (error) {
+        console.error('Error rating resource:', error);
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.error('Failed to submit rating. Please try again.');
+        }
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    checkSavedStatus();
+    console.log('Resource loaded:', {{ resource.id }});
+    console.log('Resource title:', '{{ resource.title|escapejs }}');
+    console.log('Resource content length:', {{ resource.content|length }});
+});
 </script>
 {% endblock %}

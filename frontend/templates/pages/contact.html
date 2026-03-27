@@ -1,0 +1,257 @@
+{% extends "base/public_base.html" %}
+{% load static %}
+
+{% block title %}Contact Us - MindHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5" style="max-width: 1200px;">
+    <!-- Header Section -->
+    <div class="text-center mb-4 mb-md-5">
+        <h1 class="display-4 mb-3" style="color: #2C3E2C; font-size: clamp(1.75rem, 5vw, 2.5rem);">Contact Us</h1>
+        <p class="lead" style="color: #5A6B7A; font-size: clamp(1rem, 4vw, 1.25rem); max-width: 700px; margin: 0 auto;">We're here to help and support you. Reach out anytime.</p>
+    </div>
+
+    <div class="row g-4 g-md-5">
+        <!-- Contact Form Section -->
+        <div class="col-lg-7">
+            <div class="card h-100" style="border-radius: clamp(16px, 4vw, 24px); box-shadow: 0 5px 20px rgba(26, 58, 26, 0.08);">
+                <div class="card-body p-3 p-md-4 p-lg-5">
+                    <h5 class="mb-4" style="color: #2C3E2C; font-size: clamp(1.1rem, 4vw, 1.25rem);">
+                        <i class="fas fa-envelope me-2" style="color: #4A6B4A;"></i>Send us a message
+                    </h5>
+                    
+                    <form id="contactForm" onsubmit="submitContact(event)">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: clamp(0.85rem, 3vw, 0.95rem);">Full Name</label>
+                            <input type="text" class="form-control" required 
+                                   style="padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px); font-size: clamp(0.85rem, 3vw, 1rem);">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: clamp(0.85rem, 3vw, 0.95rem);">Email Address</label>
+                            <input type="email" class="form-control" required 
+                                   style="padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px); font-size: clamp(0.85rem, 3vw, 1rem);">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: clamp(0.85rem, 3vw, 0.95rem);">Matric Number <span class="text-muted">(if applicable)</span></label>
+                            <input type="text" class="form-control" 
+                                   style="padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px); font-size: clamp(0.85rem, 3vw, 1rem);">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: clamp(0.85rem, 3vw, 0.95rem);">Subject</label>
+                            <select class="form-select" required style="padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px); font-size: clamp(0.85rem, 3vw, 1rem);">
+                                <option value="">Select a subject...</option>
+                                <option value="general">General Question</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="privacy">Privacy Concern</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="partnership">Partnership Inquiry</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label" style="font-size: clamp(0.85rem, 3vw, 0.95rem);">Message</label>
+                            <textarea class="form-control" rows="5" required 
+                                      style="padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px); font-size: clamp(0.85rem, 3vw, 1rem); resize: vertical;"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100" id="submitBtn" style="padding: clamp(12px, 3vw, 14px); font-size: clamp(0.9rem, 3.5vw, 1rem); background: linear-gradient(135deg, #4A6B4A 0%, #1A3A1A 100%);">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Info Section -->
+        <div class="col-lg-5">
+            <div class="card h-100" style="border-radius: clamp(16px, 4vw, 24px); box-shadow: 0 5px 20px rgba(26, 58, 26, 0.08);">
+                <div class="card-body p-3 p-md-4 p-lg-5">
+                    <h5 class="mb-4" style="color: #2C3E2C; font-size: clamp(1.1rem, 4vw, 1.25rem);">
+                        <i class="fas fa-address-card me-2" style="color: #4A6B4A;"></i>Other Ways to Reach Us
+                    </h5>
+                    
+                    <div class="contact-info mb-4">
+                        <div class="contact-item d-flex align-items-start mb-4">
+                            <div class="contact-icon flex-shrink-0" style="width: clamp(40px, 10vw, 48px); height: clamp(40px, 10vw, 48px); background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-envelope" style="color: #4A6B4A; font-size: clamp(1rem, 4vw, 1.25rem);"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 style="color: #2C3E2C; font-size: clamp(0.9rem, 3.5vw, 1rem);">Email</h6>
+                                <a href="mailto:support@mindhaven.com" style="color: #5A6B7A; text-decoration: none; font-size: clamp(0.85rem, 3vw, 0.95rem); word-break: break-word;">support@mindhaven.com</a><br>
+                                <a href="mailto:privacy@mindhaven.com" style="color: #5A6B7A; text-decoration: none; font-size: clamp(0.85rem, 3vw, 0.95rem); word-break: break-word;">privacy@mindhaven.com</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item d-flex align-items-start mb-4">
+                            <div class="contact-icon flex-shrink-0" style="width: clamp(40px, 10vw, 48px); height: clamp(40px, 10vw, 48px); background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-phone-alt" style="color: #4A6B4A; font-size: clamp(1rem, 4vw, 1.25rem);"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 style="color: #2C3E2C; font-size: clamp(0.9rem, 3.5vw, 1rem);">Phone</h6>
+                                <p class="mb-0" style="color: #5A6B7A; font-size: clamp(0.85rem, 3vw, 0.95rem);">+234 (0) 123 456 789</p>
+                                <small class="text-muted" style="font-size: clamp(0.7rem, 2.5vw, 0.75rem);">Mon-Fri, 9am-5pm</small>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item d-flex align-items-start mb-4">
+                            <div class="contact-icon flex-shrink-0" style="width: clamp(40px, 10vw, 48px); height: clamp(40px, 10vw, 48px); background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-map-marker-alt" style="color: #4A6B4A; font-size: clamp(1rem, 4vw, 1.25rem);"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 style="color: #2C3E2C; font-size: clamp(0.9rem, 3.5vw, 1rem);">Office</h6>
+                                <p class="mb-0" style="color: #5A6B7A; font-size: clamp(0.85rem, 3vw, 0.95rem);">Student Union Building<br>University Main Campus</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr style="border-color: #E6E6FA; margin: 1.5rem 0;">
+                    
+                    <!-- Social Links -->
+                    <div class="social-links text-center">
+                        <h6 class="mb-3" style="color: #2C3E2C; font-size: clamp(0.9rem, 3.5vw, 1rem);">Follow Us</h6>
+                        <div class="d-flex justify-content-center gap-3 gap-md-4">
+                            <a href="#" class="social-link" style="color: #5A6B7A; font-size: clamp(1.25rem, 5vw, 1.5rem); transition: all 0.3s ease;">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" style="color: #5A6B7A; font-size: clamp(1.25rem, 5vw, 1.5rem); transition: all 0.3s ease;">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" style="color: #5A6B7A; font-size: clamp(1.25rem, 5vw, 1.5rem); transition: all 0.3s ease;">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="social-link" style="color: #5A6B7A; font-size: clamp(1.25rem, 5vw, 1.5rem); transition: all 0.3s ease;">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crisis Support Card - Responsive -->
+    <div class="row mt-4 mt-md-5">
+        <div class="col-12">
+            <div class="card" style="background: linear-gradient(135deg, #FDF2F2 0%, #FCE8E8 100%); border-radius: clamp(16px, 4vw, 24px); border-left: 4px solid #C47E7E;">
+                <div class="card-body p-3 p-md-4 text-center">
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: clamp(50px, 12vw, 60px); height: clamp(50px, 12vw, 60px); background: #C47E7E; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-heartbeat" style="color: white; font-size: clamp(1.25rem, 5vw, 1.5rem);"></i>
+                            </div>
+                            <div class="text-start">
+                                <h6 class="mb-1" style="color: #2C3E2C; font-size: clamp(0.9rem, 3.5vw, 1rem);">🆘 In Crisis?</h6>
+                                <p class="mb-0 small" style="color: #5A6B7A; font-size: clamp(0.75rem, 2.8vw, 0.85rem);">If you need immediate support, help is available 24/7</p>
+                            </div>
+                        </div>
+                        <div class="text-center text-md-end">
+                            <p class="mb-1" style="font-size: clamp(1rem, 4vw, 1.1rem); font-weight: 600; color: #2C3E2C;">24/7 Crisis Helpline</p>
+                            <p class="mb-0" style="font-size: clamp(1.25rem, 5vw, 1.5rem); font-weight: 700; color: #C47E7E;">0800-123-456</p>
+                            <small class="text-muted" style="font-size: clamp(0.65rem, 2.5vw, 0.75rem);">Free and confidential</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Quick Links -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <p class="mb-0" style="color: #5A6B7A; font-size: clamp(0.85rem, 3vw, 0.95rem);">
+                <i class="fas fa-question-circle me-2"></i>Have a question? 
+                <a href="/faq" style="color: #4A6B4A; text-decoration: none;">Check our FAQ</a> for quick answers
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Contact item hover effect */
+.contact-item {
+    transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateX(5px);
+}
+
+.contact-item:hover .contact-icon {
+    background: #9CAF88 !important;
+}
+
+.contact-item:hover .contact-icon i {
+    color: white !important;
+}
+
+/* Social link hover effect */
+.social-link:hover {
+    color: #4A6B4A !important;
+    transform: translateY(-3px);
+}
+
+/* Form input focus effect */
+.form-control:focus, .form-select:focus {
+    border-color: #4A6B4A;
+    box-shadow: 0 0 0 3px rgba(74, 107, 74, 0.1);
+}
+
+/* Button hover effect */
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(74, 107, 74, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .contact-item {
+        transform: none;
+    }
+    
+    .contact-item:hover {
+        transform: translateX(3px);
+    }
+}
+</style>
+
+<script>
+function submitContact(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+    submitBtn.disabled = true;
+    
+    // Get form data
+    const formData = new FormData(event.target);
+    const formObject = {};
+    formData.forEach((value, key) => {
+        formObject[key] = value;
+    });
+    
+    // Simulate API call (replace with actual endpoint)
+    setTimeout(() => {
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.success('Message sent successfully! We\'ll respond within 24 hours.');
+        } else {
+            alert('Message sent successfully! We\'ll respond within 24 hours.');
+        }
+        
+        // Reset form
+        event.target.reset();
+        
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 1500);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base/public_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="max-width: 500px;">
+    <div class="card text-center py-5">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">✉️</div>
+        <h2 class="mb-3">Check Your Email!</h2>
+        <p class="mb-4">We've sent a registration link to <strong>{{ email }}</strong></p>
+        <p class="text-muted mb-4">Click the link in the email to complete your registration. The link expires in 24 hours.</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="{% url 'pages:matric_verification' %}" class="btn btn-outline">Try Another Matric</a>
+            <a href="{% url 'pages:login' %}" class="btn btn-primary">Go to Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

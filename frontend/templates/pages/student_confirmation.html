@@ -1,9 +1,10 @@
 {% extends "base/public_base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container" style="max-width: 600px;">
+<div class="container mb-5" style="max-width: 600px;">
     <!-- Back Link -->
-    <a href="/verify-matric" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C;">
+    <a href="{% url 'pages:matric_verification' %}" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C; text-decoration: none;">
         <i class="fas fa-arrow-left me-2"></i> Back to Edit Matric
     </a>
 
@@ -19,98 +20,370 @@
     </div>
 
     <!-- Main Card -->
-    <div class="card">
-        <h2 class="text-center mb-4">✅ Is this you?</h2>
-
-        <!-- Student Info Card -->
-        <div class="text-center mb-4">
-            <div style="width: 100px; height: 100px; background: #E6E6FA; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-user-graduate" style="font-size: 50px; color: #5D7A5C;"></i>
+    <div class="card" id="confirmationCard">
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-4">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-            
-            <h3 id="studentName">John Michael Doe</h3>
-            <hr class="my-3">
-            
-            <div style="text-align: left;">
-                <p><strong>Matric:</strong> <span id="studentMatric">202012345</span></p>
-                <p><strong>Email:</strong> <span id="studentEmail">john.doe@uni.edu</span></p>
-                <p><strong>Department:</strong> <span id="studentDept">Computer Science</span></p>
-                <p><strong>Faculty:</strong> <span id="studentFaculty">Science</span></p>
-                <p><strong>Year of Entry:</strong> <span id="studentYear">2020</span></p>
-            </div>
+            <p style="color: #5D7A5C;">Fetching your student information...</p>
         </div>
 
-        <!-- Confirmation Question -->
-        <p class="text-center mb-4" style="font-weight: 600;">Is this information correct?</p>
-
-        <!-- Action Buttons -->
-        <div class="d-flex gap-3">
-            <button class="btn btn-outline flex-grow-1" onclick="handleNo()">No, that's not me</button>
-            <button class="btn btn-primary flex-grow-1" onclick="handleYes()">Yes, Continue</button>
+        <!-- Error State -->
+        <div id="errorState" class="text-center py-4" style="display: none;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <h4 style="color: #C47E7E;">Unable to Verify Student</h4>
+            <p style="color: #5D7A5C;" id="errorMessage"></p>
+            <button class="btn btn-outline mt-3" onclick="window.location.href='{% url 'pages:matric_verification' %}'">
+                Try Again
+            </button>
         </div>
 
-        <!-- Privacy Note -->
-        <div class="info-card mt-4">
-            <span class="info-icon">🔒</span>
-            <span>We only use this to verify you're a student. Your data is encrypted.</span>
+        <!-- Student Info Content (initially hidden) -->
+        <div id="studentInfoContent" style="display: none;">
+            <h2 class="text-center mb-4">✅ Is this you?</h2>
+
+            <!-- Student Info Card -->
+            <div class="text-center mb-4">   
+                <div class="student-avatar mx-auto mb-3" style="width: 100px; height: 100px; background: #E6E6FA; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <img id="studentAvatar" 
+                         src="{% static 'images/default-avatar.png' %}" 
+                         alt="Student Avatar" 
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h3 id="studentName" style="color: #2C3E2C;">Loading...</h3>
+                <hr class="my-3">
+                
+                <div style="text-align: left;">
+                    <p><strong>Matric Number:</strong> <span id="studentMatric">-</span></p>
+                    <p><strong>Email:</strong> <span id="studentEmail">-</span></p>
+                    <p><strong>Department:</strong> <span id="studentDept">-</span></p>
+                    <p><strong>Faculty:</strong> <span id="studentFaculty">-</span></p>
+                    <p><strong>Year of Entry:</strong> <span id="studentYear">-</span></p>
+                    <p><strong>Status:</strong> <span id="studentStatus">-</span></p>
+                </div>
+            </div>
+
+            <!-- Confirmation Question -->
+            <p class="text-center mb-4" style="font-weight: 600; color: #2C3E2C;">Is this information correct?</p>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline flex-grow-1" id="noBtn" onclick="handleNo()" style="border-color: #C47E7E; color: #C47E7E;">
+                    No, that's not me
+                </button>
+                <button class="btn btn-primary flex-grow-1" id="yesBtn" onclick="handleYes()">
+                    Yes, Continue
+                </button>
+            </div>
+
+            <!-- Privacy Note -->
+            <div class="info-card mt-4">
+                <span class="info-icon">🔒</span>
+                <span>We only use this to verify you're a student. Your data is encrypted.</span>
+            </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<style>
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+    color: transparent !important;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.student-avatar {
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.student-avatar:hover {
+    transform: scale(1.05);
+}
+
+#confirmationCard {
+    min-height: 500px;
+}
+</style>
+
 <script>
-document.addEventListener('DOMContentLoaded', async function() {
-    // Check if we have matric number
-    const matricNumber = sessionStorage.getItem('matricNumber');
+// API endpoint
+const API_BASE_URL = '/api/accounts/api';
+
+// Get CSRF token
+function getCsrfToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Store student data in session for next step
+function storeStudentData(studentData) {
+    sessionStorage.setItem('verified_student', JSON.stringify(studentData));
+}
+
+// Fetch student details from API
+async function fetchStudentDetails(matricNumber) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/verify-matric/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ matric_number: matricNumber }),
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Student not found in university database');
+            } else if (response.status === 400) {
+                if (data.already_registered) {
+                    throw new Error('An account already exists with this matric number. Please login instead.');
+                }
+                const errorMsg = data.errors?.matric_number?.[0] || data.error || 'Invalid request';
+                throw new Error(errorMsg);
+            } else {
+                throw new Error(data.error || 'Failed to fetch student details');
+            }
+        }
+
+        return { success: true, data: data.student };
+    } catch (error) {
+        console.error('Error fetching student details:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Send registration email after confirmation
+async function sendRegistrationEmail() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/send-registration-email/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to send registration email');
+        }
+        
+        return { success: true, data: data };
+    } catch (error) {
+        console.error('Error sending registration email:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Display student data in the UI
+function displayStudentData(student) {
+    // Set profile image
+    const avatarImg = document.getElementById('studentAvatar');
+    if (student.profile_image) {
+        const imagePath = `/static/${student.profile_image}`;
+        avatarImg.src = imagePath;
+        avatarImg.onerror = function() {
+            this.src = '/static/images/default-avatar.png';
+        };
+    } else {
+        avatarImg.src = '/static/images/default-avatar.png';
+    }
+    
+    // Full Name
+    const fullName = student.full_name || `${student.first_name} ${student.last_name}`;
+    const nameElement = document.getElementById('studentName');
+    if (nameElement) nameElement.textContent = fullName || 'Not specified';
+    
+    // Matric Number
+    const matricElement = document.getElementById('studentMatric');
+    if (matricElement) matricElement.textContent = student.matric_number || 'Not specified';
+    
+    // Email
+    const emailElement = document.getElementById('studentEmail');
+    if (emailElement) emailElement.textContent = student.email || 'Not specified';
+    
+    // Department
+    const deptElement = document.getElementById('studentDept');
+    const department = student.department || student.department_name || 'Not specified';
+    if (deptElement) deptElement.textContent = department;
+    
+    // Faculty
+    const facultyElement = document.getElementById('studentFaculty');
+    const faculty = student.faculty || student.faculty_name || 'Not specified';
+    if (facultyElement) facultyElement.textContent = faculty;
+    
+    // Year of Entry
+    let yearOfEntry = 'Not specified';
+    if (student.year_of_entry !== undefined && student.year_of_entry !== null) {
+        yearOfEntry = student.year_of_entry;
+    }
+    const yearElement = document.getElementById('studentYear');
+    if (yearElement) yearElement.textContent = yearOfEntry;
+    
+    // Status
+    const statusElement = document.getElementById('studentStatus');
+    const status = student.status || 'Active';
+    if (statusElement) statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+// Show error state
+function showError(errorMessage) {
+    const loadingState = document.getElementById('loadingState');
+    const studentInfoContent = document.getElementById('studentInfoContent');
+    const errorState = document.getElementById('errorState');
+    const errorMessageElement = document.getElementById('errorMessage');
+    
+    if (loadingState) loadingState.style.display = 'none';
+    if (studentInfoContent) studentInfoContent.style.display = 'none';
+    if (errorState) errorState.style.display = 'block';
+    if (errorMessageElement) errorMessageElement.textContent = errorMessage;
+}
+
+// Show success/content state
+function showContent() {
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const studentInfoContent = document.getElementById('studentInfoContent');
+    
+    if (loadingState) loadingState.style.display = 'none';
+    if (errorState) errorState.style.display = 'none';
+    if (studentInfoContent) studentInfoContent.style.display = 'block';
+}
+
+// Handle "No" button click - redirect back to matric entry
+function handleNo() {
+    sessionStorage.removeItem('matricNumber');
+    sessionStorage.removeItem('verified_student');
+    
+    if (typeof flashMessages !== 'undefined') {
+        flashMessages.info('Let\'s try again with a different matric number.');
+    }
+    
+    setTimeout(() => {
+        window.location.href = "{% url 'pages:matric_verification' %}";
+    }, 1500);
+}
+
+// Handle "Yes" button click - send registration email
+async function handleYes() {
+    // Disable button to prevent double submission
+    const yesBtn = document.getElementById('yesBtn');
+    const originalText = yesBtn.innerHTML;
+    yesBtn.disabled = true;
+    yesBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+    
+    try {
+        const result = await sendRegistrationEmail();
+        
+        if (result.success) {
+            // Show success message in the card instead of redirecting
+            const card = document.getElementById('confirmationCard');
+            const studentName = document.getElementById('studentName').textContent;
+            const email = result.data.email;
+            
+            card.innerHTML = `
+                <div class="text-center py-5">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">✉️</div>
+                    <h3 class="mb-3">Check Your Email!</h3>
+                    <p class="mb-2">Hello <strong>${studentName}</strong>,</p>
+                    <p class="mb-4">We've sent a registration link to <strong>${email}</strong></p>
+                    <p class="text-muted mb-4">Click the link in the email to create your password and complete registration. The link expires in 24 hours.</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'pages:matric_verification' %}" class="btn btn-outline">Start Over</a>
+                        <a href="{% url 'pages:login' %}" class="btn btn-primary">Go to Login</a>
+                    </div>
+                </div>
+            `;
+            
+            if (typeof flashMessages !== 'undefined') {
+                flashMessages.success('Registration link sent! Check your email.');
+            }
+        } else {
+            // Show error
+            if (typeof flashMessages !== 'undefined') {
+                flashMessages.error(result.error || 'Failed to send registration email. Please try again.');
+            }
+            yesBtn.disabled = false;
+            yesBtn.innerHTML = originalText;
+        }
+    } catch (error) {
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.error('An error occurred. Please try again.');
+        }
+        yesBtn.disabled = false;
+        yesBtn.innerHTML = originalText;
+    }
+}
+
+// Main initialization function
+async function init() {
+    // Get matric number from session storage
+    let matricNumber = sessionStorage.getItem('matricNumber');
+    
+    // Also check if it was stored under a different key
     if (!matricNumber) {
-        window.location.href = '/verify-matric';
+        matricNumber = sessionStorage.getItem('verifying_matric');
+    }
+    
+    if (!matricNumber) {
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.warning('Please enter your matric number first.');
+        }
+        window.location.href = "{% url 'pages:matric_verification' %}";
         return;
     }
 
-    // Show loading state
-    showLoading();
+    // Check if we already have cached student data
+    const cachedStudent = sessionStorage.getItem('verified_student');
+    if (cachedStudent) {
+        try {
+            const student = JSON.parse(cachedStudent);
+            displayStudentData(student);
+            showContent();
+            return;
+        } catch (e) {
+            // Invalid cache, fetch fresh
+        }
+    }
 
-    // Fetch student data (mock for now - replace with actual API call)
-    setTimeout(() => {
-        // Mock data - replace with actual API call
-        document.getElementById('studentMatric').textContent = matricNumber;
-        document.getElementById('studentName').textContent = 'John Michael Doe';
-        document.getElementById('studentEmail').textContent = 'john.doe@uni.edu';
-        document.getElementById('studentDept').textContent = 'Computer Science';
-        document.getElementById('studentFaculty').textContent = 'Science';
-        document.getElementById('studentYear').textContent = '2020';
-        
-        hideLoading();
-    }, 1500);
-});
-
-function showLoading() {
-    // Show skeleton loading
-    document.querySelectorAll('h3, p, strong').forEach(el => {
-        el.classList.add('skeleton');
-    });
+    // Fetch fresh student data
+    const result = await fetchStudentDetails(matricNumber);
+    
+    if (result.success) {
+        displayStudentData(result.data);
+        storeStudentData(result.data);
+        showContent();
+    } else {
+        showError(result.error);
+    }
 }
 
-function hideLoading() {
-    document.querySelectorAll('.skeleton').forEach(el => {
-        el.classList.remove('skeleton');
-    });
-}
-
-function handleNo() {
-    flashMessages.info('Let\'s try again with a different matric number.');
-    sessionStorage.removeItem('matricNumber');
-    setTimeout(() => {
-        window.location.href = '/verify-matric';
-    }, 2000);
-}
-
-function handleYes() {
-    flashMessages.success('Information confirmed!');
-    setTimeout(() => {
-        window.location.href = '/create-password';
-    }, 2000);
-}
+// Set up event listeners when DOM is ready
+document.addEventListener('DOMContentLoaded', init);
 </script>
 {% endblock %}

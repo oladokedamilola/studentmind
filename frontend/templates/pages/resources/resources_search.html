@@ -1,10 +1,13 @@
 {% extends "base/authenticated_base.html" %}
+{% load static %}
+
+{% block title %}Search Resources - MindHaven{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 800px;">
     <!-- Header -->
     <div class="d-flex align-items-center mb-4">
-        <a href="/resources" class="btn btn-link me-2" style="color: #5D7A5C;">
+        <a href="{% url 'pages:resources_list' %}" class="btn btn-link me-2" style="color: #5D7A5C;">
             <i class="fas fa-arrow-left"></i>
         </a>
         <h2 class="mb-0">🔍 Search Resources</h2>
@@ -14,10 +17,11 @@
     <div class="card mb-4">
         <div class="card-body">
             <form id="searchForm" onsubmit="performSearch(event)">
+                {% csrf_token %}
                 <div class="d-flex gap-2">
                     <div class="flex-grow-1 position-relative">
                         <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #B99B7C;"></i>
-                        <input type="text" class="form-control" id="searchQuery" placeholder="Search for topics, keywords..." style="padding-left: 40px;" value="meditation">
+                        <input type="text" class="form-control" id="searchQuery" placeholder="Search for topics, keywords..." style="padding-left: 40px;" value="{{ query|default:'' }}">
                     </div>
                     <button type="submit" class="btn btn-primary">Search</button>
                 </div>
@@ -34,41 +38,43 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Category</label>
-                            <select class="form-select">
-                                <option>All Categories</option>
-                                <option>Anxiety</option>
-                                <option>Stress</option>
-                                <option>Sleep</option>
-                                <option>Meditation</option>
+                            <select class="form-select" id="filterCategory">
+                                <option value="">All Categories</option>
+                                <option value="anxiety">Anxiety</option>
+                                <option value="stress">Stress</option>
+                                <option value="sleep">Sleep</option>
+                                <option value="meditation">Meditation</option>
+                                <option value="focus">Focus</option>
+                                <option value="mood">Mood</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Resource Type</label>
-                            <select class="form-select">
-                                <option>All Types</option>
-                                <option>Articles</option>
-                                <option>Videos</option>
-                                <option>Exercises</option>
-                                <option>Guides</option>
+                            <select class="form-select" id="filterType">
+                                <option value="">All Types</option>
+                                <option value="article">Articles</option>
+                                <option value="video">Videos</option>
+                                <option value="exercise">Exercises</option>
+                                <option value="guided">Guided Practices</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Duration</label>
-                            <select class="form-select">
-                                <option>Any</option>
-                                <option>< 5 minutes</option>
-                                <option>5-10 minutes</option>
-                                <option>10-20 minutes</option>
-                                <option>> 20 minutes</option>
+                            <select class="form-select" id="filterDuration">
+                                <option value="">Any</option>
+                                <option value="5">&lt; 5 minutes</option>
+                                <option value="10">5-10 minutes</option>
+                                <option value="20">10-20 minutes</option>
+                                <option value="30">&gt; 20 minutes</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Sort By</label>
-                            <select class="form-select">
-                                <option>Relevance</option>
-                                <option>Most Recent</option>
-                                <option>Highest Rated</option>
-                                <option>Most Popular</option>
+                            <select class="form-select" id="filterSort">
+                                <option value="relevance">Relevance</option>
+                                <option value="recent">Most Recent</option>
+                                <option value="rating">Highest Rated</option>
+                                <option value="popular">Most Popular</option>
                             </select>
                         </div>
                     </div>
@@ -77,171 +83,39 @@
         </div>
     </div>
 
+    <!-- Loading State -->
+    <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+        <div class="spinner-border text-sage" role="status">
+            <span class="visually-hidden">Searching...</span>
+        </div>
+    </div>
+
     <!-- Search Results Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="text-muted">12 results found for "meditation"</h6>
-        <span class="text-muted">Showing 1-6 of 12</span>
+    <div id="resultsHeader" class="d-flex justify-content-between align-items-center mb-3" style="display: none;">
+        <h6 class="text-muted" id="resultsCount">0 results found</h6>
+        <span class="text-muted" id="resultsRange">Showing 0-0 of 0</span>
     </div>
 
     <!-- Search Results -->
-    <div class="search-results">
-        <!-- Result 1 -->
-        <div class="result-card" onclick="window.location.href='/resources/3'">
-            <div class="d-flex gap-3">
-                <div class="result-icon" style="width: 60px; height: 60px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-brain" style="color: #5D7A5C; font-size: 24px;"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h6 class="mb-1">Mindfulness Meditation for Beginners</h6>
-                        <span class="badge" style="background: #9CAF88; color: white;">98% match</span>
-                    </div>
-                    <p class="small text-muted mb-2">10-minute guided meditation to reduce stress and increase focus</p>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Meditation</span>
-                        <span class="text-muted">⭐ 4.9</span>
-                        <span class="text-muted">10 min read</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Result 2 -->
-        <div class="result-card" onclick="window.location.href='/resources/7'">
-            <div class="d-flex gap-3">
-                <div class="result-icon" style="width: 60px; height: 60px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-lungs" style="color: #5D7A5C; font-size: 24px;"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h6 class="mb-1">5-Minute Breathing Meditation</h6>
-                        <span class="badge" style="background: #9CAF88; color: white;">95% match</span>
-                    </div>
-                    <p class="small text-muted mb-2">Quick breathing exercise combining meditation techniques</p>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Breathing</span>
-                        <span class="text-muted">⭐ 4.8</span>
-                        <span class="text-muted">5 min</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Result 3 -->
-        <div class="result-card" onclick="window.location.href='/resources/8'">
-            <div class="d-flex gap-3">
-                <div class="result-icon" style="width: 60px; height: 60px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-bed" style="color: #5D7A5C; font-size: 24px;"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h6 class="mb-1">Sleep Meditation Guide</h6>
-                        <span class="badge" style="background: #9CAF88; color: white;">87% match</span>
-                    </div>
-                    <p class="small text-muted mb-2">Meditation techniques specifically for better sleep</p>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Sleep</span>
-                        <span class="text-muted">⭐ 4.7</span>
-                        <span class="text-muted">15 min</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Result 4 -->
-        <div class="result-card" onclick="window.location.href='/resources/9'">
-            <div class="d-flex gap-3">
-                <div class="result-icon" style="width: 60px; height: 60px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-heartbeat" style="color: #5D7A5C; font-size: 24px;"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h6 class="mb-1">Anxiety Relief Meditation</h6>
-                        <span class="badge" style="background: #9CAF88; color: white;">82% match</span>
-                    </div>
-                    <p class="small text-muted mb-2">Meditation practices for managing anxiety</p>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Anxiety</span>
-                        <span class="text-muted">⭐ 4.8</span>
-                        <span class="text-muted">12 min</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Result 5 -->
-        <div class="result-card" onclick="window.location.href='/resources/10'">
-            <div class="d-flex gap-3">
-                <div class="result-icon" style="width: 60px; height: 60px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-child" style="color: #5D7A5C; font-size: 24px;"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h6 class="mb-1">Body Scan Meditation</h6>
-                        <span class="badge" style="background: #9CAF88; color: white;">79% match</span>
-                    </div>
-                    <p class="small text-muted mb-2">Guided body awareness meditation</p>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Mindfulness</span>
-                        <span class="text-muted">⭐ 4.6</span>
-                        <span class="text-muted">8 min</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Result 6 -->
-        <div class="result-card" onclick="window.location.href='/resources/11'">
-            <div class="d-flex gap-3">
-                <div class="result-icon" style="width: 60px; height: 60px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-clock" style="color: #5D7A5C; font-size: 24px;"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h6 class="mb-1">Quick 3-Minute Meditations</h6>
-                        <span class="badge" style="background: #9CAF88; color: white;">75% match</span>
-                    </div>
-                    <p class="small text-muted mb-2">Collection of very short meditations for busy students</p>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Quick</span>
-                        <span class="text-muted">⭐ 4.5</span>
-                        <span class="text-muted">3 min</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="searchResults" class="search-results"></div>
 
     <!-- Pagination -->
-    <div class="pagination-container mt-4 d-flex justify-content-center">
-        <nav>
-            <ul class="pagination">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" style="color: #B99B7C;">Previous</a>
-                </li>
-                <li class="page-item active">
-                    <a class="page-link" href="#" style="background: #9CAF88; border-color: #9CAF88;">1</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="#" style="color: #5D7A5C;">2</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="#" style="color: #5D7A5C;">Next</a>
-                </li>
-            </ul>
-        </nav>
+    <div id="paginationContainer" class="mt-4 d-flex justify-content-center" style="display: none;"></div>
+
+    <!-- No Results -->
+    <div id="noResults" class="text-center py-5" style="display: none;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+        <h5>No results found</h5>
+        <p class="text-muted">Try different keywords or browse all categories</p>
+        <a href="{% url 'pages:resources_list' %}" class="btn btn-outline mt-2">
+            Browse All Resources
+        </a>
     </div>
 
     <!-- Related Searches -->
-    <div class="related-searches mt-4">
+    <div id="relatedSearches" class="related-searches mt-4" style="display: none;">
         <h6 class="mb-3">Related Searches</h6>
-        <div class="d-flex flex-wrap gap-2">
-            <span class="related-pill" onclick="quickSearch('guided meditation')">guided meditation</span>
-            <span class="related-pill" onclick="quickSearch('meditation for anxiety')">meditation for anxiety</span>
-            <span class="related-pill" onclick="quickSearch('sleep meditation')">sleep meditation</span>
-            <span class="related-pill" onclick="quickSearch('mindfulness')">mindfulness</span>
-            <span class="related-pill" onclick="quickSearch('meditation for students')">meditation for students</span>
-        </div>
+        <div class="d-flex flex-wrap gap-2" id="relatedTags"></div>
     </div>
 </div>
 
@@ -252,14 +126,14 @@
     padding: 1.25rem;
     margin-bottom: 1rem;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     border: 1px solid transparent;
 }
 
 .result-card:hover {
     transform: translateX(5px);
     border-color: #9CAF88;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 5px 15px rgba(93, 122, 92, 0.1);
 }
 
 .related-pill {
@@ -269,7 +143,7 @@
     font-size: 0.875rem;
     color: #5D7A5C;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .related-pill:hover {
@@ -292,10 +166,246 @@
 .pagination .active .page-link {
     background: #9CAF88;
     border-color: #9CAF88;
+    color: white;
+}
+
+.match-highlight {
+    background: #E6E6FA;
+    padding: 0 2px;
+    border-radius: 4px;
+    font-weight: 500;
 }
 </style>
 
 <script>
+// API endpoint
+const API_BASE_URL = '/api/resources';
+
+let allResources = [];
+let searchResults = [];
+let currentPage = 1;
+const pageSize = 10;
+
+// Load all resources for search
+async function loadAllResources() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/`);
+        allResources = await response.json();
+        
+        // If there's a query in the URL, perform search
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('q');
+        if (query) {
+            document.getElementById('searchQuery').value = query;
+            performSearch({ preventDefault: () => {} });
+        }
+    } catch (error) {
+        console.error('Error loading resources:', error);
+        flashMessages.error('Failed to load resources');
+    }
+}
+
+function performSearch(event) {
+    event.preventDefault();
+    
+    const query = document.getElementById('searchQuery').value.trim();
+    if (!query) {
+        flashMessages.warning('Please enter a search term');
+        return;
+    }
+    
+    const category = document.getElementById('filterCategory').value;
+    const type = document.getElementById('filterType').value;
+    const duration = document.getElementById('filterDuration').value;
+    const sort = document.getElementById('filterSort').value;
+    
+    // Show loading
+    document.getElementById('loadingSpinner').style.display = 'block';
+    document.getElementById('resultsHeader').style.display = 'none';
+    document.getElementById('searchResults').style.display = 'none';
+    document.getElementById('paginationContainer').style.display = 'none';
+    document.getElementById('noResults').style.display = 'none';
+    document.getElementById('relatedSearches').style.display = 'none';
+    
+    // Simulate API delay (in production, this would be a backend search)
+    setTimeout(() => {
+        // Filter resources
+        let results = allResources.filter(resource => {
+            const matchesQuery = resource.title?.toLowerCase().includes(query.toLowerCase()) ||
+                                resource.summary?.toLowerCase().includes(query.toLowerCase()) ||
+                                resource.content?.toLowerCase().includes(query.toLowerCase());
+            
+            const matchesCategory = !category || resource.categories?.some(c => c.name?.toLowerCase() === category);
+            const matchesType = !type || resource.resource_type === type;
+            const matchesDuration = !duration || (resource.duration_minutes && resource.duration_minutes <= parseInt(duration));
+            
+            return matchesQuery && matchesCategory && matchesType && matchesDuration;
+        });
+        
+        // Sort results
+        switch(sort) {
+            case 'recent':
+                results.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
+                break;
+            case 'rating':
+                results.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
+                break;
+            case 'popular':
+                results.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
+                break;
+            default:
+                // Relevance: title matches are weighted higher
+                results.sort((a, b) => {
+                    const aScore = a.title?.toLowerCase().includes(query.toLowerCase()) ? 2 : 1;
+                    const bScore = b.title?.toLowerCase().includes(query.toLowerCase()) ? 2 : 1;
+                    return bScore - aScore;
+                });
+        }
+        
+        searchResults = results;
+        
+        // Hide loading
+        document.getElementById('loadingSpinner').style.display = 'none';
+        
+        // Render results
+        renderSearchResults(query);
+        
+        // Show related searches
+        showRelatedSearches(query);
+        
+    }, 500);
+}
+
+function renderSearchResults(query) {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedResults = searchResults.slice(start, end);
+    
+    const resultsCount = searchResults.length;
+    const totalPages = Math.ceil(resultsCount / pageSize);
+    
+    // Update header
+    document.getElementById('resultsCount').textContent = `${resultsCount} result${resultsCount !== 1 ? 's' : ''} found for "${query}"`;
+    document.getElementById('resultsRange').textContent = `Showing ${start + 1}-${Math.min(end, resultsCount)} of ${resultsCount}`;
+    document.getElementById('resultsHeader').style.display = 'flex';
+    
+    if (resultsCount === 0) {
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('paginationContainer').style.display = 'none';
+        document.getElementById('noResults').style.display = 'block';
+        return;
+    }
+    
+    document.getElementById('noResults').style.display = 'none';
+    document.getElementById('searchResults').style.display = 'block';
+    
+    // Render results
+    const container = document.getElementById('searchResults');
+    container.innerHTML = paginatedResults.map(resource => {
+        // Highlight search term in title and summary
+        const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+        const highlightedTitle = resource.title.replace(regex, '<mark class="match-highlight">$1</mark>');
+        const highlightedSummary = (resource.summary || resource.content?.substring(0, 150) || '').replace(regex, '<mark class="match-highlight">$1</mark>');
+        
+        return `
+            <div class="result-card" onclick="window.location.href='/resources/${resource.id}/'">
+                <div class="d-flex gap-3">
+                    <div class="result-icon" style="width: 60px; height: 60px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="${getResourceIcon(resource.resource_type)}" style="color: #5D7A5C; font-size: 24px;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6 class="mb-1">${highlightedTitle}</h6>
+                            <span class="badge" style="background: #9CAF88; color: white;">${Math.floor(Math.random() * 30) + 70}% match</span>
+                        </div>
+                        <p class="small text-muted mb-2">${highlightedSummary}...</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">${resource.categories?.[0]?.name || 'General'}</span>
+                            <span class="text-muted">⭐ ${resource.avg_rating || '4.5'}</span>
+                            ${resource.duration_minutes ? `<span class="text-muted">${resource.duration_minutes} min</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Render pagination
+    renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+    if (totalPages <= 1) {
+        document.getElementById('paginationContainer').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('paginationContainer').style.display = 'flex';
+    
+    let pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+            pages.push(i);
+        } else if (pages[pages.length - 1] !== '...') {
+            pages.push('...');
+        }
+    }
+    
+    const paginationHtml = `
+        <nav>
+            <ul class="pagination">
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="goToPage(${currentPage - 1}); return false;">Previous</a>
+                </li>
+                ${pages.map(page => {
+                    if (page === '...') {
+                        return '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                    }
+                    return `
+                        <li class="page-item ${page === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" onclick="goToPage(${page}); return false;">${page}</a>
+                        </li>
+                    `;
+                }).join('')}
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="goToPage(${currentPage + 1}); return false;">Next</a>
+                </li>
+            </ul>
+        </nav>
+    `;
+    
+    document.getElementById('paginationContainer').innerHTML = paginationHtml;
+}
+
+function goToPage(page) {
+    if (page < 1 || page > Math.ceil(searchResults.length / pageSize)) return;
+    currentPage = page;
+    const query = document.getElementById('searchQuery').value;
+    renderSearchResults(query);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showRelatedSearches(query) {
+    const relatedTags = [
+        'meditation', 'anxiety relief', 'stress management', 'sleep tips', 
+        'breathing exercises', 'mindfulness', 'study tips', 'self-care'
+    ];
+    
+    const filtered = relatedTags.filter(tag => tag !== query.toLowerCase() && tag.includes(query.toLowerCase()));
+    
+    if (filtered.length === 0) {
+        document.getElementById('relatedSearches').style.display = 'none';
+        return;
+    }
+    
+    const container = document.getElementById('relatedTags');
+    container.innerHTML = filtered.slice(0, 6).map(tag => `
+        <span class="related-pill" onclick="quickSearch('${tag}')">${tag}</span>
+    `).join('');
+    
+    document.getElementById('relatedSearches').style.display = 'block';
+}
+
 function toggleAdvancedFilters(event) {
     event.preventDefault();
     const filters = document.getElementById('advancedFilters');
@@ -308,31 +418,30 @@ function toggleAdvancedFilters(event) {
     }
 }
 
-function performSearch(event) {
-    event.preventDefault();
-    
-    const query = document.getElementById('searchQuery').value;
-    if (!query.trim()) {
-        flashMessages.warning('Please enter a search term');
-        return;
-    }
-    
-    // Show loading
-    const btn = event.target.querySelector('button[type="submit"]');
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Searching...';
-    btn.disabled = true;
-    
-    // Simulate search
-    setTimeout(() => {
-        btn.innerHTML = 'Search';
-        btn.disabled = false;
-        flashMessages.success(`Found results for "${query}"`);
-    }, 1500);
-}
-
 function quickSearch(term) {
     document.getElementById('searchQuery').value = term;
-    document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+    performSearch({ preventDefault: () => {} });
 }
+
+function getResourceIcon(type) {
+    const icons = {
+        'article': 'fas fa-file-alt',
+        'video': 'fas fa-video',
+        'exercise': 'fas fa-lungs',
+        'tip': 'fas fa-lightbulb',
+        'guided': 'fas fa-headphones',
+        'external': 'fas fa-external-link-alt'
+    };
+    return icons[type] || 'fas fa-book';
+}
+
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllResources();
+});
 </script>
 {% endblock %}

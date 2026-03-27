@@ -1,10 +1,13 @@
 {% extends "base/authenticated_base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - MindHaven{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <!-- Welcome Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Welcome back, <span id="welcomeName">John</span>!</h1>
+        <h1 class="mb-0">Welcome back, <span id="welcomeName">Loading...</span>!</h1>
     </div>
 
     <!-- Student Info Card -->
@@ -20,19 +23,19 @@
                     <div class="row">
                         <div class="col-md-3">
                             <small class="text-muted">Department</small>
-                            <p class="mb-0 fw-bold" id="userDept">Computer Science</p>
+                            <p class="mb-0 fw-bold" id="userDept">Loading...</p>
                         </div>
                         <div class="col-md-3">
                             <small class="text-muted">Level</small>
-                            <p class="mb-0 fw-bold" id="userLevel">300L</p>
+                            <p class="mb-0 fw-bold" id="userLevel">Loading...</p>
                         </div>
                         <div class="col-md-3">
                             <small class="text-muted">Faculty</small>
-                            <p class="mb-0 fw-bold" id="userFaculty">Science</p>
+                            <p class="mb-0 fw-bold" id="userFaculty">Loading...</p>
                         </div>
                         <div class="col-md-3">
                             <small class="text-muted">Matric</small>
-                            <p class="mb-0 fw-bold" id="userMatric">202012345</p>
+                            <p class="mb-0 fw-bold" id="userMatric">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -44,26 +47,29 @@
     <div class="card mb-4">
         <h3 class="mb-3">How are you feeling today?</h3>
         <div class="mood-grid">
-            <div class="mood-item" data-mood="low" onclick="selectMood(this)">
+            <div class="mood-item" data-mood="1" data-mood-name="very_low" onclick="selectMood(this, 1)">
                 <div class="mood-emoji">😔</div>
+                <div>Very Low</div>
+            </div>
+            <div class="mood-item" data-mood="2" data-mood-name="low" onclick="selectMood(this, 2)">
+                <div class="mood-emoji">😟</div>
                 <div>Low</div>
             </div>
-            <div class="mood-item" data-mood="good" onclick="selectMood(this)">
-                <div class="mood-emoji">😊</div>
-                <div>Good</div>
-            </div>
-            <div class="mood-item" data-mood="okay" onclick="selectMood(this)">
+            <div class="mood-item" data-mood="3" data-mood-name="neutral" onclick="selectMood(this, 3)">
                 <div class="mood-emoji">😐</div>
                 <div>Okay</div>
             </div>
-            <div class="mood-item" data-mood="calm" onclick="selectMood(this)">
-                <div class="mood-emoji">😌</div>
-                <div>Calm</div>
+            <div class="mood-item" data-mood="4" data-mood-name="good" onclick="selectMood(this, 4)">
+                <div class="mood-emoji">🙂</div>
+                <div>Good</div>
             </div>
-            <div class="mood-item" data-mood="anxious" onclick="selectMood(this)">
-                <div class="mood-emoji">😰</div>
-                <div>High Anx</div>
+            <div class="mood-item" data-mood="5" data-mood-name="excellent" onclick="selectMood(this, 5)">
+                <div class="mood-emoji">😊</div>
+                <div>Excellent</div>
             </div>
+        </div>
+        <div id="moodFeedback" class="mt-2 text-center small text-muted" style="display: none;">
+            <i class="fas fa-check-circle text-success"></i> Mood logged for today!
         </div>
     </div>
 
@@ -73,21 +79,21 @@
             <div class="card h-100">
                 <h3 class="mb-3">Quick Actions</h3>
                 <div class="quick-actions">
-                    <div class="action-card" onclick="window.location.href='/chat'">
+                    <div class="action-card" onclick="window.location.href='{% url 'pages:chat_list' %}'">
                         <div class="action-icon">💬</div>
                         <div>Chat Now</div>
                     </div>
-                    <div class="action-card" onclick="window.location.href='/resources'">
+                    <div class="action-card" onclick="window.location.href='{% url 'pages:resources_list' %}'">
                         <div class="action-icon">📚</div>
                         <div>Resources</div>
                     </div>
-                    <div class="action-card" onclick="window.location.href='/mood-history'">
+                    <div class="action-card" onclick="window.location.href='{% url 'pages:mood_history' %}'">
                         <div class="action-icon">📊</div>
                         <div>Mood History</div>
                     </div>
-                    <div class="action-card" onclick="window.location.href='/crisis'">
-                        <div class="action-icon">🆘</div>
-                        <div>Crisis Support</div>
+                    <div class="action-card" onclick="window.location.href='{% url 'pages:assessments_list' %}'">
+                        <div class="action-icon">📋</div>
+                        <div>Assessments</div>
                     </div>
                 </div>
             </div>
@@ -98,36 +104,25 @@
             <div class="card h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="mb-0">Recent Conversations</h3>
-                    <a href="/conversations" style="color: #5D7A5C;">View All</a>
+                    <a href="{% url 'pages:chat_list' %}" style="color: #5D7A5C;">View All</a>
                 </div>
-                <div class="conversation-list">
-                    <div class="conversation-item">
-                        <span class="conversation-title">Exam anxiety support</span>
-                        <span class="conversation-time">2h ago</span>
-                    </div>
-                    <div class="conversation-item">
-                        <span class="conversation-title">Sleep issues discussion</span>
-                        <span class="conversation-time">1d ago</span>
-                    </div>
-                    <div class="conversation-item">
-                        <span class="conversation-title">Relationship advice</span>
-                        <span class="conversation-time">3d ago</span>
-                    </div>
+                <div id="recentConversations" class="conversation-list">
+                    <div class="text-center text-muted py-3">Loading conversations...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Recommended Resource -->
-    <div class="card" style="background: linear-gradient(135deg, #9CAF88 0%, #5D7A5C 100%); color: white;">
+    <div id="recommendedResource" class="card" style="background: linear-gradient(135deg, #9CAF88 0%, #5D7A5C 100%); color: white; display: none;">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h3 class="mb-2" style="color: white;">🌟 Recommended for You</h3>
-                    <p class="mb-0">5-minute breathing exercise to reduce anxiety</p>
+                    <h3 class="mb-2" style="color: white;" id="resourceTitle">🌟 Recommended for You</h3>
+                    <p class="mb-0" id="resourceDescription">Loading recommendation...</p>
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <button class="btn" style="background: white; color: #5D7A5C;" onclick="startExercise()">
+                    <button class="btn" style="background: white; color: #5D7A5C;" id="resourceButton" onclick="goToResource()">
                         Try Now
                     </button>
                 </div>
@@ -135,15 +130,404 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<style>
+.mood-grid {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.mood-item {
+    text-align: center;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 70px;
+}
+
+.mood-item:hover {
+    background: #E6E6FA;
+    transform: translateY(-3px);
+}
+
+.mood-item.selected {
+    background: #9CAF88;
+    color: white;
+}
+
+.mood-emoji {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.action-card {
+    background: #FDF6E9;
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.conversation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.conversation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #FDF6E9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.conversation-item:hover {
+    background: #E6E6FA;
+    transform: translateX(5px);
+}
+
+.conversation-title {
+    font-weight: 500;
+    color: #2C3E2C;
+}
+
+.conversation-time {
+    font-size: 0.8rem;
+    color: #B99B7C;
+}
+
+.conversation-info {
+    flex: 1;
+}
+
+.conversation-preview {
+    font-size: 0.75rem;
+    color: #B99B7C;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
+
+.conversation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #FDF6E9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.conversation-item:hover {
+    background: #E6E6FA;
+    transform: translateX(5px);
+}
+
+.conversation-title {
+    font-weight: 500;
+    color: #2C3E2C;
+    display: block;
+}
+
+.conversation-time {
+    font-size: 0.8rem;
+    color: #B99B7C;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+</style>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    loadUserData();
-});
+// API endpoints
+const API_BASE_URL = '/api';
 
-function selectMood(element) {
+// Get current user
+async function getCurrentUser() {
+    try {
+        const response = await fetch('/api/accounts/me/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch user: ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return null;
+    }
+}
+
+// Display user data in the DOM
+function displayUserData(user) {
+    if (!user || !user.id) return;
+    
+    const welcomeName = document.getElementById('welcomeName');
+    const deptElement = document.getElementById('userDept');
+    const facultyElement = document.getElementById('userFaculty');
+    const matricElement = document.getElementById('userMatric');
+    const levelElement = document.getElementById('userLevel');
+    
+    if (welcomeName) {
+        welcomeName.textContent = user.full_name || user.name || 'Student';
+    }
+    
+    if (deptElement) {
+        deptElement.textContent = user.department || 'Not specified';
+    }
+    
+    if (facultyElement) {
+        facultyElement.textContent = user.faculty || 'Not specified';
+    }
+    
+    if (matricElement) {
+        matricElement.textContent = user.matric_number || 'Not specified';
+    }
+    
+    if (levelElement) {
+        if (user.year_of_entry) {
+            levelElement.textContent = calculateLevel(user.year_of_entry);
+        } else {
+            levelElement.textContent = 'Not specified';
+        }
+    }
+}
+
+// Save mood entry
+async function saveMood(moodScore) {
+    try {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        
+        const response = await fetch(`${API_BASE_URL}/mood/save/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                mood_score: moodScore,
+                recorded_at: new Date().toISOString()
+            }),
+            credentials: 'same-origin'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to save mood');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error saving mood:', error);
+        throw error;
+    }
+}
+
+// Load recent conversations from chat API
+async function loadRecentConversations() {
+    try {
+        const response = await fetch('/api/chat/conversations/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch conversations: ${response.status}`);
+        }
+        
+        const conversations = await response.json();
+        console.log('Recent conversations:', conversations);
+        
+        // Return only the 3 most recent conversations
+        return conversations.slice(0, 3);
+    } catch (error) {
+        console.error('Error loading conversations:', error);
+        return [];
+    }
+}
+
+// Load recommended resource
+async function loadRecommendedResource() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/resources/recommended/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch recommendation');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error loading recommendation:', error);
+        return null;
+    }
+}
+
+// Check if user already logged mood today
+async function checkTodayMood() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/mood/today/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.mood) {
+                const moodItems = document.querySelectorAll('.mood-item');
+                moodItems.forEach(item => {
+                    if (parseInt(item.dataset.mood) === data.mood) {
+                        item.classList.add('selected');
+                        const feedback = document.getElementById('moodFeedback');
+                        feedback.style.display = 'block';
+                        feedback.innerHTML = '<i class="fas fa-check-circle text-success"></i> Today\'s mood logged!';
+                        setTimeout(() => {
+                            feedback.style.display = 'none';
+                        }, 3000);
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error checking today\'s mood:', error);
+    }
+}
+
+// Render conversations
+function renderConversations(conversations) {
+    const container = document.getElementById('recentConversations');
+    
+    if (!container) return;
+    
+    if (!conversations || conversations.length === 0) {
+        container.innerHTML = '<div class="text-center text-muted py-3">No conversations yet. Start a chat!</div>';
+        return;
+    }
+    
+    container.innerHTML = conversations.map(conv => {
+        const date = new Date(conv.last_activity);
+        const timeAgo = getTimeAgo(date);
+        // Use the topic if available, otherwise use a default
+        const topic = conv.topic || 'Conversation';
+        // Get the last message for preview (if available)
+        const lastMessage = conv.last_message?.content || '';
+        const preview = lastMessage.length > 50 ? lastMessage.substring(0, 50) + '...' : lastMessage;
+        
+        return `
+            <div class="conversation-item" onclick="window.location.href='{% url 'pages:chat_detail' 0 %}'.replace('0', ${conv.id})">
+                <div class="conversation-info">
+                    <span class="conversation-title">${escapeHtml(topic)}</span>
+                    ${preview ? `<div class="conversation-preview">${escapeHtml(preview)}</div>` : ''}
+                </div>
+                <span class="conversation-time">${timeAgo}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Get time ago string
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+}
+
+// Render recommended resource
+function renderRecommendedResource(resource) {
+    const container = document.getElementById('recommendedResource');
+    
+    if (!resource || !resource.id) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('resourceTitle').textContent = `🌟 ${resource.title || 'Recommended for You'}`;
+    document.getElementById('resourceDescription').textContent = resource.description || resource.summary || '';
+    document.getElementById('resourceButton').setAttribute('data-resource-id', resource.id);
+    container.style.display = 'block';
+}
+
+// Go to resource
+function goToResource() {
+    const button = document.getElementById('resourceButton');
+    const resourceId = button.getAttribute('data-resource-id');
+    if (resourceId) {
+        window.location.href = `/resources/${resourceId}/`;
+    }
+}
+
+// Escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Calculate level from year of entry
+function calculateLevel(yearOfEntry) {
+    const currentYear = new Date().getFullYear();
+    const yearDifference = currentYear - yearOfEntry;
+    
+    if (yearDifference === 0) return '100L';
+    if (yearDifference === 1) return '200L';
+    if (yearDifference === 2) return '300L';
+    if (yearDifference === 3) return '400L';
+    if (yearDifference === 4) return '500L';
+    return `${yearDifference + 1}00L`;
+}
+
+// Mood selection handler
+async function selectMood(element, moodScore) {
     // Remove selected class from all moods
     document.querySelectorAll('.mood-item').forEach(item => {
         item.classList.remove('selected');
@@ -152,34 +536,60 @@ function selectMood(element) {
     // Add selected class to clicked mood
     element.classList.add('selected');
     
-    // Get mood value
-    const mood = element.dataset.mood;
+    // Get mood name
+    const moodName = element.querySelector('div:last-child').textContent;
     
-    // Show feedback
-    flashMessages.success(`Mood logged: ${mood}`);
-    
-    // Here you would send this to your backend
-    console.log('Mood selected:', mood);
-}
-
-function startExercise() {
-    flashMessages.info('Starting breathing exercise...');
-    // Navigate to exercise page
-    setTimeout(() => {
-        window.location.href = '/exercise/breathing';
-    }, 2000);
-}
-
-async function loadUserData() {
-    const result = await getCurrentUser();
-    if (result.success) {
-        const user = result.data;
-        document.getElementById('welcomeName').textContent = user.first_name || 'John';
-        document.getElementById('userDept').textContent = user.department || 'Computer Science';
-        document.getElementById('userLevel').textContent = user.level || '300L';
-        document.getElementById('userFaculty').textContent = user.faculty || 'Science';
-        document.getElementById('userMatric').textContent = user.matric_number || '202012345';
+    try {
+        // Show loading state
+        const feedback = document.getElementById('moodFeedback');
+        feedback.style.display = 'block';
+        feedback.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving your mood...';
+        
+        // Save mood to backend
+        await saveMood(moodScore);
+        
+        // Show success message
+        feedback.innerHTML = `<i class="fas fa-check-circle text-success"></i> Mood logged: ${moodName}!`;
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 3000);
+        
+    } catch (error) {
+        // Show error message
+        feedback.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Failed to save mood. Please try again.';
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 3000);
+        
+        // Remove selected class on error
+        element.classList.remove('selected');
     }
 }
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Dashboard initializing...');
+    
+    // Get user data and display it
+    const userData = await getCurrentUser();
+    if (userData) {
+        displayUserData(userData);
+    }
+    
+    // Load recent conversations
+    const conversations = await loadRecentConversations();
+    renderConversations(conversations);
+    
+    // Load recommended resource
+    const resource = await loadRecommendedResource();
+    renderRecommendedResource(resource);
+    
+    // Check if mood already logged today
+    await checkTodayMood();
+    
+    console.log('Dashboard initialization complete');
+});
 </script>
 {% endblock %}

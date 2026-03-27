@@ -14,9 +14,8 @@ DEBUG = False
 
 # PythonAnywhere host
 ALLOWED_HOSTS = [
-    os.getenv('DJANGO_ALLOWED_HOSTS', '').split(','),
-    '.pythonanywhere.com',
-]
+    host for host in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') if host
+] + ['.pythonanywhere.com']
 
 # Database - MySQL for PythonAnywhere
 DATABASES = {
@@ -35,7 +34,7 @@ DATABASES = {
 
 # Security settings for production
 SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True  # Override base.py setting
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -46,7 +45,7 @@ X_FRAME_OPTIONS = 'DENY'
 
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
-    'https://' + host for host in ALLOWED_HOSTS if host
+    'https://' + host for host in ALLOWED_HOSTS if host and '.' in host
 ]
 
 # Static files with Whitenoise for production

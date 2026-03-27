@@ -1,128 +1,65 @@
 {% extends "base/authenticated_base.html" %}
+{% load static %}
+
+{% block title %}Your Conversations - MindHaven{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Header with Actions -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-        <h1 class="mb-3 mb-md-0">💬 Your Conversations</h1>
+<div class="container-fluid px-2 px-sm-3 px-md-4">
+    <!-- Header with Actions - Responsive -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 mb-md-4">
+        <h1 class="mb-3 mb-md-0" style="font-size: clamp(1.5rem, 5vw, 2rem);">💬 Your Conversations</h1>
         <div class="d-flex gap-2 w-100 w-md-auto">
-            <div class="position-relative flex-grow-1">
-                <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #B99B7C;"></i>
-                <input type="text" class="form-control" placeholder="Search conversations" style="padding-left: 40px;" id="searchInput">
+            <div class="position-relative flex-grow-1" style="max-width: 300px;">
+                <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #B99B7C; font-size: clamp(0.875rem, 3vw, 1rem);"></i>
+                <input type="text" class="form-control" placeholder="Search conversations" 
+                       style="padding-left: 40px; font-size: clamp(0.875rem, 3vw, 1rem);" 
+                       id="searchInput">
             </div>
-            <a href="/chat/new" class="btn btn-primary">
+            <a href="{% url 'pages:chat_new' %}" class="btn btn-primary" style="white-space: nowrap; padding: clamp(8px, 2vw, 10px) clamp(16px, 3vw, 20px);">
                 <i class="fas fa-plus me-2"></i>New Chat
             </a>
         </div>
     </div>
 
-    <!-- Conversations List -->
-    <div class="conversations-container">
-        <!-- Today's Conversations -->
-        <div class="mb-4">
-            <h6 class="text-muted mb-3" style="font-size: 0.9rem; letter-spacing: 0.5px;">TODAY</h6>
-            
-            <div class="conversation-item-card" onclick="window.location.href='/chat/1'" style="cursor: pointer;">
-                <div class="d-flex align-items-center">
-                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-comment" style="color: #5D7A5C;"></i>
-                    </div>
-                    <div class="ms-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-1">Exam Anxiety Support</h6>
-                            <small class="text-muted">2:30 PM</small>
-                        </div>
-                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">I'm really anxious about my exams next week...</p>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge" style="background: #9CAF88; color: white;">3 messages</span>
-                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Active</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="conversation-item-card mt-2" onclick="window.location.href='/chat/2'" style="cursor: pointer;">
-                <div class="d-flex align-items-center">
-                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-moon" style="color: #5D7A5C;"></i>
-                    </div>
-                    <div class="ms-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-1">Sleep Issues Discussion</h6>
-                            <small class="text-muted">11:20 AM</small>
-                        </div>
-                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">Can't sleep at night, keep waking up at 3am...</p>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge" style="background: #ff6b6b; color: white;">1 new</span>
-                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">8 messages</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Loading State - Responsive -->
+    <div id="loadingSpinner" class="text-center py-5">
+        <div class="spinner-border text-sage" role="status">
+            <span class="visually-hidden">Loading conversations...</span>
         </div>
-
-        <!-- Yesterday's Conversations -->
-        <div class="mb-4">
-            <h6 class="text-muted mb-3" style="font-size: 0.9rem; letter-spacing: 0.5px;">YESTERDAY</h6>
-            
-            <div class="conversation-item-card" onclick="window.location.href='/chat/3'" style="cursor: pointer;">
-                <div class="d-flex align-items-center">
-                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-heart-broken" style="color: #5D7A5C;"></i>
-                    </div>
-                    <div class="ms-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-1">Relationship Stress</h6>
-                            <small class="text-muted">8:45 PM</small>
-                        </div>
-                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">We had a big argument and I don't know what to do...</p>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">12 messages</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Last Week -->
-        <div class="mb-4">
-            <h6 class="text-muted mb-3" style="font-size: 0.9rem; letter-spacing: 0.5px;">LAST WEEK</h6>
-            
-            <div class="conversation-item-card" onclick="window.location.href='/chat/4'" style="cursor: pointer;">
-                <div class="d-flex align-items-center">
-                    <div class="conversation-avatar" style="width: 50px; height: 50px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-brain" style="color: #5D7A5C;"></i>
-                    </div>
-                    <div class="ms-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-1">Procrastination & Focus</h6>
-                            <small class="text-muted">Mon</small>
-                        </div>
-                        <p class="mb-1 text-truncate" style="color: #B99B7C; max-width: 300px;">Can't focus on my assignments, keep procrastinating...</p>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">15 messages</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <p class="mt-2 text-muted" style="font-size: clamp(0.875rem, 3vw, 1rem);">Loading your conversations...</p>
     </div>
 
-    <!-- Load More Button -->
-    <div class="text-center mt-4">
-        <button class="btn btn-outline" onclick="loadMoreConversations()">
+    <!-- Error State - Responsive -->
+    <div id="errorMessage" class="alert alert-danger text-center py-4" style="display: none; border-radius: clamp(12px, 3vw, 16px);">
+        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+        <h5 style="font-size: clamp(1rem, 4vw, 1.25rem);">Failed to load conversations</h5>
+        <p class="mb-3" style="font-size: clamp(0.875rem, 3vw, 1rem);">Please try refreshing the page</p>
+        <button class="btn btn-outline-danger" onclick="location.reload()" style="padding: clamp(8px, 2vw, 10px) clamp(16px, 3vw, 20px);">
+            <i class="fas fa-sync-alt me-2"></i>Refresh
+        </button>
+    </div>
+
+    <!-- Conversations List (initially hidden) -->
+    <div id="conversationsContainer" style="display: none;"></div>
+
+    <!-- Load More Button (hidden initially) -->
+    <div id="loadMoreContainer" class="text-center mt-3 mt-md-4" style="display: none;">
+        <button class="btn btn-outline" onclick="loadMoreConversations()" id="loadMoreBtn" style="padding: clamp(8px, 2vw, 10px) clamp(20px, 4vw, 30px);">
             <i class="fas fa-chevron-down me-2"></i>Load More
         </button>
     </div>
 </div>
 
 <style>
+/* Conversation Card - Responsive */
 .conversation-item-card {
     background: white;
-    border-radius: 16px;
-    padding: 1rem;
+    border-radius: clamp(12px, 3vw, 16px);
+    padding: clamp(0.75rem, 2.5vw, 1rem);
     transition: all 0.3s ease;
     border: 1px solid transparent;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
 }
 
 .conversation-item-card:hover {
@@ -131,43 +68,435 @@
     box-shadow: 0 5px 15px rgba(93, 122, 92, 0.1);
 }
 
+/* Conversation Avatar */
+.conversation-avatar {
+    width: clamp(40px, 10vw, 50px);
+    height: clamp(40px, 10vw, 50px);
+    background: #E6E6FA;
+    border-radius: clamp(10px, 3vw, 12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.conversation-avatar i {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    color: #5D7A5C;
+}
+
+/* Conversation Content */
+.conversation-content {
+    flex: 1;
+    min-width: 0;
+    margin-left: clamp(10px, 3vw, 15px);
+}
+
+.conversation-title {
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #2C3E2C;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-time {
+    font-size: clamp(0.7rem, 2.5vw, 0.75rem);
+    color: #5A6B7A;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.conversation-preview {
+    font-size: clamp(0.75rem, 2.8vw, 0.875rem);
+    color: #B99B7C;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.conversation-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
 .badge {
-    padding: 0.35rem 0.65rem;
+    padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 10px);
     border-radius: 20px;
     font-weight: 500;
-    font-size: 0.75rem;
+    font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+    white-space: nowrap;
+}
+
+.text-sage {
+    color: #9CAF88;
+}
+
+.group-header {
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    letter-spacing: 0.5px;
+    color: #B99B7C;
+    margin: 1rem 0 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.empty-state-icon {
+    font-size: clamp(3rem, 12vw, 4rem);
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    color: #2C3E2C;
+}
+
+.empty-state p {
+    font-size: clamp(0.875rem, 3vw, 1rem);
+    color: #5A6B7A;
+}
+
+/* Responsive Flex Layout for Conversation Item */
+.conversation-item-card .d-flex {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 2vw, 12px);
+}
+
+/* On very small screens, adjust layout */
+@media (max-width: 480px) {
+    .conversation-item-card .d-flex {
+        flex-wrap: wrap;
+    }
+    
+    .conversation-content {
+        width: calc(100% - 60px);
+        margin-left: 0;
+    }
+    
+    .conversation-time {
+        margin-left: auto;
+    }
+    
+    .conversation-title {
+        max-width: calc(100% - 60px);
+    }
+    
+    .conversation-badges {
+        width: 100%;
+        margin-top: 8px;
+        justify-content: flex-start;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 481px) and (max-width: 768px) {
+    .conversation-preview {
+        max-width: 250px;
+    }
+}
+
+/* Search input responsive */
+#searchInput {
+    min-width: clamp(150px, 40vw, 250px);
+}
+
+/* No horizontal scroll */
+.container-fluid,
+#conversationsContainer,
+.conversation-item-card {
+    overflow-x: hidden;
+}
+
+/* Fix for long text */
+.text-truncate {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Loading spinner responsive */
+.spinner-border {
+    width: clamp(2rem, 5vw, 2.5rem);
+    height: clamp(2rem, 5vw, 2.5rem);
 }
 </style>
 
+<script src="{% static 'js/chat-service.js' %}"></script>
 <script>
-function loadMoreConversations() {
-    // Show loading
-    const btn = event.target.closest('button');
+let conversations = [];
+let filteredConversations = [];
+
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadConversations();
+    
+    // Setup search with debounce
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => filterConversations(), 300);
+        });
+    }
+});
+
+async function loadConversations() {
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+    const conversationsContainer = document.getElementById('conversationsContainer');
+    
+    try {
+        // Show loading
+        if (loadingSpinner) loadingSpinner.style.display = 'block';
+        if (errorMessage) errorMessage.style.display = 'none';
+        if (conversationsContainer) conversationsContainer.style.display = 'none';
+        
+        const data = await ChatAPI.getConversations();
+        
+        console.log('Loaded conversations:', data);
+        
+        // Ensure data is an array
+        conversations = Array.isArray(data) ? data : [];
+        filteredConversations = conversations;
+        
+        // Hide loading
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+        
+        if (conversations.length === 0) {
+            showEmptyState();
+        } else {
+            if (conversationsContainer) conversationsContainer.style.display = 'block';
+            renderConversations();
+        }
+    } catch (error) {
+        console.error('Failed to load conversations:', error);
+        
+        // Hide loading, show error
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+        if (errorMessage) {
+            errorMessage.style.display = 'block';
+            const errorText = errorMessage.querySelector('p');
+            if (errorText) {
+                errorText.textContent = error.message || 'Failed to load conversations. Please try again.';
+            }
+        }
+    }
+}
+
+function renderConversations() {
+    const container = document.getElementById('conversationsContainer');
+    if (!container) return;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const lastWeek = new Date(today);
+    lastWeek.setDate(lastWeek.getDate() - 7);
+    
+    // Group conversations by date
+    const groups = {
+        today: [],
+        yesterday: [],
+        thisWeek: [],
+        older: []
+    };
+    
+    filteredConversations.forEach(conv => {
+        const convDate = new Date(conv.last_activity);
+        convDate.setHours(0, 0, 0, 0);
+        
+        if (convDate.getTime() === today.getTime()) {
+            groups.today.push(conv);
+        } else if (convDate.getTime() === yesterday.getTime()) {
+            groups.yesterday.push(conv);
+        } else if (convDate >= lastWeek) {
+            groups.thisWeek.push(conv);
+        } else {
+            groups.older.push(conv);
+        }
+    });
+    
+    let html = '';
+    
+    // Helper to render a conversation
+    function renderConversation(conv) {
+        const lastMessage = conv.last_message || { content: 'No messages', timestamp: '' };
+        const date = new Date(conv.last_activity);
+        const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dateString = date.toLocaleDateString();
+        
+        // Determine icon based on topic or default
+        let icon = 'fa-comment';
+        const topic = (conv.topic || '').toLowerCase();
+        if (topic.includes('exam')) icon = 'fa-graduation-cap';
+        else if (topic.includes('sleep')) icon = 'fa-moon';
+        else if (topic.includes('anxi')) icon = 'fa-heartbeat';
+        else if (topic.includes('mood')) icon = 'fa-smile';
+        else if (topic.includes('focus')) icon = 'fa-brain';
+        else if (topic.includes('relation')) icon = 'fa-heart';
+        
+        const isToday = new Date(conv.last_activity).toDateString() === today.toDateString();
+        const displayTime = isToday ? timeString : dateString;
+        
+        // Calculate unread count safely
+        const messages = conv.messages || [];
+        const unreadCount = messages.filter(m => !m.is_read && m.sender === 'ai').length;
+        
+        // Truncate message content
+        let messageContent = lastMessage.content || 'No messages';
+        if (messageContent.length > 80) {
+            messageContent = messageContent.substring(0, 80) + '...';
+        }
+        
+        return `
+            <div class="conversation-item-card" onclick="window.location.href='{% url 'pages:chat_detail' 0 %}'.replace('0', ${conv.id})">
+                <div class="d-flex align-items-start align-items-sm-center">
+                    <div class="conversation-avatar">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="conversation-content">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="conversation-title">${escapeHtml(conv.topic || 'Conversation')}</div>
+                            <div class="conversation-time">${displayTime}</div>
+                        </div>
+                        <div class="conversation-preview">${escapeHtml(messageContent)}</div>
+                        <div class="conversation-badges">
+                            <span class="badge" style="background: #9CAF88; color: white;">${conv.message_count || 0} messages</span>
+                            ${unreadCount > 0 ? 
+                                `<span class="badge" style="background: #ff6b6b; color: white;">${unreadCount} new</span>` : 
+                                `<span class="badge" style="background: #E6E6FA; color: #5D7A5C;">${conv.status || 'active'}</span>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Helper to escape HTML
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Render each group
+    if (groups.today.length > 0) {
+        html += '<div class="group-header">TODAY</div>';
+        groups.today.forEach(conv => {
+            html += renderConversation(conv);
+        });
+    }
+    
+    if (groups.yesterday.length > 0) {
+        html += '<div class="group-header">YESTERDAY</div>';
+        groups.yesterday.forEach(conv => {
+            html += renderConversation(conv);
+        });
+    }
+    
+    if (groups.thisWeek.length > 0) {
+        html += '<div class="group-header">THIS WEEK</div>';
+        groups.thisWeek.forEach(conv => {
+            html += renderConversation(conv);
+        });
+    }
+    
+    if (groups.older.length > 0) {
+        html += '<div class="group-header">OLDER</div>';
+        groups.older.forEach(conv => {
+            html += renderConversation(conv);
+        });
+    }
+    
+    container.innerHTML = html;
+}
+
+function showEmptyState() {
+    const container = document.getElementById('conversationsContainer');
+    if (!container) return;
+    
+    container.style.display = 'block';
+    container.innerHTML = `
+        <div class="empty-state text-center py-5">
+            <div class="empty-state-icon">💬</div>
+            <h5>No conversations yet</h5>
+            <p class="text-muted mb-4">Start a new chat to begin your journey</p>
+            <a href="{% url 'pages:chat_new' %}" class="btn btn-primary" style="padding: clamp(10px, 3vw, 12px) clamp(24px, 5vw, 32px);">
+                <i class="fas fa-plus me-2"></i>Start New Chat
+            </a>
+        </div>
+    `;
+}
+
+function filterConversations() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    if (!searchTerm) {
+        filteredConversations = conversations;
+    } else {
+        filteredConversations = conversations.filter(conv => {
+            const topicMatch = (conv.topic || '').toLowerCase().includes(searchTerm);
+            const lastMessage = (conv.last_message?.content || '').toLowerCase().includes(searchTerm);
+            return topicMatch || lastMessage;
+        });
+    }
+    
+    if (filteredConversations.length === 0 && searchTerm) {
+        // Show no results message
+        const container = document.getElementById('conversationsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="empty-state-icon">🔍</div>
+                    <h5>No results found</h5>
+                    <p class="text-muted">No conversations match "${escapeHtml(searchTerm)}"</p>
+                </div>
+            `;
+        }
+    } else {
+        renderConversations();
+    }
+}
+
+async function loadMoreConversations() {
+    const btn = document.getElementById('loadMoreBtn');
+    if (!btn) return;
+    
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
     btn.disabled = true;
     
-    // Simulate loading more conversations
+    // Simulate loading more (in production, implement pagination)
     setTimeout(() => {
-        flashMessages.info('No more conversations to load');
+        if (typeof flashMessages !== 'undefined') {
+            flashMessages.info('All conversations loaded');
+        }
         btn.innerHTML = '<i class="fas fa-check me-2"></i>All Loaded';
-    }, 1500);
+    }, 1000);
 }
 
-// Search functionality
-document.getElementById('searchInput').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const conversations = document.querySelectorAll('.conversation-item-card');
-    
-    conversations.forEach(conv => {
-        const title = conv.querySelector('h6').textContent.toLowerCase();
-        const preview = conv.querySelector('p').textContent.toLowerCase();
-        
-        if (title.includes(searchTerm) || preview.includes(searchTerm)) {
-            conv.style.display = 'block';
-        } else {
-            conv.style.display = 'none';
-        }
-    });
-});
+// Helper to escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 </script>
 {% endblock %}

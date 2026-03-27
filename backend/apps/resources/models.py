@@ -55,6 +55,7 @@ class ResourceItem(models.Model):
     author = models.CharField(max_length=100, blank=True, null=True)
     source = models.CharField(max_length=200, blank=True, null=True)
     external_url = models.URLField(blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True, help_text="YouTube or Vimeo embed URL")
     
     # Media
     featured_image = models.ImageField(upload_to='resources/', blank=True, null=True)

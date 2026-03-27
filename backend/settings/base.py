@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'apps.emergency',
     'apps.resources',
     'apps.university',
+    'apps.mood',
+    'apps.assessment',
 ]
 
 MIDDLEWARE = [
@@ -97,15 +99,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'frontend/css',
-    BASE_DIR / 'frontend/js',
-    BASE_DIR / 'frontend/images',
+    BASE_DIR / 'frontend',  # Include the whole frontend directory
+    # You can keep these for clarity, but they're now redundant
+    # BASE_DIR / 'frontend/css',
+    # BASE_DIR / 'frontend/js',
+    # BASE_DIR / 'frontend/images',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles' 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'  
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -145,8 +149,21 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
 SESSION_SAVE_EVERY_REQUEST = True
 
 # Encryption settings (for sensitive data)
-ENCRYPTION_KEY = os.getenv('ENCRYPTION_KEY', None)  # Will be generated if None
+# Generate a fixed key for production. For development, you can generate one:
+# python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+ENCRYPTION_KEY_STRING = os.getenv('ENCRYPTION_KEY', None)
 
+# Store as bytes for the cipher
+ENCRYPTION_KEY = None
+if ENCRYPTION_KEY_STRING:
+    ENCRYPTION_KEY = ENCRYPTION_KEY_STRING.encode()
+    
+# If no key is provided in .env, log a warning
+if not ENCRYPTION_KEY:
+    import warnings
+    warnings.warn("ENCRYPTION_KEY not set in environment variables. Messages may not be decryptable after server restart.")
+    
+    
 # GitHub Models (Microsoft Foundry) settings
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 AZURE_INFERENCE_ENDPOINT = os.getenv('AZURE_INFERENCE_ENDPOINT', 'https://models.github.ai/inference')
@@ -155,3 +172,42 @@ AZURE_MODEL_NAME = os.getenv('AZURE_MODEL_NAME', 'gpt-4o')
 # Validate GitHub token is present
 if not GITHUB_TOKEN:
     raise ValueError("GITHUB_TOKEN environment variable is required")
+
+
+# Email Configuration
+EMAIL_BACKEND = os.getenv('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.getenv('DJANGO_EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('DJANGO_EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('DJANGO_EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
+EMAIL_HOST_USER = os.getenv('DJANGO_EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('DJANGO_EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'MindHaven <noreply@mindhaven.com>')
+
+# Add these for better email debugging
+EMAIL_TIMEOUT = 30  # seconds
+EMAIL_USE_LOCALTIME = True
+
+# Site URL for email links (important for verification emails)
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
+
+# Session Settings
+SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.db')
+SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', 86400))  # 24 hours default
+SESSION_SAVE_EVERY_REQUEST = os.getenv('SESSION_SAVE_EVERY_REQUEST', 'True').lower() in ('true', '1', 't')
+SESSION_EXPIRE_AT_BROWSER_CLOSE = os.getenv('SESSION_EXPIRE_AT_BROWSER_CLOSE', 'False').lower() in ('true', '1', 't')  # Default False now
+
+# Optional: Make sessions more secure
+SESSION_COOKIE_SECURE = False  # Default to False, override in production
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+
+# Token Expiry Times
+OTP_EXPIRY_MINUTES = int(os.getenv('OTP_EXPIRY_MINUTES', 10))
+PASSWORD_RESET_TOKEN_EXPIRY_HOURS = int(os.getenv('PASSWORD_RESET_TOKEN_EXPIRY_HOURS', 1))
+# Email verification token expiry (uses the same pattern)
+EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = int(os.getenv('EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS', 24))
+
+# Rate Limiting Settings
+RATE_LIMIT_MAX_ATTEMPTS = 3
+RATE_LIMIT_BLOCK_HOURS = 1
+RATE_LIMIT_WINDOW_HOURS = 1  # Time window before counter resets

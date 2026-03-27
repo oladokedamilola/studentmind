@@ -1,34 +1,33 @@
 {% extends "base/authenticated_base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid px-2 px-sm-3 px-md-4">
     <!-- Header -->
-    <div class="d-flex align-items-center mb-4">
-        <a href="/assessments/history" class="btn btn-link me-2" style="color: #5D7A5C;">
+    <div class="d-flex align-items-center mb-3 mb-md-4">
+        <a href="{% url 'pages:assessment_history' %}" class="btn btn-link p-0 me-2 me-sm-3" style="color: #5D7A5C; font-size: clamp(1rem, 4vw, 1.2rem);">
             <i class="fas fa-arrow-left"></i>
         </a>
-        <h2 class="mb-0">📊 Compare Assessment Results</h2>
+        <h2 class="mb-0" style="font-size: clamp(1.25rem, 5vw, 1.75rem);">📊 Compare Assessment Results</h2>
     </div>
 
     <!-- Assessment Selector -->
-    <div class="card mb-4">
-        <div class="card-body">
+    <div class="card mb-4" style="border-radius: clamp(16px, 4vw, 24px);">
+        <div class="card-body p-3 p-md-4">
             <div class="row g-3">
-                <div class="col-md-5">
-                    <label class="form-label">Select Assessment Type</label>
-                    <select class="form-select" onchange="changeAssessmentType(this.value)">
-                        <option value="phq9" selected>PHQ-9 (Depression)</option>
-                        <option value="gad7">GAD-7 (Anxiety)</option>
-                        <option value="pss">PSS (Stress)</option>
+                <div class="col-12 col-md-5">
+                    <label class="form-label" style="font-size: clamp(0.8rem, 3vw, 0.9rem);">Select Assessment Type</label>
+                    <select class="form-select" onchange="changeAssessmentType(this.value)" style="padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px); font-size: clamp(0.85rem, 3vw, 1rem);">
+                        <option value="phq9" {% if assessment_code == 'phq9' %}selected{% endif %}>PHQ-9 (Depression)</option>
+                        <option value="gad7" {% if assessment_code == 'gad7' %}selected{% endif %}>GAD-7 (Anxiety)</option>
                     </select>
                 </div>
-                <div class="col-md-7">
-                    <label class="form-label">Time Range</label>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline flex-grow-1 active">3 Months</button>
-                        <button class="btn btn-outline flex-grow-1">6 Months</button>
-                        <button class="btn btn-outline flex-grow-1">1 Year</button>
-                        <button class="btn btn-outline flex-grow-1">All</button>
+                <div class="col-12 col-md-7">
+                    <label class="form-label" style="font-size: clamp(0.8rem, 3vw, 0.9rem);">Time Range</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-outline flex-grow-1 {% if time_range == '3' %}active{% endif %}" onclick="changeTimeRange(3)" style="padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px); font-size: clamp(0.75rem, 2.8vw, 0.9rem);">3 Months</button>
+                        <button class="btn btn-outline flex-grow-1 {% if time_range == '6' %}active{% endif %}" onclick="changeTimeRange(6)" style="padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px); font-size: clamp(0.75rem, 2.8vw, 0.9rem);">6 Months</button>
+                        <button class="btn btn-outline flex-grow-1 {% if time_range == '12' %}active{% endif %}" onclick="changeTimeRange(12)" style="padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px); font-size: clamp(0.75rem, 2.8vw, 0.9rem);">1 Year</button>
+                        <button class="btn btn-outline flex-grow-1 {% if time_range == 'all' %}active{% endif %}" onclick="changeTimeRange(0)" style="padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px); font-size: clamp(0.75rem, 2.8vw, 0.9rem);">All</button>
                     </div>
                 </div>
             </div>
@@ -36,99 +35,92 @@
     </div>
 
     <!-- Main Comparison Chart -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="mb-3">PHQ-9 Score Trend</h5>
-            <canvas id="comparisonChart" style="height: 300px;"></canvas>
+    <div class="card mb-4" style="border-radius: clamp(16px, 4vw, 24px);">
+        <div class="card-body p-3 p-md-4">
+            <h5 class="mb-3" style="font-size: clamp(1rem, 4vw, 1.25rem);">{{ assessment_name }} Score Trend</h5>
+            <div style="position: relative; height: clamp(250px, 50vh, 350px); width: 100%;">
+                <canvas id="comparisonChart"></canvas>
+            </div>
             
-            <!-- Legend -->
-            <div class="d-flex justify-content-center gap-4 mt-3">
+            <div class="d-flex justify-content-center gap-3 gap-md-4 mt-3 flex-wrap">
                 <div class="d-flex align-items-center">
-                    <div style="width: 12px; height: 12px; background: #9CAF88; border-radius: 3px; margin-right: 6px;"></div>
-                    <span>Your Scores</span>
+                    <div style="width: clamp(10px, 3vw, 12px); height: clamp(10px, 3vw, 12px); background: #9CAF88; border-radius: 3px; margin-right: 6px;"></div>
+                    <span style="font-size: clamp(0.7rem, 2.8vw, 0.85rem);">Your Scores</span>
                 </div>
                 <div class="d-flex align-items-center">
-                    <div style="width: 12px; height: 12px; background: #E6E6FA; border-radius: 3px; margin-right: 6px;"></div>
-                    <span>Average</span>
+                    <div style="width: clamp(10px, 3vw, 12px); height: clamp(10px, 3vw, 12px); background: #E6E6FA; border-radius: 3px; margin-right: 6px;"></div>
+                    <span style="font-size: clamp(0.7rem, 2.8vw, 0.85rem);">University Average</span>
                 </div>
                 <div class="d-flex align-items-center">
-                    <div style="width: 12px; height: 12px; background: #B99B7C; border-radius: 3px; margin-right: 6px;"></div>
-                    <span>Improvement Trend</span>
+                    <div style="width: clamp(10px, 3vw, 12px); height: clamp(10px, 3vw, 12px); background: #B99B7C; border-radius: 3px; margin-right: 6px;"></div>
+                    <span style="font-size: clamp(0.7rem, 2.8vw, 0.85rem);">Trend Line</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Statistics Grid -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <small class="text-muted">Starting Score</small>
-                <h3>14</h3>
-                <span class="text-muted">Feb 15, 2025</span>
+    <div class="row g-2 g-md-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card p-2 p-md-3" style="background: white; border-radius: clamp(12px, 3vw, 16px);">
+                <small class="text-muted" style="font-size: clamp(0.65rem, 2.5vw, 0.75rem);">Starting Score</small>
+                <h3 style="font-size: clamp(1.25rem, 5vw, 1.75rem); margin: 0.25rem 0;">{{ first_score|default:"—" }}</h3>
+                <span class="text-muted" style="font-size: clamp(0.6rem, 2.5vw, 0.75rem);">{{ first_date|default:"—" }}</span>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <small class="text-muted">Current Score</small>
-                <h3>12</h3>
-                <span class="text-muted">Mar 15, 2025</span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card p-2 p-md-3" style="background: white; border-radius: clamp(12px, 3vw, 16px);">
+                <small class="text-muted" style="font-size: clamp(0.65rem, 2.5vw, 0.75rem);">Current Score</small>
+                <h3 style="font-size: clamp(1.25rem, 5vw, 1.75rem); margin: 0.25rem 0;">{{ last_score|default:"—" }}</h3>
+                <span class="text-muted" style="font-size: clamp(0.6rem, 2.5vw, 0.75rem);">{{ last_date|default:"—" }}</span>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <small class="text-muted">Change</small>
-                <h3 style="color: #51cf66;">-2</h3>
-                <span class="badge" style="background: #51cf66; color: white;">Improving</span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card p-2 p-md-3" style="background: white; border-radius: clamp(12px, 3vw, 16px);">
+                <small class="text-muted" style="font-size: clamp(0.65rem, 2.5vw, 0.75rem);">Change</small>
+                <h3 style="font-size: clamp(1.25rem, 5vw, 1.75rem); margin: 0.25rem 0; color: {% if change > 0 %}#ff6b6b{% else %}#51cf66{% endif %};">{{ change_display }}</h3>
+                <span class="badge" style="background: {% if change > 0 %}#ff6b6b{% else %}#51cf66{% endif %}; color: white; font-size: clamp(0.6rem, 2.5vw, 0.7rem); padding: clamp(3px, 1.5vw, 5px) clamp(6px, 2vw, 8px);">{{ change_direction }}</span>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <small class="text-muted">Improvement Rate</small>
-                <h3>14%</h3>
-                <span class="text-muted">over 30 days</span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card p-2 p-md-3" style="background: white; border-radius: clamp(12px, 3vw, 16px);">
+                <small class="text-muted" style="font-size: clamp(0.65rem, 2.5vw, 0.75rem);">Improvement Rate</small>
+                <h3 style="font-size: clamp(1.25rem, 5vw, 1.75rem); margin: 0.25rem 0;">{{ improvement_rate|default:"0" }}%</h3>
+                <span class="text-muted" style="font-size: clamp(0.6rem, 2.5vw, 0.75rem);">over {{ days_between }} days</span>
             </div>
         </div>
     </div>
 
     <!-- Detailed Comparison Table -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="mb-3">📋 Detailed Comparison</h5>
+    <div class="card mb-4" style="border-radius: clamp(16px, 4vw, 24px);">
+        <div class="card-body p-3 p-md-4">
+            <h5 class="mb-3" style="font-size: clamp(1rem, 4vw, 1.25rem);">📋 Detailed Comparison</h5>
             
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr style="background: #FDF6E9;">
-                            <th>Date</th>
-                            <th>Score</th>
-                            <th>Severity</th>
-                            <th>Change</th>
-                            <th>Notes</th>
+                            <th style="font-size: clamp(0.75rem, 3vw, 0.85rem);">Date</th>
+                            <th style="font-size: clamp(0.75rem, 3vw, 0.85rem);">Score</th>
+                            <th style="font-size: clamp(0.75rem, 3vw, 0.85rem);">Severity</th>
+                            <th style="font-size: clamp(0.75rem, 3vw, 0.85rem);">Change</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for result in comparison_results %}
                         <tr>
-                            <td>Mar 15, 2025</td>
-                            <td><strong>12</strong></td>
-                            <td><span class="badge" style="background: #9CAF88; color: white;">Moderate</span></td>
-                            <td style="color: #51cf66;">↓ -3</td>
-                            <td><i class="fas fa-check-circle" style="color: #51cf66;"></i> Improvement</td>
+                            <td style="font-size: clamp(0.75rem, 3vw, 0.85rem);">{{ result.completed_at|date:"M j, Y" }}</td>
+                            <td style="font-size: clamp(0.75rem, 3vw, 0.85rem);"><strong>{{ result.total_score }}</strong></td>
+                            <td><span class="badge" style="background: {% if result.severity == 'Minimal' %}#4A6B4A{% elif result.severity == 'Mild' %}#9CAF88{% elif result.severity == 'Moderate' %}#E5B25D{% else %}#C47E7E{% endif %}; color: white;">{{ result.severity }}</span></td>
+                            <td style="color: {% if result.change > 0 %}#ff6b6b{% else %}#51cf66{% endif %};">
+                                {% if result.change > 0 %}↑ +{{ result.change }}{% elif result.change < 0 %}↓ {{ result.change }}{% else %}—{% endif %}
+                            </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td>Mar 1, 2025</td>
-                            <td><strong>15</strong></td>
-                            <td><span class="badge" style="background: #5D7A5C; color: white;">Mod-Severe</span></td>
-                            <td style="color: #ff6b6b;">↑ +1</td>
-                            <td><i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i> Slight increase</td>
+                            <td colspan="4" class="text-center py-4">No assessment data available for comparison</td>
                         </tr>
-                        <tr>
-                            <td>Feb 15, 2025</td>
-                            <td><strong>14</strong></td>
-                            <td><span class="badge" style="background: #9CAF88; color: white;">Moderate</span></td>
-                            <td>-</td>
-                            <td>Baseline</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -136,38 +128,16 @@
     </div>
 
     <!-- Insights Card -->
-    <div class="card" style="background: #FDF6E9;">
-        <div class="card-body">
-            <h5 class="mb-3">🧠 Insights & Patterns</h5>
+    <div class="card" style="background: #FDF6E9; border-radius: clamp(16px, 4vw, 24px);">
+        <div class="card-body p-3 p-md-4">
+            <h5 class="mb-3" style="font-size: clamp(1rem, 4vw, 1.25rem);">🧠 Insights & Patterns</h5>
             
-            <div class="insights-grid">
-                <div class="insight-item mb-3">
-                    <div class="d-flex align-items-start gap-3">
-                        <i class="fas fa-calendar-check" style="color: #9CAF88; font-size: 1.5rem;"></i>
-                        <div>
-                            <strong>Your lowest scores are on Mondays</strong>
-                            <p class="small text-muted mb-0">Consider scheduling self-care activities on Sunday evenings</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="insight-item mb-3">
-                    <div class="d-flex align-items-start gap-3">
-                        <i class="fas fa-chart-line" style="color: #9CAF88; font-size: 1.5rem;"></i>
-                        <div>
-                            <strong>15% improvement over 3 months</strong>
-                            <p class="small text-muted mb-0">You're making steady progress. Keep up the good work!</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="insight-item">
-                    <div class="d-flex align-items-start gap-3">
-                        <i class="fas fa-lightbulb" style="color: #9CAF88; font-size: 1.5rem;"></i>
-                        <div>
-                            <strong>Correlation detected</strong>
-                            <p class="small text-muted mb-0">Your mood scores improve after exercise days</p>
-                        </div>
+            <div class="insight-item mb-3 p-2 p-md-3" style="background: white; border-radius: clamp(10px, 3vw, 12px);">
+                <div class="d-flex flex-column flex-sm-row align-items-start gap-2 gap-sm-3">
+                    <i class="fas fa-chart-line" style="color: #9CAF88; font-size: clamp(1.25rem, 4vw, 1.5rem);"></i>
+                    <div>
+                        <strong style="font-size: clamp(0.9rem, 3.5vw, 1rem);">{{ insight_title }}</strong>
+                        <p class="small text-muted mb-0" style="font-size: clamp(0.7rem, 2.8vw, 0.85rem);">{{ insight_description }}</p>
                     </div>
                 </div>
             </div>
@@ -175,11 +145,11 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="d-flex gap-3 mt-4">
-        <button class="btn btn-outline flex-grow-1" onclick="exportComparison()">
+    <div class="d-flex flex-column flex-sm-row gap-2 gap-md-3 mt-4">
+        <button class="btn btn-outline flex-grow-1" onclick="exportComparison()" style="padding: clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px); font-size: clamp(0.85rem, 3vw, 1rem);">
             <i class="fas fa-download me-2"></i>Export Report
         </button>
-        <button class="btn btn-primary flex-grow-1" onclick="window.location.href='/assessments/take/phq9'">
+        <button class="btn btn-primary flex-grow-1" onclick="window.location.href='{% url 'pages:assessments_list' %}'" style="padding: clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px); font-size: clamp(0.85rem, 3vw, 1rem); background: linear-gradient(135deg, #4A6B4A 0%, #1A3A1A 100%);">
             <i class="fas fa-plus-circle me-2"></i>Take New Assessment
         </button>
     </div>
@@ -187,39 +157,34 @@
 
 <style>
 .stat-card {
-    background: white;
-    border-radius: 16px;
-    padding: 1.25rem;
-    box-shadow: var(--shadow-soft);
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(26, 58, 26, 0.05);
 }
 
 .stat-card:hover {
     transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 10px 25px rgba(26, 58, 58, 0.1);
 }
 
 .table td, .table th {
-    padding: 1rem;
     vertical-align: middle;
 }
 
 .insight-item {
-    padding: 1rem;
-    background: white;
-    border-radius: 12px;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .insight-item:hover {
     transform: translateX(5px);
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 5px 15px rgba(26, 58, 26, 0.1);
 }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+let comparisonChart = null;
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeComparisonChart();
 });
@@ -227,42 +192,18 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeComparisonChart() {
     const ctx = document.getElementById('comparisonChart').getContext('2d');
     
-    new Chart(ctx, {
+    if (comparisonChart) {
+        comparisonChart.destroy();
+    }
+    
+    const chartData = {{ chart_data|safe }};
+    
+    comparisonChart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: ['Feb 15', 'Mar 1', 'Mar 15'],
-            datasets: [
-                {
-                    label: 'Your Score',
-                    data: [14, 15, 12],
-                    borderColor: '#9CAF88',
-                    backgroundColor: 'rgba(156, 175, 136, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#5D7A5C',
-                    pointRadius: 6
-                },
-                {
-                    label: 'Student Average',
-                    data: [13, 13, 13],
-                    borderColor: '#E6E6FA',
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0
-                },
-                {
-                    label: 'Trend Line',
-                    data: [14, 13.5, 13],
-                    borderColor: '#B99B7C',
-                    borderWidth: 2,
-                    fill: false,
-                    pointRadius: 0
-                }
-            ]
-        },
+        data: chartData,
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
                     display: false
@@ -271,10 +212,20 @@ function initializeComparisonChart() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 27,
+                    max: {{ max_score|default:27 }},
                     title: {
                         display: true,
-                        text: 'PHQ-9 Score'
+                        text: '{{ assessment_name }} Score',
+                        font: {
+                            size: clampValue(10, 11, 12)
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: clampValue(9, 10, 11)
+                        }
                     }
                 }
             }
@@ -282,20 +233,27 @@ function initializeComparisonChart() {
     });
 }
 
+function clampValue(min, preferred, max) {
+    if (window.innerWidth <= 480) return min;
+    if (window.innerWidth <= 768) return preferred;
+    return max;
+}
+
 function changeAssessmentType(type) {
-    flashMessages.info(`Loading ${type.toUpperCase()} data...`);
-    
-    // In production, update chart with new data
-    setTimeout(() => {
-        flashMessages.success('Chart updated');
-    }, 1000);
+    window.location.href = "{% url 'pages:assessment_compare' %}?assessment=" + type;
+}
+
+function changeTimeRange(months) {
+    window.location.href = "{% url 'pages:assessment_compare' %}?assessment={{ assessment_code }}&months=" + months;
 }
 
 function exportComparison() {
-    flashMessages.success('Generating comparison report...');
-    setTimeout(() => {
-        flashMessages.info('Report downloaded');
-    }, 1500);
+    if (typeof flashMessages !== 'undefined') {
+        flashMessages.success('Generating comparison report...');
+        setTimeout(() => {
+            flashMessages.info('Report downloaded');
+        }, 1500);
+    }
 }
 </script>
 {% endblock %}

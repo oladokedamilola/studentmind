@@ -1,10 +1,11 @@
+<!--templates/pages/mood/mood_log.html-->
 {% extends "base/authenticated_base.html" %}
 
 {% block content %}
 <div class="container" style="max-width: 600px;">
     <!-- Header -->
     <div class="d-flex align-items-center mb-4">
-        <a href="/dashboard" class="btn btn-link me-2" style="color: #5D7A5C;">
+        <a href="{% url 'pages:dashboard' %}" class="btn btn-link me-2" style="color: #5D7A5C;">
             <i class="fas fa-arrow-left"></i>
         </a>
         <h2 class="mb-0">📊 How are you feeling today?</h2>
@@ -53,14 +54,14 @@
             <div class="mood-descriptors mb-4" id="moodDescriptors" style="display: none;">
                 <label class="form-label">What words describe your feeling?</label>
                 <div class="d-flex flex-wrap gap-2">
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Anxious')">Anxious</span>
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Stressed')">Stressed</span>
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Tired')">Tired</span>
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Calm')">Calm</span>
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Hopeful')">Hopeful</span>
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Motivated')">Motivated</span>
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Overwhelmed')">Overwhelmed</span>
-                    <span class="descriptor-pill" onclick="toggleDescriptor('Peaceful')">Peaceful</span>
+                    <span class="descriptor-pill" data-descriptor="Anxious" onclick="toggleDescriptor(this)">Anxious</span>
+                    <span class="descriptor-pill" data-descriptor="Stressed" onclick="toggleDescriptor(this)">Stressed</span>
+                    <span class="descriptor-pill" data-descriptor="Tired" onclick="toggleDescriptor(this)">Tired</span>
+                    <span class="descriptor-pill" data-descriptor="Calm" onclick="toggleDescriptor(this)">Calm</span>
+                    <span class="descriptor-pill" data-descriptor="Hopeful" onclick="toggleDescriptor(this)">Hopeful</span>
+                    <span class="descriptor-pill" data-descriptor="Motivated" onclick="toggleDescriptor(this)">Motivated</span>
+                    <span class="descriptor-pill" data-descriptor="Overwhelmed" onclick="toggleDescriptor(this)">Overwhelmed</span>
+                    <span class="descriptor-pill" data-descriptor="Peaceful" onclick="toggleDescriptor(this)">Peaceful</span>
                 </div>
             </div>
 
@@ -74,12 +75,12 @@
             <div class="activities mb-4">
                 <label class="form-label">What did you do today?</label>
                 <div class="d-flex flex-wrap gap-2">
-                    <span class="activity-pill" onclick="toggleActivity('Exercise')">🏃 Exercise</span>
-                    <span class="activity-pill" onclick="toggleActivity('Study')">📚 Study</span>
-                    <span class="activity-pill" onclick="toggleActivity('Social')">👥 Social</span>
-                    <span class="activity-pill" onclick="toggleActivity('Rest')">😴 Rest</span>
-                    <span class="activity-pill" onclick="toggleActivity('Meditation')">🧘 Meditation</span>
-                    <span class="activity-pill" onclick="toggleActivity('Nature')">🌳 Nature</span>
+                    <span class="activity-pill" data-activity="Exercise" onclick="toggleActivity(this)">🏃 Exercise</span>
+                    <span class="activity-pill" data-activity="Study" onclick="toggleActivity(this)">📚 Study</span>
+                    <span class="activity-pill" data-activity="Social" onclick="toggleActivity(this)">👥 Social</span>
+                    <span class="activity-pill" data-activity="Rest" onclick="toggleActivity(this)">😴 Rest</span>
+                    <span class="activity-pill" data-activity="Meditation" onclick="toggleActivity(this)">🧘 Meditation</span>
+                    <span class="activity-pill" data-activity="Nature" onclick="toggleActivity(this)">🌳 Nature</span>
                 </div>
             </div>
 
@@ -89,23 +90,13 @@
             </button>
 
             <!-- Previous Entries Preview -->
-            <div class="previous-entries mt-4 pt-4 border-top">
+            <div class="previous-entries mt-4 pt-4 border-top" id="previousEntries">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="mb-0">Your Last 3 Entries</h6>
-                    <a href="/mood/history" style="color: #5D7A5C;">View Full History →</a>
+                    <a href="{% url 'pages:mood_history' %}" style="color: #5D7A5C;">View Full History →</a>
                 </div>
-                
-                <div class="entry-preview d-flex justify-content-between align-items-center py-2">
-                    <div><span class="me-2">😐</span> Yesterday</div>
-                    <span class="text-muted">3 (Okay)</span>
-                </div>
-                <div class="entry-preview d-flex justify-content-between align-items-center py-2">
-                    <div><span class="me-2">😟</span> Monday</div>
-                    <span class="text-muted">2 (Low)</span>
-                </div>
-                <div class="entry-preview d-flex justify-content-between align-items-center py-2">
-                    <div><span class="me-2">🙂</span> Sunday</div>
-                    <span class="text-muted">4 (Good)</span>
+                <div id="recentEntriesList" class="recent-entries-list">
+                    <div class="text-center text-muted py-3">Loading...</div>
                 </div>
             </div>
         </div>
@@ -176,6 +167,7 @@
 
 .entry-preview {
     border-bottom: 1px solid #E6E6FA;
+    padding: 0.75rem 0;
 }
 
 .entry-preview:last-child {
@@ -184,9 +176,94 @@
 </style>
 
 <script>
+const API_BASE_URL = '/api/mood';
 let selectedMood = null;
 let selectedDescriptors = [];
 let selectedActivities = [];
+
+// Get CSRF token
+function getCsrfToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Load today's mood if already logged
+async function loadTodayMood() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/today/`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        
+        if (data.has_entry && data.mood) {
+            // Pre-select the mood
+            selectedMood = data.mood;
+            const moodBtn = document.querySelector(`.mood-btn[data-value="${data.mood}"]`);
+            if (moodBtn) {
+                moodBtn.classList.add('selected');
+                document.getElementById('moodDescriptors').style.display = 'block';
+                document.getElementById('saveBtn').disabled = false;
+            }
+            
+            // Pre-fill note if exists
+            if (data.note) {
+                document.getElementById('moodNote').value = data.note;
+            }
+            
+            flashMessages.info('Today\'s mood already logged. You can update it.');
+        }
+    } catch (error) {
+        console.error('Error loading today\'s mood:', error);
+    }
+}
+
+// Load recent entries for preview
+async function loadRecentEntries() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/history/`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        
+        const container = document.getElementById('recentEntriesList');
+        
+        if (!data.moods || data.moods.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-3">No mood entries yet. Log your first mood!</div>';
+            return;
+        }
+        
+        const moodEmojis = { 1: '😭', 2: '😟', 3: '😐', 4: '🙂', 5: '😊' };
+        const moodNames = { 1: 'Very Low', 2: 'Low', 3: 'Okay', 4: 'Good', 5: 'Excellent' };
+        
+        const recent = data.moods.slice(0, 3);
+        container.innerHTML = recent.map(entry => `
+            <div class="entry-preview d-flex justify-content-between align-items-center py-2">
+                <div><span class="me-2">${moodEmojis[entry.mood_score]}</span> ${entry.date}</div>
+                <span class="text-muted">${entry.mood_score} (${moodNames[entry.mood_score]})</span>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading recent entries:', error);
+        document.getElementById('recentEntriesList').innerHTML = '<div class="text-center text-muted py-3">Unable to load recent entries</div>';
+    }
+}
 
 function selectMood(value) {
     // Remove selected class from all mood buttons
@@ -207,29 +284,29 @@ function selectMood(value) {
     document.getElementById('saveBtn').disabled = false;
 }
 
-function toggleDescriptor(descriptor) {
-    const pill = event.currentTarget;
-    pill.classList.toggle('selected');
+function toggleDescriptor(element) {
+    const descriptor = element.dataset.descriptor;
+    element.classList.toggle('selected');
     
-    if (pill.classList.contains('selected')) {
+    if (element.classList.contains('selected')) {
         selectedDescriptors.push(descriptor);
     } else {
         selectedDescriptors = selectedDescriptors.filter(d => d !== descriptor);
     }
 }
 
-function toggleActivity(activity) {
-    const pill = event.currentTarget;
-    pill.classList.toggle('selected');
+function toggleActivity(element) {
+    const activity = element.dataset.activity;
+    element.classList.toggle('selected');
     
-    if (pill.classList.contains('selected')) {
+    if (element.classList.contains('selected')) {
         selectedActivities.push(activity);
     } else {
         selectedActivities = selectedActivities.filter(a => a !== activity);
     }
 }
 
-function saveMood() {
+async function saveMood() {
     if (!selectedMood) {
         flashMessages.error('Please select a mood');
         return;
@@ -242,26 +319,56 @@ function saveMood() {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
     btn.disabled = true;
     
-    // Simulate API call
-    setTimeout(() => {
-        flashMessages.success('Mood logged successfully! 🌟');
-        
-        // Reset form
-        selectedMood = null;
-        selectedDescriptors = [];
-        selectedActivities = [];
-        document.querySelectorAll('.mood-btn').forEach(btn => {
-            btn.classList.remove('selected');
+    try {
+        const response = await fetch(`${API_BASE_URL}/save/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({
+                mood_score: selectedMood,
+                note: note
+            }),
+            credentials: 'same-origin'
         });
-        document.querySelectorAll('.descriptor-pill, .activity-pill').forEach(pill => {
-            pill.classList.remove('selected');
-        });
-        document.getElementById('moodNote').value = '';
-        document.getElementById('moodDescriptors').style.display = 'none';
         
+        const data = await response.json();
+        
+        if (data.success) {
+            flashMessages.success(data.message + ' 🌟');
+            
+            // Reset form
+            selectedMood = null;
+            selectedDescriptors = [];
+            selectedActivities = [];
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelectorAll('.descriptor-pill, .activity-pill').forEach(pill => {
+                pill.classList.remove('selected');
+            });
+            document.getElementById('moodNote').value = '';
+            document.getElementById('moodDescriptors').style.display = 'none';
+            
+            // Reload recent entries
+            loadRecentEntries();
+        } else {
+            flashMessages.error(data.error || 'Failed to save mood');
+        }
+    } catch (error) {
+        console.error('Error saving mood:', error);
+        flashMessages.error('Failed to save mood. Please try again.');
+    } finally {
         btn.innerHTML = 'Save Today\'s Mood';
-        btn.disabled = true;
-    }, 1500);
+        btn.disabled = false;
+    }
 }
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadTodayMood();
+    loadRecentEntries();
+});
 </script>
 {% endblock %}

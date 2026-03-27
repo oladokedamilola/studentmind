@@ -1,3 +1,4 @@
+# apps/chat/models.py
 from django.db import models
 from apps.accounts.models import AnonymousUserSession
 from apps.university.models import Student
@@ -7,14 +8,37 @@ from django.conf import settings
 import base64
 import os
 import json
+import logging
 
-# Initialize encryption (simplified - will be enhanced later)
+logger = logging.getLogger(__name__)
+
+# Cache for cipher to avoid recreating it for every message
+_cipher_cache = None
+
 def get_encryption_key():
-    """Get or generate encryption key"""
+    """
+    Get the encryption key from settings.
+    Must be consistent across server restarts.
+    """
+    # Check if there's a key in settings (already bytes)
     if hasattr(settings, 'ENCRYPTION_KEY') and settings.ENCRYPTION_KEY:
-        return settings.ENCRYPTION_KEY.encode()
-    # Generate a key (in production, this should be stored securely)
+        return settings.ENCRYPTION_KEY
+    
+    # For development without a key, generate a temporary one
+    # WARNING: This will cause decryption errors if used across server restarts!
+    logger.warning("No ENCRYPTION_KEY found in settings. Using temporary key. Messages may not be decryptable after server restart.")
     return Fernet.generate_key()
+
+def get_cipher():
+    """
+    Get or create a cached Fernet cipher instance.
+    This ensures the same cipher is reused for all encryption/decryption.
+    """
+    global _cipher_cache
+    if _cipher_cache is None:
+        key = get_encryption_key()
+        _cipher_cache = Fernet(key)
+    return _cipher_cache
 
 class Conversation(models.Model):
     """
@@ -137,21 +161,35 @@ class Message(models.Model):
         ordering = ['timestamp']
     
     def encrypt_content(self, content):
-        """Encrypt message content"""
-        key = get_encryption_key()
-        cipher = Fernet(key)
-        encrypted = cipher.encrypt(content.encode())
-        self.encrypted_content = base64.b64encode(encrypted).decode()
+        """
+        Encrypt message content using consistent cipher.
+        Falls back to plain text if encryption fails (with marker).
+        """
+        try:
+            cipher = get_cipher()
+            encrypted = cipher.encrypt(content.encode())
+            self.encrypted_content = base64.b64encode(encrypted).decode()
+        except Exception as e:
+            logger.error(f"Encryption error for message: {e}")
+            # Store as plain text with marker as fallback (prevents data loss)
+            self.encrypted_content = f"PLAIN:{content}"
     
     def decrypt_content(self):
-        """Decrypt message content"""
+        """
+        Decrypt message content using consistent cipher.
+        Handles plain text fallback and decryption errors gracefully.
+        """
         try:
-            key = get_encryption_key()
-            cipher = Fernet(key)
+            # Handle plain text fallback (for messages that couldn't be encrypted)
+            if self.encrypted_content.startswith('PLAIN:'):
+                return self.encrypted_content[6:]
+            
+            cipher = get_cipher()
             encrypted = base64.b64decode(self.encrypted_content.encode())
             return cipher.decrypt(encrypted).decode()
-        except Exception:
-            return "[Encrypted content - unable to decrypt]"
+        except Exception as e:
+            logger.error(f"Decryption error for message {self.id}: {e}")
+            return "[Message temporarily unavailable]"
     
     def get_content(self):
         """Alias for decrypt_content for template use"""
@@ -164,7 +202,10 @@ class Message(models.Model):
     def get_keywords(self):
         """Retrieve detected keywords"""
         if self.detected_keywords:
-            return json.loads(self.detected_keywords)
+            try:
+                return json.loads(self.detected_keywords)
+            except json.JSONDecodeError:
+                return []
         return []
     
     def save(self, *args, **kwargs):

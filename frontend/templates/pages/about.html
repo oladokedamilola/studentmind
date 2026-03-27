@@ -1,0 +1,275 @@
+{% extends "base/public_base.html" %}
+{% load static %}
+
+{% block title %}About Us - MindHaven{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="about-hero py-5" style="background: linear-gradient(135deg, #FDF6E9 0%, #E6E6FA 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 mb-4" style="color: #2C3E2C;">Your Campus Sanctuary</h1>
+                <p class="lead mb-4" style="color: #5D7A5C;">MindHaven is a safe, confidential space where students can talk openly about their mental health and find the support they need.</p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'pages:matric_verification' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-heart me-2"></i>Get Started
+                    </a>
+                    <a href="#mission" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-chevron-down me-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'images/about-hero.jpeg' %}" alt="Students supporting each other" class="img-fluid" onerror="this.style.display='none'">
+                <!-- Fallback if image doesn't exist -->
+                <div class="text-center p-5" style="background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div style="font-size: 8rem;">🏡</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section id="mission" class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4" style="color: #2C3E2C;">Our Mission</h2>
+                <div class="divider mx-auto mb-4" style="width: 60px; height: 3px; background: #9CAF88;"></div>
+                <p class="lead" style="color: #5D7A5C;">To provide every student with immediate, anonymous access to mental health support, breaking down barriers of stigma, cost, and accessibility.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="py-5" style="background: #FDF6E9;">
+    <div class="container">
+        <h2 class="text-center mb-5" style="color: #2C3E2C;">Our Core Values</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="value-card text-center p-4" style="background: white; border-radius: 16px; height: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <div class="value-icon mb-3" style="font-size: 3rem;">🔒</div>
+                    <h4 class="mb-3" style="color: #2C3E2C;">Privacy First</h4>
+                    <p style="color: #5D7A5C;">Your conversations are completely confidential and encrypted. We never share your personal information.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="value-card text-center p-4" style="background: white; border-radius: 16px; height: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <div class="value-icon mb-3" style="font-size: 3rem;">⚡</div>
+                    <h4 class="mb-3" style="color: #2C3E2C;">24/7 Availability</h4>
+                    <p style="color: #5D7A5C;">Support whenever you need it. Day or night, our AI assistant is here to listen and help.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="value-card text-center p-4" style="background: white; border-radius: 16px; height: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <div class="value-icon mb-3" style="font-size: 3rem;">🤝</div>
+                    <h4 class="mb-3" style="color: #2C3E2C;">No Judgment</h4>
+                    <p style="color: #5D7A5C;">Talk about anything without fear of judgment. We're here to support, not to judge.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Story Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="mb-4" style="color: #2C3E2C;">Why We Started MindHaven</h2>
+                <div class="divider mb-4" style="width: 60px; height: 3px; background: #9CAF88;"></div>
+                <p class="mb-3" style="color: #5D7A5C;">As university students ourselves, we experienced firsthand the mental health crisis on campuses. Long waiting lists for counseling, stigma around seeking help, and the feeling of being alone in our struggles.</p>
+                <p class="mb-3" style="color: #5D7A5C;">We built MindHaven to be the support system we wished we had - something immediate, anonymous, and always available. A place where any student could talk openly without fear.</p>
+                <p class="mb-4" style="color: #5D7A5C;">Today, we're proud to serve thousands of students across multiple universities, providing a safe space for mental wellness.</p>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="stat-box p-3 text-center" style="background: #E6E6FA; border-radius: 12px;">
+                            <div class="h3 mb-1" style="color: #2C3E2C;">5,000+</div>
+                            <small style="color: #5D7A5C;">Students Helped</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-box p-3 text-center" style="background: #E6E6FA; border-radius: 12px;">
+                            <div class="h3 mb-1" style="color: #2C3E2C;">50,000+</div>
+                            <small style="color: #5D7A5C;">Conversations</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'images/team.jpeg' %}" alt="Our team" class="img-fluid rounded-4" onerror="this.style.display='none'">
+                <!-- Fallback -->
+                <div class="p-5 text-center" style="background: #E6E6FA; border-radius: 20px;">
+                    <div style="font-size: 6rem;">👥</div>
+                    <p class="mt-3" style="color: #5D7A5C;">Meet the MindHaven Team</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="py-5" style="background: #FDF6E9;">
+    <div class="container">
+        <h2 class="text-center mb-5" style="color: #2C3E2C;">Meet Our Team</h2>
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="team-card text-center">
+                    <div class="team-avatar mx-auto mb-3" style="width: 120px; height: 120px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 3rem; color: white;">👩‍💻</span>
+                    </div>
+                    <h5 style="color: #2C3E2C;">Sarah Johnson</h5>
+                    <small style="color: #5D7A5C;">Co-Founder, Psychologist</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="team-card text-center">
+                    <div class="team-avatar mx-auto mb-3" style="width: 120px; height: 120px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 3rem; color: white;">👨‍💻</span>
+                    </div>
+                    <h5 style="color: #2C3E2C;">Michael Chen</h5>
+                    <small style="color: #5D7A5C;">Co-Founder, Lead Developer</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="team-card text-center">
+                    <div class="team-avatar mx-auto mb-3" style="width: 120px; height: 120px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 3rem; color: white;">👩‍⚕️</span>
+                    </div>
+                    <h5 style="color: #2C3E2C;">Dr. Amara Okonkwo</h5>
+                    <small style="color: #5D7A5C;">Clinical Advisor</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="team-card text-center">
+                    <div class="team-avatar mx-auto mb-3" style="width: 120px; height: 120px; background: #9CAF88; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 3rem; color: white;">👨‍🔬</span>
+                    </div>
+                    <h5 style="color: #2C3E2C;">David Okafor</h5>
+                    <small style="color: #5D7A5C;">AI Research Lead</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5" style="color: #2C3E2C;">Frequently Asked Questions</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item mb-3" style="border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" style="background: white; border-radius: 12px; color: #2C3E2C;">
+                                Is MindHaven really anonymous?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: #5D7A5C;">
+                                Yes! We only use your matric number to verify you're a student. Your identity is never linked to your conversations. All messages are encrypted and anonymized.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3" style="border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" style="background: white; border-radius: 12px; color: #2C3E2C;">
+                                How much does it cost?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: #5D7A5C;">
+                                MindHaven is completely free for all registered students. We believe mental health support should be accessible to everyone.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3" style="border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" style="background: white; border-radius: 12px; color: #2C3E2C;">
+                                Who can I talk to?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: #5D7A5C;">
+                                Our AI assistant is trained in mental health support techniques. For crisis situations, we provide immediate resources and contacts for human counselors.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3" style="border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" style="background: white; border-radius: 12px; color: #2C3E2C;">
+                                What about emergency situations?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: #5D7A5C;">
+                                If our system detects crisis language, we immediately provide emergency resources and contacts. Remember, you can always call emergency services directly.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3" style="border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5" style="background: white; border-radius: 12px; color: #2C3E2C;">
+                                Can I use MindHaven on my phone?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="color: #5D7A5C;">
+                                Yes! MindHaven is a Progressive Web App (PWA). You can add it to your home screen and use it like a native app, even offline!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5" style="background: #2C3E2C; color: white;">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Start Your Journey?</h2>
+        <p class="lead mb-4" style="color: rgba(255,255,255,0.9);">Join thousands of students who've found support at MindHaven.</p>
+        <a href="{% url 'pages:matric_verification' %}" class="btn btn-light btn-lg" style="background: white; color: #2C3E2C; padding: 12px 40px; border-radius: 30px;">
+            <i class="fas fa-heart me-2"></i>Get Started Now
+        </a>
+    </div>
+</section>
+
+<style>
+.value-card {
+    transition: transform 0.3s ease;
+}
+.value-card:hover {
+    transform: translateY(-5px);
+}
+.team-card {
+    transition: all 0.3s ease;
+}
+.team-card:hover {
+    transform: translateY(-5px);
+}
+.accordion-button:not(.collapsed) {
+    background: #9CAF88;
+    color: white;
+}
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: #9CAF88;
+}
+.stat-box {
+    transition: transform 0.3s ease;
+}
+.stat-box:hover {
+    transform: scale(1.05);
+}
+</style>
+{% endblock %}

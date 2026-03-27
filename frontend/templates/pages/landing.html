@@ -1,90 +1,420 @@
 {% extends "base/public_base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container">
-    <!-- Hero Section -->
-    <section class="row align-items-center min-vh-75 py-5">
-        <div class="col-lg-6 text-center text-lg-start">
-            <h1 class="display-4 mb-4" style="color: #5D7A5C; font-weight: 700;">
-                Your Campus Sanctuary
-            </h1>
-            <p class="lead mb-4" style="color: #B99B7C; font-size: 1.25rem;">
-                A safe, private space to talk about whatever's on your mind.
-            </p>
-            <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
-                <a href="/register" class="btn btn-primary btn-lg">Get Started</a>
-                <a href="/login" class="btn btn-outline btn-lg">Login</a>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="text-center">
-                <!-- Illustration placeholder -->
-                <svg width="400" height="400" viewBox="0 0 400 400" fill="none">
-                    <circle cx="200" cy="200" r="150" fill="#E6E6FA"/>
-                    <rect x="150" y="150" width="100" height="100" rx="20" fill="#9CAF88"/>
-                    <circle cx="200" cy="200" r="30" fill="#FDF6E9"/>
-                    <path d="M100 250 L300 250" stroke="#5D7A5C" stroke-width="3"/>
-                    <circle cx="130" cy="220" r="15" fill="#B99B7C"/>
-                    <circle cx="270" cy="220" r="15" fill="#B99B7C"/>
-                </svg>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonial -->
-    <section class="row justify-content-center my-5">
-        <div class="col-md-8">
-            <div class="card-soft p-4 text-center">
-                <p class="mb-0" style="font-size: 1.25rem; font-style: italic;">
-                    "Finally, a place where I feel heard."
+<!-- Hero Section - Enhanced with gradient and better visuals -->
+<section class="hero-section position-relative overflow-hidden" style="background: linear-gradient(135deg, #2C3E2C 0%, #1A3A1A 100%); padding: 60px 0 80px;">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-center text-lg-start text-white mb-5 mb-lg-0">
+                <h1 class="display-4 fw-bold mb-3" style="color: white; line-height: 1.2; font-size: clamp(2rem, 8vw, 3.5rem);">
+                    Your Mental Health<br>Companion on Campus
+                </h1>
+                <p class="lead mb-4" style="color: rgba(255, 255, 255, 0.9); font-size: clamp(1rem, 4vw, 1.3rem);">
+                    A safe, anonymous space where you can talk, track your mood,<br class="d-none d-lg-block"> and access resources whenever you need.
                 </p>
-                <p class="mt-2" style="color: #5D7A5C;">- Sarah, 300L</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start mb-4">
+                    <a href="{% url 'pages:matric_verification' %}" class="btn btn-lg" style="background: white; color: #1A3A1A; padding: 12px 24px; border-radius: 40px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.2);">Get Started Free</a>
+                    <a href="/about" class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; border: 1px solid rgba(255,255,255,0.3);">Learn More</a>
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-3 gap-sm-4 align-items-center justify-content-center justify-content-lg-start">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2" style="color: #E5B25D;"></i>
+                        <span style="color: rgba(255,255,255,0.9); font-size: 0.95rem;">100% Anonymous</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2" style="color: #E5B25D;"></i>
+                        <span style="color: rgba(255,255,255,0.9); font-size: 0.95rem;">Free for Students</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2" style="color: #E5B25D;"></i>
+                        <span style="color: rgba(255,255,255,0.9); font-size: 0.95rem;">24/7 Available</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="position-relative text-center">
+                    <!-- Main Illustration - Responsive SVG -->
+                    <svg width="100%" height="auto" viewBox="0 0 450 450" fill="none" style="max-width: 400px; height: auto; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3)); margin: 0 auto;">
+                        <!-- Background glow -->
+                        <circle cx="225" cy="225" r="170" fill="rgba(255,255,255,0.1)"/>
+                        
+                        <!-- Main circle -->
+                        <circle cx="225" cy="225" r="150" fill="white" stroke="#E5B25D" stroke-width="3" stroke-dasharray="8 8"/>
+                        
+                        <!-- Cozy elements -->
+                        <rect x="175" y="175" width="100" height="100" rx="20" fill="url(#gradient-soft)"/>
+                        <circle cx="225" cy="225" r="35" fill="#2C3E2C"/>
+                        
+                        <!-- Decorative elements -->
+                        <circle cx="150" cy="190" r="20" fill="#E5B25D" opacity="0.6"/>
+                        <circle cx="300" cy="260" r="20" fill="#E5B25D" opacity="0.6"/>
+                        
+                        <!-- Chat bubbles -->
+                        <path d="M120 280 L160 310" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M330 140 L370 170" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                        
+                        <defs>
+                            <linearGradient id="gradient-soft" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4A6B4A"/>
+                                <stop offset="100%" style="stop-color:#1A3A1A"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    
+                    <!-- Floating stats - Hidden on mobile, shown on tablet/desktop -->
+                    <div class="d-none d-md-block position-absolute" style="top: 15%; right: 5%; background: white; padding: 10px 20px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-smile" style="color: #4A6B4A; font-size: 20px;"></i>
+                            <span style="color: #2C3E2C; font-weight: 600; font-size: 0.9rem;">10,000+ students</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-none d-md-block position-absolute" style="bottom: 15%; left: 5%; background: white; padding: 10px 20px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-clock" style="color: #4A6B4A; font-size: 20px;"></i>
+                            <span style="color: #2C3E2C; font-weight: 600; font-size: 0.9rem;">24/7 Support</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+    <!-- Decorative wave -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to right bottom, transparent 49%, #FAF7F2 50%);"></div>
+</section>
 
-    <!-- How It Works -->
-    <section class="my-5">
-        <h2 class="text-center mb-5">How It Works</h2>
+<!-- Stats Bar - Responsive grid -->
+<section style="background: #FAF7F2; padding: 30px 0; border-bottom: 1px solid rgba(74, 107, 74, 0.1);">
+    <div class="container">
+        <div class="row g-3 text-center">
+            <div class="col-6 col-md-3">
+                <h2 class="h3 fw-bold mb-1" style="color: #2C3E2C;">15+</h2>
+                <p style="color: #5A6B7A; font-size: 0.9rem;">Partner Universities</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="h3 fw-bold mb-1" style="color: #2C3E2C;">10k+</h2>
+                <p style="color: #5A6B7A; font-size: 0.9rem;">Active Students</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="h3 fw-bold mb-1" style="color: #2C3E2C;">50k+</h2>
+                <p style="color: #5A6B7A; font-size: 0.9rem;">Chat Sessions</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="h3 fw-bold mb-1" style="color: #2C3E2C;">95%</h2>
+                <p style="color: #5A6B7A; font-size: 0.9rem;">Would Recommend</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section - Responsive -->
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h2 fw-bold mb-2" style="color: #2C3E2C;">How MindHaven Works</h2>
+            <p class="lead" style="color: #5A6B7A; max-width: 600px; margin: 0 auto; font-size: 1rem;">Three simple steps to start your journey to better mental wellness</p>
+        </div>
+        
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card text-center h-100">
-                    <div class="card-body">
-                        <div class="display-1 mb-3">1️⃣</div>
-                        <h3>Verify</h3>
-                        <p class="text-muted">Confirm your student status with your matric number</p>
+                <div class="card h-100 border-0" style="background: #FAF7F2; border-radius: 20px; overflow: hidden;">
+                    <div class="card-body text-center p-4">
+                        <div class="step-number mb-3" style="width: 50px; height: 50px; background: #2C3E2C; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <span style="color: white; font-size: 20px; font-weight: 700;">1</span>
+                        </div>
+                        <h3 class="h5 mb-2" style="color: #2C3E2C;">Verify Your Identity</h3>
+                        <p style="color: #5A6B7A; font-size: 0.95rem; margin-bottom: 15px;">Securely confirm you're a student using your matric number.</p>
+                        <div style="background: white; padding: 6px 12px; border-radius: 40px; display: inline-block;">
+                            <i class="fas fa-check-circle" style="color: #4A6B4A; font-size: 0.9rem;"></i>
+                            <span class="ms-1" style="color: #2C3E2C; font-size: 0.85rem;">Takes 30 seconds</span>
+                        </div>
                     </div>
                 </div>
             </div>
+            
             <div class="col-md-4">
-                <div class="card text-center h-100">
-                    <div class="card-body">
-                        <div class="display-1 mb-3">2️⃣</div>
-                        <h3>Chat</h3>
-                        <p class="text-muted">Talk anonymously with trained peer supporters</p>
+                <div class="card h-100 border-0" style="background: #FAF7F2; border-radius: 20px; overflow: hidden;">
+                    <div class="card-body text-center p-4">
+                        <div class="step-number mb-3" style="width: 50px; height: 50px; background: #4A6B4A; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <span style="color: white; font-size: 20px; font-weight: 700;">2</span>
+                        </div>
+                        <h3 class="h5 mb-2" style="color: #2C3E2C;">Chat Anonymously</h3>
+                        <p style="color: #5A6B7A; font-size: 0.95rem; margin-bottom: 15px;">Talk with trained peer supporters about anything.</p>
+                        <div style="background: white; padding: 6px 12px; border-radius: 40px; display: inline-block;">
+                            <i class="fas fa-comment" style="color: #4A6B4A; font-size: 0.9rem;"></i>
+                            <span class="ms-1" style="color: #2C3E2C; font-size: 0.85rem;">24/7 Available</span>
+                        </div>
                     </div>
                 </div>
             </div>
+            
             <div class="col-md-4">
-                <div class="card text-center h-100">
-                    <div class="card-body">
-                        <div class="display-1 mb-3">3️⃣</div>
-                        <h3>Grow</h3>
-                        <p class="text-muted">Access resources and track your wellbeing journey</p>
+                <div class="card h-100 border-0" style="background: #FAF7F2; border-radius: 20px; overflow: hidden;">
+                    <div class="card-body text-center p-4">
+                        <div class="step-number mb-3" style="width: 50px; height: 50px; background: #1A3A1A; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <span style="color: white; font-size: 20px; font-weight: 700;">3</span>
+                        </div>
+                        <h3 class="h5 mb-2" style="color: #2C3E2C;">Track & Grow</h3>
+                        <p style="color: #5A6B7A; font-size: 0.95rem; margin-bottom: 15px;">Access resources and track your mood over time.</p>
+                        <div style="background: white; padding: 6px 12px; border-radius: 40px; display: inline-block;">
+                            <i class="fas fa-chart-line" style="color: #4A6B4A; font-size: 0.9rem;"></i>
+                            <span class="ms-1" style="color: #2C3E2C; font-size: 0.85rem;">Personalized insights</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Trust Badge -->
-    <section class="text-center my-5 py-4" style="background: white; border-radius: 24px;">
-        <h3 class="mb-4">Trusted by students at</h3>
-        <div class="d-flex justify-content-center gap-5 flex-wrap">
-            <div style="width: 150px; height: 60px; background: #E6E6FA; border-radius: 12px;"></div>
-            <div style="width: 150px; height: 60px; background: #E6E6FA; border-radius: 12px;"></div>
-            <div style="width: 150px; height: 60px; background: #E6E6FA; border-radius: 12px;"></div>
+<!-- Key Features / Benefits Section - Responsive grid -->
+<section class="py-5" style="background: linear-gradient(135deg, #FAF7F2 0%, #F5F0E8 100%);">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h2 fw-bold mb-2" style="color: #2C3E2C;">Everything You Need in One Place</h2>
+            <p class="lead" style="color: #5A6B7A; font-size: 1rem;">Designed by students, for students</p>
         </div>
-    </section>
-</div>
+        
+        <div class="row g-3">
+            <div class="col-6 col-lg-4">
+                <div class="feature-card h-100" style="background: white; border-radius: 16px; padding: 20px 15px; box-shadow: 0 5px 15px rgba(26,58,26,0.05);">
+                    <div style="width: 45px; height: 45px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <i class="fas fa-comment-dots" style="font-size: 22px; color: #4A6B4A;"></i>
+                    </div>
+                    <h4 style="color: #2C3E2C; margin-bottom: 8px; font-size: 1rem;">Anonymous Chat</h4>
+                    <p style="color: #5A6B7A; margin-bottom: 0; font-size: 0.85rem;">Talk openly without judgment.</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-lg-4">
+                <div class="feature-card h-100" style="background: white; border-radius: 16px; padding: 20px 15px; box-shadow: 0 5px 15px rgba(26,58,26,0.05);">
+                    <div style="width: 45px; height: 45px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <i class="fas fa-smile" style="font-size: 22px; color: #4A6B4A;"></i>
+                    </div>
+                    <h4 style="color: #2C3E2C; margin-bottom: 8px; font-size: 1rem;">Mood Tracking</h4>
+                    <p style="color: #5A6B7A; margin-bottom: 0; font-size: 0.85rem;">See patterns over time.</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-lg-4">
+                <div class="feature-card h-100" style="background: white; border-radius: 16px; padding: 20px 15px; box-shadow: 0 5px 15px rgba(26,58,26,0.05);">
+                    <div style="width: 45px; height: 45px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <i class="fas fa-clipboard-list" style="font-size: 22px; color: #4A6B4A;"></i>
+                    </div>
+                    <h4 style="color: #2C3E2C; margin-bottom: 8px; font-size: 1rem;">Self-Assessments</h4>
+                    <p style="color: #5A6B7A; margin-bottom: 0; font-size: 0.85rem;">Check in with yourself.</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-lg-4">
+                <div class="feature-card h-100" style="background: white; border-radius: 16px; padding: 20px 15px; box-shadow: 0 5px 15px rgba(26,58,26,0.05);">
+                    <div style="width: 45px; height: 45px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <i class="fas fa-book-open" style="font-size: 22px; color: #4A6B4A;"></i>
+                    </div>
+                    <h4 style="color: #2C3E2C; margin-bottom: 8px; font-size: 1rem;">Resource Library</h4>
+                    <p style="color: #5A6B7A; margin-bottom: 0; font-size: 0.85rem;">Articles and exercises.</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-lg-4">
+                <div class="feature-card h-100" style="background: white; border-radius: 16px; padding: 20px 15px; box-shadow: 0 5px 15px rgba(26,58,26,0.05);">
+                    <div style="width: 45px; height: 45px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <i class="fas fa-shield-alt" style="font-size: 22px; color: #4A6B4A;"></i>
+                    </div>
+                    <h4 style="color: #2C3E2C; margin-bottom: 8px; font-size: 1rem;">100% Private</h4>
+                    <p style="color: #5A6B7A; margin-bottom: 0; font-size: 0.85rem;">Your data is encrypted.</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-lg-4">
+                <div class="feature-card h-100" style="background: white; border-radius: 16px; padding: 20px 15px; box-shadow: 0 5px 15px rgba(26,58,26,0.05);">
+                    <div style="width: 45px; height: 45px; background: #E6E6FA; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <i class="fas fa-clock" style="font-size: 22px; color: #4A6B4A;"></i>
+                    </div>
+                    <h4 style="color: #2C3E2C; margin-bottom: 8px; font-size: 1rem;">24/7 Availability</h4>
+                    <p style="color: #5A6B7A; margin-bottom: 0; font-size: 0.85rem;">Support anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section - Responsive -->
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h2 fw-bold mb-2" style="color: #2C3E2C;">What Students Are Saying</h2>
+            <p class="lead" style="color: #5A6B7A; font-size: 1rem;">Real stories from students like you</p>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="testimonial-card p-3" style="background: #FAF7F2; border-radius: 16px; height: 100%;">
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 40px; height: 40px; background: #2C3E2C; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: white; font-size: 16px;">S</span>
+                        </div>
+                        <div class="ms-2">
+                            <h5 style="color: #2C3E2C; margin-bottom: 0; font-size: 0.95rem;">Sarah K.</h5>
+                            <small style="color: #5A6B7A; font-size: 0.75rem;">300L, CS</small>
+                        </div>
+                    </div>
+                    <p style="color: #2C3E2C; font-style: italic; margin-bottom: 10px; font-size: 0.9rem;">"Finally, a place where I feel heard."</p>
+                    <div style="color: #E5B25D; font-size: 0.8rem;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="testimonial-card p-3" style="background: #FAF7F2; border-radius: 16px; height: 100%;">
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 40px; height: 40px; background: #4A6B4A; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: white; font-size: 16px;">M</span>
+                        </div>
+                        <div class="ms-2">
+                            <h5 style="color: #2C3E2C; margin-bottom: 0; font-size: 0.95rem;">Michael O.</h5>
+                            <small style="color: #5A6B7A; font-size: 0.75rem;">200L, Medicine</small>
+                        </div>
+                    </div>
+                    <p style="color: #2C3E2C; font-style: italic; margin-bottom: 10px; font-size: 0.9rem;">"Mood tracking helped me identify my stress patterns."</p>
+                    <div style="color: #E5B25D; font-size: 0.8rem;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="testimonial-card p-3" style="background: #FAF7F2; border-radius: 16px; height: 100%;">
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 40px; height: 40px; background: #1A3A1A; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: white; font-size: 16px;">A</span>
+                        </div>
+                        <div class="ms-2">
+                            <h5 style="color: #2C3E2C; margin-bottom: 0; font-size: 0.95rem;">Amina B.</h5>
+                            <small style="color: #5A6B7A; font-size: 0.75rem;">Final Year, Psych</small>
+                        </div>
+                    </div>
+                    <p style="color: #2C3E2C; font-style: italic; margin-bottom: 10px; font-size: 0.9rem;">"The breathing exercises are incredible."</p>
+                    <div style="color: #E5B25D; font-size: 0.8rem;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section - Responsive -->
+<section class="py-5" style="background: linear-gradient(135deg, #2C3E2C 0%, #1A3A1A 100%); color: white;">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+                <h2 class="h2 fw-bold mb-3" style="color: white;">Why Students Choose MindHaven</h2>
+                <div class="benefit-item d-flex mb-3">
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                        <i class="fas fa-check" style="color: #E5B25D; font-size: 14px;"></i>
+                    </div>
+                    <div>
+                        <h5 style="color: white; font-size: 1rem; margin-bottom: 4px;">100% Anonymous</h5>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 0;">Your identity is always protected.</p>
+                    </div>
+                </div>
+                <div class="benefit-item d-flex mb-3">
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                        <i class="fas fa-check" style="color: #E5B25D; font-size: 14px;"></i>
+                    </div>
+                    <div>
+                        <h5 style="color: white; font-size: 1rem; margin-bottom: 4px;">Free for Students</h5>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 0;">No cost, ever.</p>
+                    </div>
+                </div>
+                <div class="benefit-item d-flex mb-3">
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                        <i class="fas fa-check" style="color: #E5B25D; font-size: 14px;"></i>
+                    </div>
+                    <div>
+                        <h5 style="color: white; font-size: 1rem; margin-bottom: 4px;">Trained Peer Supporters</h5>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 0;">Students who understand.</p>
+                    </div>
+                </div>
+                <div class="benefit-item d-flex">
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                        <i class="fas fa-check" style="color: #E5B25D; font-size: 14px;"></i>
+                    </div>
+                    <div>
+                        <h5 style="color: white; font-size: 1rem; margin-bottom: 4px;">Evidence-Based Resources</h5>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 0;">Reviewed by professionals.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="p-3 text-center" style="background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+                            <h3 class="h4 fw-bold mb-1" style="color: #E5B25D;">50k+</h3>
+                            <p style="color: white; margin-bottom: 0; font-size: 0.85rem;">Chat Sessions</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 text-center" style="background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+                            <h3 class="h4 fw-bold mb-1" style="color: #E5B25D;">95%</h3>
+                            <p style="color: white; margin-bottom: 0; font-size: 0.85rem;">Satisfaction</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 text-center" style="background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+                            <h3 class="h4 fw-bold mb-1" style="color: #E5B25D;">24/7</h3>
+                            <p style="color: white; margin-bottom: 0; font-size: 0.85rem;">Always Available</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 text-center" style="background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+                            <h3 class="h4 fw-bold mb-1" style="color: #E5B25D;">15+</h3>
+                            <p style="color: white; margin-bottom: 0; font-size: 0.85rem;">Universities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Badge Section - Responsive -->
+<section class="py-4" style="background: white;">
+    <div class="container">
+        <div class="text-center mb-3">
+            <h3 style="color: #2C3E2C; font-size: 1.25rem;">Trusted by students at</h3>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center gap-3 align-items-center">
+            <div style="width: 120px; height: 50px; background: #F5F0E8; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <span style="color: #2C3E2C; font-weight: 600; font-size: 0.9rem;">Uni of Lagos</span>
+            </div>
+            <div style="width: 120px; height: 50px; background: #F5F0E8; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <span style="color: #2C3E2C; font-weight: 600; font-size: 0.9rem;">UI</span>
+            </div>
+            <div style="width: 120px; height: 50px; background: #F5F0E8; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <span style="color: #2C3E2C; font-weight: 600; font-size: 0.9rem;">OAU</span>
+            </div>
+            <div style="width: 120px; height: 50px; background: #F5F0E8; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <span style="color: #2C3E2C; font-weight: 600; font-size: 0.9rem;">UNILORIN</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action - Responsive -->
+<section class="py-5" style="background: linear-gradient(135deg, #FAF7F2 0%, #F5F0E8 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h2 class="h2 fw-bold mb-3" style="color: #2C3E2C;">Ready to prioritize your mental health?</h2>
+                <p class="lead mb-4" style="color: #5A6B7A; font-size: 1rem;">Join thousands of students who've found support on MindHaven.</p>
+                <a href="{% url 'pages:matric_verification' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #4A6B4A 0%, #1A3A1A 100%); color: white; padding: 12px 40px; border-radius: 40px; font-weight: 600; box-shadow: 0 10px 30px rgba(26,58,26,0.3); display: inline-block;">Get Started Now</a>
+                <p class="mt-3" style="color: #5A6B7A; font-size: 0.9rem;"><i class="fas fa-lock me-2"></i>Free, private, and anonymous</p>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

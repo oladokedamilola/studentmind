@@ -1,10 +1,11 @@
+<!--templates\base\public_base.html-->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindHaven - Your Campus Sanctuary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>MindHaven - {% block title %}Your Campus Sanctuary{% endblock %}</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,83 +14,343 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/fav.png' %}">
+    
+    <style>
+        /* Emergency responsive fixes */
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        
+        .row {
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        
+        .col, [class*="col-"] {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        
+        img, svg, iframe, video {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Fix for navbar toggler on mobile */
+        .navbar-toggler {
+            padding: 4px 8px;
+            font-size: 1.25rem;
+        }
+        
+        /* Ensure no horizontal scroll on any element */
+        * {
+            max-width: 100vw;
+            box-sizing: border-box;
+        }
+        
+        /* Flash Messages Container - Fixed Position Overlay */
+        #flash-messages-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        
+        .flash-message {
+            max-width: 450px;
+            width: 90%;
+            margin: 0 auto 10px auto;
+            pointer-events: auto;
+            animation: slideDown 0.3s ease forwards;
+            background: white;
+            border-radius: 16px;
+            padding: 14px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-left: 4px solid;
+        }
+        
+        .flash-message.flash-success {
+            border-left-color: #4A6B4A;
+            background: #F0F4EA;
+        }
+        
+        .flash-message.flash-error {
+            border-left-color: #C47E7E;
+            background: #FDF2F2;
+        }
+        
+        .flash-message.flash-warning {
+            border-left-color: #E5B25D;
+            background: #FEF5E7;
+        }
+        
+        .flash-message.flash-info {
+            border-left-color: #9CAF88;
+            background: #FAF7F2;
+        }
+        
+        .flash-icon {
+            font-size: 1.25rem;
+        }
+        
+        .flash-text {
+            flex: 1;
+            font-family: 'Quicksand', sans-serif;
+            color: #2C3E2C;
+            font-weight: 500;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+        
+        .flash-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: rgba(44, 62, 44, 0.5);
+            padding: 0 5px;
+            transition: all 0.2s;
+            border-radius: 8px;
+        }
+        
+        .flash-close:hover {
+            color: #2C3E2C;
+            background: rgba(44, 62, 44, 0.1);
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+        
+        .flash-message.hiding {
+            animation: slideUp 0.3s ease forwards;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .flash-message {
+                max-width: 90%;
+                width: 90%;
+                padding: 12px 16px;
+            }
+            
+            #flash-messages-container {
+                top: 10px;
+            }
+            
+            .flash-text {
+                font-size: 0.85rem;
+            }
+            
+            .flash-icon {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .flash-message {
+                max-width: 400px;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Public Navigation -->
-    <nav class="navbar navbar-expand-lg" style="background: white; box-shadow: var(--shadow-soft);">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="20" cy="20" r="18" stroke="#9CAF88" stroke-width="2"/>
-                    <path d="M12 20 L18 26 L28 16" stroke="#5D7A5C" stroke-width="2" stroke-linecap="round"/>
+    <!-- Public Navigation - Deep Sage Solid Color -->
+    <nav class="navbar navbar-expand-lg" style="background: #2C3E2C; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 100%;">
+        <div class="container" style="padding-left: 15px; padding-right: 15px;">
+            <a class="navbar-brand" href="{% url 'pages:landing' %}" style="display: flex; align-items: center;">
+                <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width: 36px;">
+                    <circle cx="20" cy="20" r="18" stroke="white" stroke-width="2"/>
+                    <path d="M12 20 L18 26 L28 16" stroke="white" stroke-width="2" stroke-linecap="round"/>
                 </svg>
-                <span style="font-family: 'Nunito', sans-serif; font-weight: 700; color: #5D7A5C; margin-left: 10px;">MindHaven</span>
+                <span style="font-family: 'Nunito', sans-serif; font-weight: 700; color: white; margin-left: 8px; font-size: 1.25rem;">MindHaven</span>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border-color: rgba(255, 255, 255, 0.3);">
+                <span class="navbar-toggler-icon" style="filter: brightness(0) invert(1);"></span>
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/" style="color: #5D7A5C; font-weight: 500;">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about" style="color: #5D7A5C; font-weight: 500;">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login" style="color: #5D7A5C; font-weight: 500;">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-primary" href="/register" style="margin-left: 10px;">Get Started</a>
-                    </li>
+                    {% if request.session.student_id %}
+                        <!-- Logged In Navigation -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:dashboard' %}" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:chat_list' %}" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">Chat</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:mood_log' %}" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">Mood</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:resources_list' %}" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">Resources</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">
+                                {{ request.session.full_name|default:"Account" }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'pages:settings' %}">Settings</a></li>
+                                <li><a class="dropdown-item" href="{% url 'pages:change_password' %}">Change Password</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a></li>
+                            </ul>
+                        </li>
+                        <form id="logout-form" method="POST" action="{% url 'accounts:logout_page' %}" style="display: none;">
+                            {% csrf_token %}
+                        </form>
+                    {% else %}
+                        <!-- Public Navigation -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:landing' %}" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:about' %}" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:login' %}" style="color: rgba(255, 255, 255, 0.9); font-weight: 500; padding: 0.5rem 1rem;">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn" href="{% url 'pages:matric_verification' %}" style="background: white; color: #2C3E2C; padding: 0.5rem 1.5rem; border-radius: 30px; font-weight: 600; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); margin-left: 10px; border: none; display: inline-block; white-space: nowrap;">Get Started</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main>
+    <main style="min-height: calc(100vh - 300px); background: linear-gradient(180deg, #FAF7F2 0%, #F5F0E8 100%); width: 100%; overflow-x: hidden;">
+        <!-- Flash Messages Container -->
+        <div id="flash-messages-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-message flash-{{ message.tags }}" data-autohide="true">
+                        <span class="flash-icon">
+                            {% if message.tags == 'success' %}✅
+                            {% elif message.tags == 'error' %}❌
+                            {% elif message.tags == 'warning' %}⚠️
+                            {% else %}ℹ️
+                            {% endif %}
+                        </span>
+                        <span class="flash-text">{{ message }}</span>
+                        <button class="flash-close" onclick="this.parentElement.remove()">✕</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer style="background: white; padding: 40px 0; margin-top: 60px; border-top: 1px solid #E6E6FA;">
+    <!-- Footer - Forest Green Solid Color -->
+    <footer style="background: #1A3A1A; padding: 40px 0 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: white; width: 100%;">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h4 style="color: #5D7A5C; margin-bottom: 20px;">MindHaven</h4>
-                    <p style="color: #B99B7C;">Your safe, private space for mental wellness on campus.</p>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width: 32px;">
+                            <circle cx="20" cy="20" r="18" stroke="white" stroke-width="2"/>
+                            <path d="M12 20 L18 26 L28 16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <span style="font-family: 'Nunito', sans-serif; font-weight: 700; color: white; margin-left: 8px; font-size: 1.1rem;">MindHaven</span>
+                    </div>
+                    <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6; font-size: 0.95rem;">Your safe, private space for mental wellness on campus. Available 24/7 for all students.</p>
+                    <div style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
+                        <a href="#" style="color: white; font-size: 1.1rem; opacity: 0.8;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: white; font-size: 1.1rem; opacity: 0.8;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: white; font-size: 1.1rem; opacity: 0.8;"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" style="color: white; font-size: 1.1rem; opacity: 0.8;"><i class="fab fa-facebook"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h4 style="color: #5D7A5C; margin-bottom: 20px;">Quick Links</h4>
+                <div class="col-lg-4 col-md-6">
+                    <h4 style="color: white; margin-bottom: 15px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Quick Links</h4>
                     <ul style="list-style: none; padding: 0;">
-                        <li><a href="/privacy" style="color: #B99B7C; text-decoration: none;">Privacy Policy</a></li>
-                        <li><a href="/terms" style="color: #B99B7C; text-decoration: none;">Terms of Use</a></li>
-                        <li><a href="/contact" style="color: #B99B7C; text-decoration: none;">Contact Us</a></li>
+                        <li style="margin-bottom: 8px;"><a href="{% url 'pages:about' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">About Us</a></li>
+                        <li style="margin-bottom: 8px;"><a href="{% url 'pages:privacy' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">Privacy Policy</a></li>
+                        <li style="margin-bottom: 8px;"><a href="{% url 'pages:terms' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">Terms of Use</a></li>
+                        <li style="margin-bottom: 8px;"><a href="{% url 'pages:contact' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">Contact Us</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4">
-                    <h4 style="color: #5D7A5C; margin-bottom: 20px;">Emergency</h4>
-                    <p style="color: #B99B7C;">If you're in crisis, please call:<br><strong>24/7 Helpline: 0800-123-456</strong></p>
+                <div class="col-lg-4">
+                    <h4 style="color: white; margin-bottom: 15px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Emergency Support</h4>
+                    <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; border-left: 4px solid #E5B25D;">
+                        <p style="color: white; margin-bottom: 8px; font-size: 0.95rem;">24/7 Crisis Helpline</p>
+                        <p style="font-size: 1.25rem; color: #E5B25D; font-weight: 700; margin-bottom: 5px; word-break: break-word;">0800-123-456</p>
+                        <small style="color: rgba(255, 255, 255, 0.8);">Free and confidential</small>
+                    </div>
                 </div>
             </div>
-            <hr style="border-color: #E6E6FA; margin: 30px 0;">
-            <p style="text-align: center; color: #B99B7C;">&copy; 2024 MindHaven. All rights reserved.</p>
+            <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 30px 0 15px;">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 0; font-size: 0.9rem;">&copy; {% now "Y" %} MindHaven. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 0; font-size: 0.9rem;">Made with 💚 for student mental health</p>
+                </div>
+            </div>
         </div>
     </footer>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'flash-messages.js' %}"></script>
-    <script src="{% static 'main.js' %}"></script>
-    <script src="{% static 'validation.js' %}"></script>
-    <script src="{% static 'auth.js' %}"></script>
-    {% block scripts %}{% endblock %}
+    <script src="{% static 'js/flash-messages.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/validation.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+    
+    <script>
+        // No additional auto-hide needed - handled by flash-messages.js
+        console.log('Public base template loaded');
+    </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,31 +1,34 @@
 {% extends "base/public_base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container" style="max-width: 500px;">
     <!-- Back Link -->
-    <a href="/" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C;">
+    <a href="{% url 'pages:landing' %}" class="d-inline-flex align-items-center mt-4" style="color: #5D7A5C; text-decoration: none;">
         <i class="fas fa-arrow-left me-2"></i> Back to Home
     </a>
 
     <!-- Main Card -->
-    <div class="card mt-4">
+    <div class="card mt-4 mb-5 p-4" style="border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
         <div class="text-center mb-4">
             <span style="font-size: 3rem;">🔑</span>
             <h2 class="mt-3">Welcome Back</h2>
         </div>
 
         <form id="loginForm">
+            {% csrf_token %}
             <div class="form-group">
                 <label class="form-label">Matric Number</label>
                 <input type="text" class="form-input" id="matricNumber" 
-                       placeholder="202012345" required>
+                       placeholder="202012345" required autocomplete="username">
+                <small class="text-muted" style="font-size: 0.8rem;">Enter your 9-10 digit matric number</small>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Password</label>
                 <div class="position-relative">
-                    <input type="password" class="form-input" id="password" required>
-                    <button type="button" class="position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none;" onclick="togglePassword('password')">
+                    <input type="password" class="form-input" id="password" required autocomplete="current-password">
+                    <button type="button" class="position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;" onclick="togglePassword('password')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
@@ -36,10 +39,10 @@
                     <input type="checkbox" class="form-check-input" id="rememberMe">
                     <label class="form-check-label" for="rememberMe">Remember Me</label>
                 </div>
-                <a href="/forgot-password" style="color: #5D7A5C;">Forgot password?</a>
+                <a href="{% url 'pages:forgot_password' %}" style="color: #5D7A5C; text-decoration: none;">Forgot password?</a>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100" id="loginBtn">
+            <button type="submit" class="btn btn-primary w-100" id="loginBtn" disabled>
                 Login
             </button>
         </form>
@@ -47,7 +50,7 @@
         <!-- Register Link -->
         <div class="text-center mt-4 pt-3" style="border-top: 1px solid #E6E6FA;">
             <p class="mb-0">New to MindHaven?</p>
-            <a href="/register" class="btn btn-outline mt-2">Create Account</a>
+            <a href="{% url 'pages:matric_verification' %}" class="btn btn-outline mt-2" style="text-decoration: none;">Create Account</a>
         </div>
     </div>
 
@@ -57,42 +60,238 @@
         <span id="attemptsMessage">3 attempts remaining</span>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<style>
+/* Additional styles for better UX */
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #9CAF88;
+    pointer-events: none;
+}
+
+.form-input.valid {
+    border-color: #4A6B4A;
+    background-color: rgba(74, 107, 74, 0.05);
+}
+
+.form-input.error {
+    border-color: #C47E7E;
+    background-color: rgba(196, 126, 126, 0.05);
+}
+
+#matricNumber:focus {
+    border-color: #4A6B4A;
+    box-shadow: 0 0 0 3px rgba(74, 107, 74, 0.1);
+}
+
+.form-error {
+    color: #C47E7E;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+}
+</style>
+
 <script>
-let attempts = 3;
+// API endpoint
+const API_BASE_URL = '/api/accounts/api';
 
+// Get the next URL from query parameter
+function getNextUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let next = urlParams.get('next');
+    
+    // Validate next URL to prevent open redirect vulnerabilities
+    if (next) {
+        // Only allow relative URLs (not external domains)
+        if (next.startsWith('/') && !next.startsWith('//')) {
+            return next;
+        }
+        // Also allow dashboard and chat pages
+        const allowedPaths = ['/dashboard', '/chat', '/resources', '/mood', '/assessments', '/settings'];
+        for (const path of allowedPaths) {
+            if (next.startsWith(path)) {
+                return next;
+            }
+        }
+    }
+    return '/dashboard';
+}
+
+// Get CSRF token
+function getCsrfToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Login function - NOW INCLUDES NEXT URL
+async function login(matricNumber, password, rememberMe, nextUrl) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/login/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({
+                matric_number: matricNumber,
+                password: password,
+                remember_me: rememberMe,
+                next_url: nextUrl  // Add next_url to the request body
+            }),
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 400) {
+                // Check for account locked message
+                const errorMsg = data.errors?.__all__?.[0] || data.error || 'Invalid credentials';
+                throw new Error(errorMsg);
+            }
+            throw new Error(data.error || 'Login failed');
+        }
+
+        return { success: true, data: data };
+    } catch (error) {
+        console.error('Login error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Validate matric number locally
+function validateMatricNumber(matric) {
+    const cleaned = matric.replace(/\s/g, '');
+    const regex = /^\d{9,10}$/;
+    
+    if (!cleaned) {
+        return { valid: false, message: 'Matric number is required' };
+    }
+    
+    if (!regex.test(cleaned)) {
+        return { valid: false, message: 'Matric number must be 9-10 digits' };
+    }
+    
+    return { valid: true, message: '' };
+}
+
+// Show error message
+function showError(input, message) {
+    removeError(input);
+    const error = document.createElement('span');
+    error.className = 'form-error';
+    error.textContent = message;
+    input.parentNode.appendChild(error);
+}
+
+// Remove error message
+function removeError(input) {
+    const parent = input.parentNode;
+    const existingError = parent.querySelector('.form-error');
+    if (existingError) existingError.remove();
+}
+
+// Toggle password visibility
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    
+    const button = field.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// Make togglePassword globally available
+window.togglePassword = togglePassword;
+
+// Wait for all scripts to load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing login form');
+    
     const form = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
     const matricInput = document.getElementById('matricNumber');
     const passwordInput = document.getElementById('password');
+    
+    let attempts = 3;
+    
+    // Store the next URL for redirect after login
+    const nextUrl = getNextUrl();
+    console.log('Next URL after login:', nextUrl);
 
-    // Real-time matric validation
-    matricInput.addEventListener('input', function() {
-        const result = validateMatricNumber(this.value);
-        if (this.value && !result.valid) {
-            this.classList.add('error');
-            showError(this, result.message);
+    // Function to check if form is valid
+    function checkFormValidity() {
+        const matricValue = matricInput.value.trim();
+        const passwordValue = passwordInput.value.trim();
+        
+        // Validate matric number
+        const result = validateMatricNumber(matricValue);
+        
+        // Update styling
+        if (matricValue.length > 0) {
+            if (result.valid) {
+                matricInput.classList.add('valid');
+                matricInput.classList.remove('error');
+                removeError(matricInput);
+            } else {
+                matricInput.classList.remove('valid');
+                matricInput.classList.add('error');
+                showError(matricInput, result.message);
+            }
         } else {
-            this.classList.remove('error');
-            removeError(this);
+            matricInput.classList.remove('valid', 'error');
+            removeError(matricInput);
         }
-    });
+        
+        // Enable button only if matric is valid AND password is not empty
+        if (result.valid && passwordValue.length > 0) {
+            loginBtn.disabled = false;
+        } else {
+            loginBtn.disabled = true;
+        }
+    }
+
+    // Real-time validation
+    matricInput.addEventListener('input', checkFormValidity);
+    matricInput.addEventListener('blur', checkFormValidity);
+    passwordInput.addEventListener('input', checkFormValidity);
+    passwordInput.addEventListener('blur', checkFormValidity);
 
     // Form submission
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        if (loginBtn.disabled) return;
+        
         const matricNumber = matricInput.value.trim();
         const password = passwordInput.value;
         const rememberMe = document.getElementById('rememberMe').checked;
 
-        // Validate inputs
-        const matricResult = validateMatricNumber(matricNumber);
-        if (!matricResult.valid) {
-            flashMessages.error(matricResult.message);
+        // Final validation check
+        const validation = validateMatricNumber(matricNumber);
+        if (!validation.valid) {
+            flashMessages.error(validation.message);
             return;
         }
 
@@ -105,63 +304,46 @@ document.addEventListener('DOMContentLoaded', function() {
         loginBtn.disabled = true;
         loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
 
-        // Attempt login
-        const result = await login(matricNumber, password, rememberMe);
+        // Attempt login - PASS THE NEXT URL
+        const result = await login(matricNumber, password, rememberMe, nextUrl);
         
         if (result.success) {
-            flashMessages.success('Login successful!');
+            flashMessages.success('Login successful! Redirecting...');
             setTimeout(() => {
-                window.location.href = '/dashboard';
-            }, 2000);
+                // Use the redirect_url from the server response (with validation)
+                const redirectTo = result.data.redirect_url || nextUrl;
+                window.location.href = redirectTo;
+            }, 1500);
         } else {
             attempts--;
             
             if (attempts > 0) {
                 const warning = document.getElementById('attemptsWarning');
-                document.getElementById('attemptsMessage').textContent = 
-                    `Invalid credentials. ${attempts} attempt${attempts > 1 ? 's' : ''} remaining.`;
-                warning.style.display = 'block';
+                const messageEl = document.getElementById('attemptsMessage');
+                if (warning && messageEl) {
+                    messageEl.textContent = `Invalid credentials. ${attempts} attempt${attempts > 1 ? 's' : ''} remaining.`;
+                    warning.style.display = 'flex';
+                    setTimeout(() => {
+                        warning.style.display = 'none';
+                    }, 3000);
+                }
                 
-                flashMessages.error(result.error || 'Login failed');
+                flashMessages.error(result.error || 'Invalid matric number or password');
             } else {
                 flashMessages.error('Too many failed attempts. Please reset your password.');
                 setTimeout(() => {
-                    window.location.href = '/forgot-password';
-                }, 3000);
+                    window.location.href = "{% url 'pages:forgot_password' %}";
+                }, 2000);
             }
             
             loginBtn.disabled = false;
             loginBtn.innerHTML = 'Login';
+            checkFormValidity();
         }
     });
+
+    // Initial check
+    checkFormValidity();
 });
-
-function togglePassword(fieldId) {
-    const field = document.getElementById(fieldId);
-    const toggleBtn = field.nextElementSibling.querySelector('i');
-    
-    if (field.type === 'password') {
-        field.type = 'text';
-        toggleBtn.classList.remove('fa-eye');
-        toggleBtn.classList.add('fa-eye-slash');
-    } else {
-        field.type = 'password';
-        toggleBtn.classList.remove('fa-eye-slash');
-        toggleBtn.classList.add('fa-eye');
-    }
-}
-
-function showError(input, message) {
-    removeError(input);
-    const error = document.createElement('span');
-    error.className = 'form-error';
-    error.textContent = message;
-    input.parentNode.appendChild(error);
-}
-
-function removeError(input) {
-    const existingError = input.parentNode.querySelector('.form-error');
-    if (existingError) existingError.remove();
-}
 </script>
 {% endblock %}

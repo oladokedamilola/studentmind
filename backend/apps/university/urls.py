@@ -4,13 +4,14 @@ from . import views
 app_name = 'university'
 
 urlpatterns = [
-    # Registration flow
-    path('verify-matric/', views.verify_matric_number, name='verify-matric'),
-    path('create-password/', views.create_password, name='create-password'),
+    # Student data endpoints
+    path('students/verify/<str:matric_number>/', views.verify_student, name='verify_student'),
+    path('students/<str:matric_number>/', views.get_student, name='get_student'),
+    path('students/by-department/<int:department_id>/', views.list_students_by_department, name='students_by_department'),
+    path('students/by-year/<int:year>/', views.list_students_by_year, name='students_by_year'),
+    path('students/stats/', views.student_stats, name='student_stats'),
     
-    # Authentication
-    path('login/', views.login_student, name='login'),
-    path('logout/', views.logout_student, name='logout'),
-    path('me/', views.get_current_student, name='me'),
-    path('change-password/', views.change_password, name='change-password'),
+    # Lookup endpoints
+    path('departments/', views.list_departments, name='list_departments'),
+    path('faculties/', views.list_faculties, name='list_faculties'),
 ]

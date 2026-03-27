@@ -3,6 +3,8 @@ Development settings for StudentMind project.
 """
 
 from .base import *
+import os
+from pathlib import Path
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,18 +31,15 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SECURE_SSL_REDIRECT = False
 
-# Development-specific apps
-# INSTALLED_APPS += [
-#     'django_extensions',  # Optional: for better development tools
-# ]
-
 # More relaxed rate limiting for development
-# REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
-#     'anon': '1000/day',
-# }
+REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
+    'anon': '1000/day',
+}
 
-# Show emails in console instead of sending
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Create logs directory if it doesn't exist
+LOG_DIR = BASE_DIR / 'logs'
+LOG_DIR.mkdir(exist_ok=True)
 
 # Logging for development
 LOGGING = {
@@ -49,6 +48,20 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+        },
+        'mail_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',  # Use RotatingFileHandler
+            'filename': LOG_DIR / 'emails.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 3,
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} [{levelname}] {module} - {message}',
+            'style': '{',
         },
     },
     'root': {
@@ -64,6 +77,11 @@ LOGGING = {
         'apps': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.mail': {  # Log all emails
+            'handlers': ['console', 'mail_file'],
+            'level': 'INFO',
             'propagate': False,
         },
     },

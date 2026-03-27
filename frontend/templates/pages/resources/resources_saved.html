@@ -1,194 +1,71 @@
 {% extends "base/authenticated_base.html" %}
+{% load static %}
+
+{% block title %}Saved Resources - MindHaven{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <!-- Header -->
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div class="d-flex align-items-center">
-            <a href="/resources" class="btn btn-link me-2" style="color: #5D7A5C;">
+            <a href="{% url 'pages:resources_list' %}" class="btn btn-link me-2" style="color: #5D7A5C;">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <h2 class="mb-0">❤️ Your Saved Resources</h2>
         </div>
         
-        <button class="btn btn-outline" onclick="clearAllSaved()">
+        <button class="btn btn-outline" onclick="clearAllSaved()" id="clearAllBtn" style="display: none;">
             <i class="fas fa-trash me-2"></i>Clear All
         </button>
     </div>
 
+    <!-- Loading State -->
+    <div id="loadingSpinner" class="text-center py-5">
+        <div class="spinner-border text-sage" role="status">
+            <span class="visually-hidden">Loading saved resources...</span>
+        </div>
+    </div>
+
     <!-- Stats Card -->
-    <div class="stats-card mb-4">
+    <div id="statsCard" class="stats-card mb-4" style="display: none;">
         <div class="row g-3">
             <div class="col-md-4">
                 <div class="stat-item text-center">
-                    <h3>8</h3>
+                    <h3 id="savedCount">0</h3>
                     <small class="text-muted">Saved Items</small>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-item text-center">
-                    <h3>4</h3>
+                    <h3 id="categoryCount">0</h3>
                     <small class="text-muted">Categories</small>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-item text-center">
-                    <h3>2</h3>
-                    <small class="text-muted">Unread</small>
+                    <h3 id="recentCount">0</h3>
+                    <small class="text-muted">Recently Saved</small>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Categories Filter -->
-    <div class="categories-filter mb-4">
+    <div id="categoriesFilter" class="categories-filter mb-4" style="display: none;">
         <div class="d-flex gap-2 flex-wrap">
-            <button class="category-pill active" onclick="filterSaved('all')">All</button>
-            <button class="category-pill" onclick="filterSaved('anxiety')">Anxiety</button>
-            <button class="category-pill" onclick="filterSaved('stress')">Stress</button>
-            <button class="category-pill" onclick="filterSaved('sleep')">Sleep</button>
-            <button class="category-pill" onclick="filterSaved('meditation')">Meditation</button>
+            <button class="category-pill active" data-category="all" onclick="filterSaved('all')">All</button>
         </div>
     </div>
 
     <!-- Saved Resources Grid -->
-    <div class="row g-3" id="savedGrid">
-        <!-- Saved Item 1 -->
-        <div class="col-md-6">
-            <div class="saved-card">
-                <div class="d-flex">
-                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-lungs" style="font-size: 32px; color: #5D7A5C;"></i>
-                    </div>
-                    <div class="saved-content p-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1">5-Minute Breathing Exercise</h6>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Anxiety</span>
-                                    <small class="text-muted">Saved 2 days ago</small>
-                                </div>
-                            </div>
-                            <button class="btn btn-link text-danger" onclick="removeSaved(1)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/1'">Read</button>
-                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(1)">Move</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="savedGrid" class="row g-3"></div>
 
-        <!-- Saved Item 2 -->
-        <div class="col-md-6">
-            <div class="saved-card">
-                <div class="d-flex">
-                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-graduation-cap" style="font-size: 32px; color: #5D7A5C;"></i>
-                    </div>
-                    <div class="saved-content p-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1">Exam Stress Management</h6>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Stress</span>
-                                    <small class="text-muted">Saved 1 week ago</small>
-                                </div>
-                            </div>
-                            <button class="btn btn-link text-danger" onclick="removeSaved(2)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/2'">Read</button>
-                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(2)">Move</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Saved Item 3 -->
-        <div class="col-md-6">
-            <div class="saved-card">
-                <div class="d-flex">
-                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-brain" style="font-size: 32px; color: #5D7A5C;"></i>
-                    </div>
-                    <div class="saved-content p-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1">Mindfulness Meditation Guide</h6>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Meditation</span>
-                                    <small class="text-muted">Saved 2 weeks ago</small>
-                                </div>
-                            </div>
-                            <button class="btn btn-link text-danger" onclick="removeSaved(3)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/3'">Read</button>
-                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(3)">Move</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Saved Item 4 -->
-        <div class="col-md-6">
-            <div class="saved-card">
-                <div class="d-flex">
-                    <div class="saved-icon" style="width: 80px; background: #E6E6FA; border-radius: 16px 0 0 16px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-bed" style="font-size: 32px; color: #5D7A5C;"></i>
-                    </div>
-                    <div class="saved-content p-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1">Better Sleep Guide</h6>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">Sleep</span>
-                                    <small class="text-muted">Saved 2 weeks ago</small>
-                                </div>
-                            </div>
-                            <button class="btn btn-link text-danger" onclick="removeSaved(4)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/4'">Read</button>
-                            <button class="btn btn-sm btn-outline" onclick="moveToFolder(4)">Move</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Create Folder Card -->
-    <div class="create-folder-card mt-4">
-        <div class="d-flex align-items-center justify-content-between p-3" style="background: white; border-radius: 16px;">
-            <div class="d-flex align-items-center gap-3">
-                <i class="fas fa-folder-plus" style="font-size: 24px; color: #9CAF88;"></i>
-                <span>Organize your saved resources into folders</span>
-            </div>
-            <button class="btn btn-outline" onclick="createFolder()">
-                <i class="fas fa-plus me-2"></i>New Folder
-            </button>
-        </div>
-    </div>
-
-    <!-- Empty State (hidden by default) -->
+    <!-- Empty State -->
     <div id="emptyState" class="text-center py-5" style="display: none;">
         <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
         <h5>No saved resources yet</h5>
         <p class="text-muted">When you save resources, they'll appear here</p>
-        <a href="/resources" class="btn btn-primary mt-2">
+        <a href="{% url 'pages:resources_list' %}" class="btn btn-primary mt-2">
             <i class="fas fa-compass me-2"></i>Browse Resources
         </a>
     </div>
@@ -211,14 +88,15 @@
     background: white;
     border-radius: 16px;
     overflow: hidden;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     border: 1px solid transparent;
+    height: 100%;
 }
 
 .saved-card:hover {
     transform: translateY(-3px);
     border-color: #9CAF88;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 5px 15px rgba(93, 122, 92, 0.1);
 }
 
 .category-pill {
@@ -229,7 +107,7 @@
     font-size: 0.875rem;
     color: #5D7A5C;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .category-pill:hover, .category-pill.active {
@@ -238,45 +116,192 @@
     border-color: #9CAF88;
 }
 
-.create-folder-card {
-    cursor: pointer;
-    transition: var(--transition);
+.saved-icon {
+    width: 80px;
+    background: #E6E6FA;
+    border-radius: 16px 0 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.create-folder-card:hover {
-    transform: translateY(-2px);
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
 }
 </style>
 
 <script>
-let savedCount = 8;
+// API endpoint
+const API_BASE_URL = '/api/resources';
 
-function filterSaved(filter) {
-    document.querySelectorAll('.category-pill').forEach(pill => {
-        pill.classList.remove('active');
-    });
-    event.target.classList.add('active');
+let savedResources = [];
+let filteredSaved = [];
+let currentFilter = 'all';
+
+// Load saved resources from API
+async function loadSavedResources() {
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const statsCard = document.getElementById('statsCard');
+    const categoriesFilter = document.getElementById('categoriesFilter');
     
-    flashMessages.info(`Filtering by: ${filter}`);
-    
-    // Simulate filter
-    setTimeout(() => {
-        flashMessages.success('Filter applied');
-    }, 500);
+    try {
+        // In production, this would be a real API call to get saved resources
+        // For now, we'll use localStorage to simulate saved resources
+        const savedIds = JSON.parse(localStorage.getItem('savedResources') || '[]');
+        
+        if (savedIds.length === 0) {
+            loadingSpinner.style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            return;
+        }
+        
+        // Fetch full resource details
+        const response = await fetch(`${API_BASE_URL}/api/`);
+        const allResources = await response.json();
+        
+        savedResources = allResources.filter(r => savedIds.includes(r.id));
+        filteredSaved = [...savedResources];
+        
+        // Update stats
+        document.getElementById('savedCount').textContent = savedResources.length;
+        
+        // Get unique categories
+        const categories = new Set();
+        savedResources.forEach(r => {
+            r.categories?.forEach(c => categories.add(c.name));
+        });
+        document.getElementById('categoryCount').textContent = categories.size;
+        
+        // Count recent saves (last 7 days)
+        const recent = savedResources.filter(r => {
+            const savedDate = new Date(localStorage.getItem(`saved_${r.id}`) || Date.now());
+            const daysAgo = (Date.now() - savedDate) / (1000 * 60 * 60 * 24);
+            return daysAgo <= 7;
+        });
+        document.getElementById('recentCount').textContent = recent.length;
+        
+        // Build category filters
+        const filterContainer = document.querySelector('#categoriesFilter .d-flex');
+        filterContainer.innerHTML = '<button class="category-pill active" data-category="all" onclick="filterSaved(\'all\')">All</button>';
+        categories.forEach(cat => {
+            filterContainer.innerHTML += `
+                <button class="category-pill" data-category="${cat.toLowerCase()}" onclick="filterSaved('${cat.toLowerCase()}')">${cat}</button>
+            `;
+        });
+        
+        // Hide loading, show content
+        loadingSpinner.style.display = 'none';
+        statsCard.style.display = 'block';
+        categoriesFilter.style.display = 'block';
+        document.getElementById('clearAllBtn').style.display = 'inline-block';
+        
+        renderSavedResources();
+        
+    } catch (error) {
+        console.error('Error loading saved resources:', error);
+        loadingSpinner.innerHTML = '<div class="text-danger">Failed to load saved resources</div>';
+    }
 }
 
-function removeSaved(id) {
+function renderSavedResources() {
+    const container = document.getElementById('savedGrid');
+    
+    if (filteredSaved.length === 0) {
+        container.innerHTML = '<div class="col-12 text-center py-5"><p class="text-muted">No saved resources match this filter</p></div>';
+        return;
+    }
+    
+    container.innerHTML = filteredSaved.map(resource => {
+        const savedDate = localStorage.getItem(`saved_${resource.id}`);
+        const timeAgo = savedDate ? getTimeAgo(new Date(savedDate)) : 'Recently';
+        
+        return `
+            <div class="col-md-6">
+                <div class="saved-card" data-resource-id="${resource.id}">
+                    <div class="d-flex">
+                        <div class="saved-icon">
+                            <i class="${getResourceIcon(resource.resource_type)}" style="font-size: 32px; color: #5D7A5C;"></i>
+                        </div>
+                        <div class="saved-content p-3 flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">${escapeHtml(resource.title)}</h6>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="badge" style="background: #E6E6FA; color: #5D7A5C;">${resource.categories?.[0]?.name || 'General'}</span>
+                                        <small class="text-muted">Saved ${timeAgo}</small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-link text-danger" onclick="removeSaved(${resource.id})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-sm btn-primary" onclick="window.location.href='/resources/${resource.id}/'">Read</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterSaved(category) {
+    currentFilter = category;
+    
+    // Update active pill
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.remove('active');
+        if (pill.getAttribute('data-category') === category) {
+            pill.classList.add('active');
+        }
+    });
+    
+    if (category === 'all') {
+        filteredSaved = [...savedResources];
+    } else {
+        filteredSaved = savedResources.filter(resource => 
+            resource.categories?.some(cat => cat.name?.toLowerCase() === category)
+        );
+    }
+    
+    renderSavedResources();
+}
+
+function removeSaved(resourceId) {
     if (confirm('Remove this resource from your saved items?')) {
-        const card = event.target.closest('.col-md-6');
+        const card = document.querySelector(`.saved-card[data-resource-id="${resourceId}"]`).closest('.col-md-6');
         card.style.animation = 'slideOut 0.3s ease';
         
         setTimeout(() => {
-            card.remove();
-            savedCount--;
+            // Remove from localStorage
+            const savedIds = JSON.parse(localStorage.getItem('savedResources') || '[]');
+            const updatedIds = savedIds.filter(id => id !== resourceId);
+            localStorage.setItem('savedResources', JSON.stringify(updatedIds));
+            localStorage.removeItem(`saved_${resourceId}`);
             
-            if (savedCount === 0) {
+            // Update local arrays
+            savedResources = savedResources.filter(r => r.id !== resourceId);
+            filteredSaved = filteredSaved.filter(r => r.id !== resourceId);
+            
+            card.remove();
+            
+            // Update stats
+            document.getElementById('savedCount').textContent = savedResources.length;
+            
+            if (savedResources.length === 0) {
+                document.getElementById('savedGrid').innerHTML = '';
+                document.getElementById('statsCard').style.display = 'none';
+                document.getElementById('categoriesFilter').style.display = 'none';
                 document.getElementById('emptyState').style.display = 'block';
-                document.getElementById('savedGrid').style.display = 'none';
+                document.getElementById('clearAllBtn').style.display = 'none';
             }
             
             flashMessages.success('Resource removed from saved');
@@ -286,21 +311,58 @@ function removeSaved(id) {
 
 function clearAllSaved() {
     if (confirm('Are you sure you want to remove all saved resources?')) {
+        // Clear all from localStorage
+        const savedIds = JSON.parse(localStorage.getItem('savedResources') || '[]');
+        savedIds.forEach(id => localStorage.removeItem(`saved_${id}`));
+        localStorage.removeItem('savedResources');
+        
+        savedResources = [];
+        filteredSaved = [];
+        
         document.getElementById('savedGrid').innerHTML = '';
+        document.getElementById('statsCard').style.display = 'none';
+        document.getElementById('categoriesFilter').style.display = 'none';
         document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('clearAllBtn').style.display = 'none';
+        
         flashMessages.info('All saved resources cleared');
     }
 }
 
-function moveToFolder(id) {
-    flashMessages.info('Move to folder feature coming soon!');
+function getResourceIcon(type) {
+    const icons = {
+        'article': 'fas fa-file-alt',
+        'video': 'fas fa-video',
+        'exercise': 'fas fa-lungs',
+        'tip': 'fas fa-lightbulb',
+        'guided': 'fas fa-headphones',
+        'external': 'fas fa-external-link-alt'
+    };
+    return icons[type] || 'fas fa-book';
 }
 
-function createFolder() {
-    const folderName = prompt('Enter folder name:');
-    if (folderName) {
-        flashMessages.success(`Folder "${folderName}" created!`);
-    }
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
 }
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadSavedResources();
+});
 </script>
 {% endblock %}

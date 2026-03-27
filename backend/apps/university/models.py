@@ -1,3 +1,4 @@
+# apps/university/models.py
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 import uuid
@@ -67,7 +68,8 @@ class Student(models.Model):
     department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name='students')
     year_of_entry = models.IntegerField()  # 2020, 2021, etc.
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
-    
+    # Profile Image 
+    profile_image = models.CharField(max_length=255, blank=True, null=True, help_text="Path to profile image (e.g., students/john_doe.jpg)")
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -98,49 +100,6 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.matric_number} - {self.get_full_name()}"
 
-class StudentAuth(models.Model):
-    """Authentication information for students who register"""
-    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='auth')
-    password_hash = models.CharField(max_length=128)
-    is_verified = models.BooleanField(default=False)
-    last_login = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    # Security fields
-    login_attempts = models.IntegerField(default=0)
-    locked_until = models.DateTimeField(null=True, blank=True)
-    
-    def set_password(self, raw_password):
-        """Hash and set password"""
-        self.password_hash = make_password(raw_password)
-        self.save()
-    
-    def check_password(self, raw_password):
-        """Verify password"""
-        return check_password(raw_password, self.password_hash)
-    
-    def increment_login_attempts(self):
-        """Track failed login attempts"""
-        self.login_attempts += 1
-        if self.login_attempts >= 5:
-            from django.utils import timezone
-            self.locked_until = timezone.now() + timezone.timedelta(minutes=30)
-        self.save()
-    
-    def reset_login_attempts(self):
-        """Reset after successful login"""
-        self.login_attempts = 0
-        self.locked_until = None
-        self.save()
-    
-    class Meta:
-        indexes = [
-            models.Index(fields=['student']),
-        ]
-    
-    def __str__(self):
-        return f"Auth for {self.student.matric_number}"
 
 class Enrollment(models.Model):
     """Tracks student enrollments across academic years"""

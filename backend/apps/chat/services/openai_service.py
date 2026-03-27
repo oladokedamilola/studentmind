@@ -4,6 +4,8 @@ OpenAI API integration service using GitHub Models (Microsoft Foundry Inference 
 import os
 import time
 import logging
+import random
+from functools import wraps
 from django.conf import settings
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage, AssistantMessage
@@ -12,6 +14,42 @@ from azure.core.exceptions import HttpResponseError, ServiceRequestError
 from apps.openai_integration.models import APICallLog, PromptTemplate
 
 logger = logging.getLogger(__name__)
+
+def retry_on_connection_error(max_retries=3, base_delay=1):
+    """Decorator to retry on connection errors with exponential backoff"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_error = None
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except (HttpResponseError, ServiceRequestError) as e:
+                    last_error = e
+                    # Check if it's a connection error
+                    error_str = str(e)
+                    is_connection_error = (
+                        "ConnectionResetError" in error_str or 
+                        "10054" in error_str or 
+                        "connection" in error_str.lower() or
+                        "timeout" in error_str.lower() or
+                        "reset" in error_str.lower()
+                    )
+                    
+                    if is_connection_error and attempt < max_retries - 1:
+                        delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                        logger.warning(f"Connection error on attempt {attempt + 1}/{max_retries}. Retrying in {delay:.2f}s... Error: {e}")
+                        time.sleep(delay)
+                        continue
+                    else:
+                        raise
+                except Exception as e:
+                    # For non-retryable errors, just raise
+                    raise
+            raise last_error if last_error else Exception("Max retries exceeded")
+        return wrapper
+    return decorator
+
 
 class OpenAIService:
     """Service for interacting with GitHub Models (Microsoft Foundry Inference)"""
@@ -64,9 +102,10 @@ class OpenAIService:
         
         return base_prompt
     
+    @retry_on_connection_error(max_retries=3, base_delay=1)
     def generate_response(self, message, conversation_history=None, student_context=None):
         """
-        Generate AI response using GitHub Models
+        Generate AI response using GitHub Models with automatic retry on connection errors
         """
         start_time = time.time()
         
@@ -78,12 +117,40 @@ class OpenAIService:
             messages.append(SystemMessage(self.get_system_prompt(student_context)))
             
             # Add conversation history (last 10 messages for context)
-            if conversation_history:
-                for msg in conversation_history[-10:]:
-                    if msg.sender == 'ai':
-                        messages.append(AssistantMessage(msg.decrypt_content()))
-                    elif msg.sender == 'user':
-                        messages.append(UserMessage(msg.decrypt_content()))
+            # FIX: Handle empty or small conversation_history properly
+            if conversation_history is not None:
+                # Check if it's a QuerySet or list
+                if hasattr(conversation_history, 'exists') and conversation_history.exists():
+                    # It's a QuerySet with data
+                    history_list = list(conversation_history)
+                    # Get last 10 messages (or all if less than 10)
+                    if len(history_list) > 10:
+                        history_list = history_list[-10:]
+                    
+                    for msg in history_list:
+                        try:
+                            if msg.sender == 'ai':
+                                messages.append(AssistantMessage(msg.decrypt_content()))
+                            elif msg.sender == 'user':
+                                messages.append(UserMessage(msg.decrypt_content()))
+                        except Exception as e:
+                            logger.error(f"Error processing history message: {e}")
+                            continue
+                elif isinstance(conversation_history, list) and len(conversation_history) > 0:
+                    # It's a list
+                    history_list = conversation_history
+                    if len(history_list) > 10:
+                        history_list = history_list[-10:]
+                    
+                    for msg in history_list:
+                        try:
+                            if msg.sender == 'ai':
+                                messages.append(AssistantMessage(msg.decrypt_content()))
+                            elif msg.sender == 'user':
+                                messages.append(UserMessage(msg.decrypt_content()))
+                        except Exception as e:
+                            logger.error(f"Error processing history message: {e}")
+                            continue
             
             # Add current message
             messages.append(UserMessage(message))
@@ -159,10 +226,11 @@ class OpenAIService:
                 
         except ServiceRequestError as e:
             logger.error(f"GitHub Models connection error: {e}")
+            # The retry decorator will handle retries, so this is just a fallback
             return {
                 'success': False,
                 'error': 'connection_error',
-                'message': "Unable to reach the AI service. Please check your internet connection."
+                'message': "Network issue. Please check your internet connection and try again."
             }
             
         except Exception as e:

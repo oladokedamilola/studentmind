@@ -1,216 +1,168 @@
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import login
-from django.utils import timezone
-from .models import Student, StudentAuth
-from .serializers import (
-    MatricNumberSerializer, 
-    StudentVerificationSerializer,
-    PasswordCreateSerializer,
-    LoginSerializer
-)
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from .models import Student, Department, Faculty
+import json
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def verify_matric_number(request):
-    """
-    Step 1: Student enters matric number
-    Returns student details if found in university database
-    """
-    serializer = MatricNumberSerializer(data=request.data)
-    
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    matric_number = serializer.validated_data['matric_number']
-    
+# ======================
+# UNIVERSITY API VIEWS (Data endpoints)
+# ======================
+
+@require_http_methods(["GET"])
+def verify_student(request, matric_number):
+    """Verify if a student exists by matric number"""
     try:
-        student = Student.objects.get(matric_number=matric_number)
+        student = Student.objects.select_related('department__faculty').get(
+            matric_number=matric_number
+        )
+        return JsonResponse({
+            'exists': True,
+            'student': {
+                'id': student.id,
+                'matric_number': student.matric_number,
+                'full_name': student.get_full_name(),
+                'first_name': student.first_name,
+                'middle_name': student.middle_name,
+                'last_name': student.last_name,
+                'email': student.email,
+                'department': {
+                    'id': student.department.id,
+                    'name': student.department.name,
+                    'code': student.department.code,
+                },
+                'faculty': {
+                    'id': student.department.faculty.id,
+                    'name': student.department.faculty.name,
+                    'code': student.department.faculty.code,
+                },
+                'year_of_entry': student.year_of_entry,
+                'status': student.status
+            }
+        })
     except Student.DoesNotExist:
-        return Response(
-            {'error': 'Student not found in university database'},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    # Check if already registered
-    if hasattr(student, 'auth'):
-        return Response(
-            {'error': 'Student already registered. Please login.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Return student info for verification
-    response_serializer = StudentVerificationSerializer(student)
-    return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return JsonResponse({'exists': False, 'error': 'Student not found'}, status=404)
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def create_password(request):
-    """
-    Step 2: Create password for verified student
-    """
-    serializer = PasswordCreateSerializer(data=request.data)
-    
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    matric_number = serializer.validated_data['matric_number']
-    password = serializer.validated_data['password']
-    
+@require_http_methods(["GET"])
+def get_student(request, matric_number):
+    """Get student details by matric number"""
     try:
-        student = Student.objects.get(matric_number=matric_number)
-    except Student.DoesNotExist:
-        return Response(
-            {'error': 'Student not found'},
-            status=status.HTTP_404_NOT_FOUND
+        student = Student.objects.select_related('department__faculty').get(
+            matric_number=matric_number
         )
-    
-    # Double-check not already registered
-    if hasattr(student, 'auth'):
-        return Response(
-            {'error': 'Student already registered'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Create authentication record
-    auth = StudentAuth.objects.create(student=student)
-    auth.set_password(password)
-    
-    return Response(
-        {'message': 'Password created successfully. You can now login.'},
-        status=status.HTTP_201_CREATED
-    )
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def login_student(request):
-    """
-    Step 3: Login with matric number and password
-    """
-    serializer = LoginSerializer(data=request.data)
-    
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    student = serializer.validated_data['student']
-    
-    # Update last login
-    student.auth.last_login = timezone.now()
-    student.auth.save()
-    
-    # Create session (Django's built-in session)
-    request.session['student_id'] = str(student.id)
-    request.session['matric_number'] = student.matric_number
-    request.session.set_expiry(60 * 60 * 24 * 7)  # 1 week
-    
-    # For API clients, you might want to use tokens
-    # token, created = Token.objects.get_or_create(user=student)  # Would need to adapt
-    
-    return Response({
-        'message': 'Login successful',
-        'student': {
+        return JsonResponse({
+            'id': student.id,
             'matric_number': student.matric_number,
-            'name': student.get_full_name(),
+            'full_name': student.get_full_name(),
+            'first_name': student.first_name,
+            'middle_name': student.middle_name,
+            'last_name': student.last_name,
             'email': student.email,
-            'department': student.department.name,
-        },
-        'session_id': request.session.session_key
-    }, status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def logout_student(request):
-    """
-    Logout student
-    """
-    request.session.flush()
-    return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def get_current_student(request):
-    """
-    Get currently logged in student info
-    """
-    student_id = request.session.get('student_id')
-    
-    if not student_id:
-        return Response(
-            {'error': 'Not authenticated'},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-    
-    try:
-        student = Student.objects.get(id=student_id)
+            'department': {
+                'id': student.department.id,
+                'name': student.department.name,
+                'code': student.department.code,
+            },
+            'faculty': {
+                'id': student.department.faculty.id,
+                'name': student.department.faculty.name,
+                'code': student.department.faculty.code,
+            },
+            'year_of_entry': student.year_of_entry,
+            'status': student.status
+        })
     except Student.DoesNotExist:
-        return Response(
-            {'error': 'Student not found'},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    return Response({
-        'matric_number': student.matric_number,
-        'name': student.get_full_name(),
-        'email': student.email,
-        'department': student.department.name,
-        'faculty': student.department.faculty.name,
-    }, status=status.HTTP_200_OK)
+        return JsonResponse({'error': 'Student not found'}, status=404)
 
 
-@api_view(['POST'])
-def change_password(request):
-    """
-    Change password for authenticated student
-    """
-    student_id = request.session.get('student_id')
-    
-    if not student_id:
-        return Response(
-            {'error': 'Not authenticated'},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-    
+@require_http_methods(["GET"])
+def list_departments(request):
+    """List all departments with their faculties"""
+    departments = Department.objects.select_related('faculty').all()
+    data = [{
+        'id': dept.id,
+        'name': dept.name,
+        'code': dept.code,
+        'faculty': {
+            'id': dept.faculty.id,
+            'name': dept.faculty.name,
+            'code': dept.faculty.code
+        }
+    } for dept in departments]
+    return JsonResponse({'departments': data})
+
+
+@require_http_methods(["GET"])
+def list_faculties(request):
+    """List all faculties"""
+    faculties = Faculty.objects.all()
+    data = [{
+        'id': fac.id,
+        'name': fac.name,
+        'code': fac.code
+    } for fac in faculties]
+    return JsonResponse({'faculties': data})
+
+
+@require_http_methods(["GET"])
+def list_students_by_department(request, department_id):
+    """List all students in a department"""
     try:
-        student = Student.objects.get(id=student_id)
-    except Student.DoesNotExist:
-        return Response(
-            {'error': 'Student not found'},
-            status=status.HTTP_404_NOT_FOUND
-        )
+        department = Department.objects.get(id=department_id)
+        students = Student.objects.filter(department=department)
+        data = [{
+            'id': s.id,
+            'matric_number': s.matric_number,
+            'full_name': s.get_full_name(),
+            'email': s.email,
+            'year_of_entry': s.year_of_entry,
+            'status': s.status
+        } for s in students]
+        return JsonResponse({
+            'department': department.name,
+            'students': data
+        })
+    except Department.DoesNotExist:
+        return JsonResponse({'error': 'Department not found'}, status=404)
+
+
+@require_http_methods(["GET"])
+def list_students_by_year(request, year):
+    """List all students who entered in a specific year"""
+    students = Student.objects.filter(year_of_entry=year)
+    data = [{
+        'id': s.id,
+        'matric_number': s.matric_number,
+        'full_name': s.get_full_name(),
+        'email': s.email,
+        'department': s.department.name,
+        'status': s.status
+    } for s in students]
+    return JsonResponse({
+        'year': year,
+        'count': students.count(),
+        'students': data
+    })
+
+
+@require_http_methods(["GET"])
+def student_stats(request):
+    """Get statistics about students"""
+    total_students = Student.objects.count()
+    active_students = Student.objects.filter(status='active').count()
+    by_faculty = {}
     
-    old_password = request.data.get('old_password')
-    new_password = request.data.get('new_password')
-    confirm_password = request.data.get('confirm_password')
+    faculties = Faculty.objects.all()
+    for faculty in faculties:
+        count = Student.objects.filter(department__faculty=faculty).count()
+        by_faculty[faculty.name] = count
     
-    # Verify old password
-    if not student.auth.check_password(old_password):
-        return Response(
-            {'error': 'Current password is incorrect'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Validate new password
-    if new_password != confirm_password:
-        return Response(
-            {'error': 'New passwords do not match'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    if len(new_password) < 8:
-        return Response(
-            {'error': 'Password must be at least 8 characters'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Update password
-    student.auth.set_password(new_password)
-    
-    return Response(
-        {'message': 'Password changed successfully'},
-        status=status.HTTP_200_OK
-    )
+    return JsonResponse({
+        'total_students': total_students,
+        'active_students': active_students,
+        'by_faculty': by_faculty,
+        'by_year': {
+            str(year): Student.objects.filter(year_of_entry=year).count()
+            for year in Student.objects.values_list('year_of_entry', flat=True).distinct()
+        }
+    })

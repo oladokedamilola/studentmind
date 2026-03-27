@@ -3,7 +3,7 @@ const STATIC_CACHE = 'mindhaven-static-v1';
 const DYNAMIC_CACHE = 'mindhaven-dynamic-v1';
 const API_CACHE = 'mindhaven-api-v1';
 
-// Assets to cache on install
+// Assets to cache on install - using Django static paths
 const staticAssets = [
   '/',
   '/offline/',
@@ -13,18 +13,25 @@ const staticAssets = [
   '/static/js/auth.js',
   '/static/js/validation.js',
   '/static/js/flash-messages.js',
-  '/static/icons/icon-192x192.png',
-  '/static/icons/icon-512x512.png',
+  '/static/js/pwa.js',
+  '/static/images/fav.png',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
 ];
 
 // Install event
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
-      .then(cache => cache.addAll(staticAssets))
+      .then(cache => {
+        console.log('Caching static assets');
+        return cache.addAll(staticAssets);
+      })
       .then(() => self.skipWaiting())
+      .catch(error => {
+        console.log('Cache addAll failed:', error);
+      })
   );
 });
 
@@ -34,7 +41,10 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys => {
       return Promise.all(
         keys.filter(key => key !== STATIC_CACHE && key !== DYNAMIC_CACHE && key !== API_CACHE)
-          .map(key => caches.delete(key))
+          .map(key => {
+            console.log('Deleting old cache:', key);
+            return caches.delete(key);
+          })
       );
     }).then(() => self.clients.claim())
   );
@@ -44,7 +54,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   
-  // API requests - Network first, then cache (stale-while-revalidate)
+  // API requests - Network first, then cache
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request)
@@ -66,7 +76,12 @@ self.addEventListener('fetch', event => {
   if (event.request.url.match(/\.(css|js|png|jpg|jpeg|svg|ico)$/)) {
     event.respondWith(
       caches.match(event.request)
-        .then(response => response || fetch(event.request))
+        .then(response => {
+          return response || fetch(event.request);
+        })
+        .catch(() => {
+          return fetch(event.request);
+        })
     );
     return;
   }
@@ -82,9 +97,10 @@ self.addEventListener('fetch', event => {
           });
           return response;
         })
-        .catch(() => {
-          return caches.match(event.request)
-            .then(cached => cached || caches.match('/offline/'));
+        .catch(async () => {
+          const cachedResponse = await caches.match(event.request);
+          if (cachedResponse) return cachedResponse;
+          return caches.match('/offline/');
         })
     );
     return;
@@ -106,20 +122,34 @@ self.addEventListener('sync', event => {
 
 async function syncMessages() {
   try {
-    const db = await openDB();
-    const offlineMessages = await getOfflineMessages(db);
-    
-    for (const message of offlineMessages) {
-      await fetch('/api/chat/send/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(message)
-      });
-      await deleteOfflineMessage(db, message.id);
-    }
+    console.log('Syncing offline messages...');
+    // Add your sync logic here when implementing IndexedDB
   } catch (error) {
     console.log('Background sync failed:', error);
   }
 }
+
+// Push notification support
+self.addEventListener('push', event => {
+  const data = event.data.json();
+  const options = {
+    body: data.body,
+    icon: '/static/images/fav.png',
+    badge: '/static/images/fav.png',
+    vibrate: [200, 100, 200],
+    data: {
+      url: data.url || '/'
+    }
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'MindHaven', options)
+  );
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow(event.notification.data.url)
+  );
+});

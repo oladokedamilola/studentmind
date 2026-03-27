@@ -18,6 +18,15 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'images/fav.png' %}">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MindHaven">
+    <link rel="apple-touch-icon" href="{% static 'images/fav.png' %}">
+    <meta name="theme-color" content="#2C3E2C">
+    <meta name="mobile-web-app-capable" content="yes">
     
     <style>
         /* Emergency responsive fixes */
@@ -352,5 +361,22 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+
+
+<script src="{% static 'js/pwa.js' %}"></script>
+<script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('ServiceWorker registered: ', registration);
+                })
+                .catch(error => {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+        });
+    }
+</script>
 </body>
 </html>

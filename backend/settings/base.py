@@ -99,13 +99,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'frontend',  # Include the whole frontend directory
-    # You can keep these for clarity, but they're now redundant
-    # BASE_DIR / 'frontend/css',
-    # BASE_DIR / 'frontend/js',
-    # BASE_DIR / 'frontend/images',
+    BASE_DIR / 'frontend',  # Your frontend folder with css, js, images
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# For serving manifest.json and service-worker.js correctly
+WHITENOISE_ROOT = BASE_DIR / 'frontend'  # whitenoise in production
 
 # Media files
 MEDIA_URL = '/media/'

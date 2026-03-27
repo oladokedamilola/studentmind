@@ -1,85 +1,41 @@
-{% extends 'base/public_base.html' %}
+{% extends "base/public_base.html" %}
 {% load static %}
 
-{% block title %}You're Offline - MindHaven{% endblock %}
+{% block title %}Offline - MindHaven{% endblock %}
 
 {% block content %}
-<div class="offline-page min-vh-100 d-flex align-items-center">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 text-center">
-                <div class="offline-icon mb-4">
-                    <img src="{% static 'images/offline.svg' %}" alt="Offline" class="img-fluid" style="max-width: 200px;">
-                </div>
-                
-                <h1 class="display-4 mb-3">You're Offline</h1>
-                
-                <p class="lead mb-4">
-                    Don't worry! You can still access your saved resources 
-                    and previous conversations. Your new messages will be 
-                    sent automatically when you're back online.
-                </p>
-                
-                <div class="offline-actions">
-                    <a href="{% url 'pages:dashboard' %}" class="btn btn-sage btn-lg mb-3">
-                        Go to Dashboard
-                    </a>
-                    
-                    <div class="saved-content mt-4">
-                        <h5>Available Offline:</h5>
-                        <div class="row g-3 mt-2">
-                            <div class="col-6">
-                                <div class="offline-card p-3">
-                                    <span class="emoji">💬</span>
-                                    <span>Last 50 messages</span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="offline-card p-3">
-                                    <span class="emoji">📚</span>
-                                    <span>Saved resources</span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="offline-card p-3">
-                                    <span class="emoji">📊</span>
-                                    <span>Mood history</span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="offline-card p-3">
-                                    <span class="emoji">🆘</span>
-                                    <span>Crisis contacts</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="connection-status mt-5">
-                    <p class="text-muted">
-                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        Waiting for connection...
-                    </p>
-                </div>
+<div class="container py-5" style="max-width: 600px;">
+    <div class="text-center">
+        <div style="font-size: 5rem; margin-bottom: 1.5rem;">
+            📡
+        </div>
+        <h1 class="display-4 mb-3" style="color: #2C3E2C;">You're Offline</h1>
+        <p class="lead mb-4" style="color: #5A6B7A;">
+            Looks like you've lost your internet connection.
+            Don't worry, you can still access previously visited pages.
+        </p>
+        
+        <div class="card mb-4" style="background: #FDF6E9;">
+            <div class="card-body">
+                <h5 class="mb-3">✨ You can still:</h5>
+                <ul class="text-start">
+                    <li>Browse previously loaded resources</li>
+                    <li>View your mood history (cached)</li>
+                    <li>Read saved articles</li>
+                </ul>
+                <p class="small text-muted mb-0">Messages will be sent when you're back online</p>
             </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="location.reload()">
+            <i class="fas fa-sync-alt me-2"></i>Try Again
+        </button>
+        
+        <div class="mt-4">
+            <a href="/" class="btn btn-link" style="color: #5A6B7A;">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
         </div>
     </div>
 </div>
-
-<style>
-.offline-card {
-    background: var(--cream);
-    border-radius: 12px;
-    transition: transform 0.2s;
-}
-.offline-card:hover {
-    transform: translateY(-2px);
-}
-.offline-card .emoji {
-    display: block;
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-</style>
 {% endblock %}
